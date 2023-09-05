@@ -1,1 +1,14 @@
 *.o
+
+/autom4te.cache
+/compile
+/config.status
+/COPYING
+/depcomp
+/INSTALL
+/install-sh
+/Makefile.in
+/missing
+
+/src/.deps
+/Makefile.in
