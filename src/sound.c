@@ -37,7 +37,6 @@ uint8_t snfreqhi[4],snfreqlo[4];
 uint8_t snvol[4];
 uint8_t snnoise;
 int lasttone;
-int soundon=1;
 int curwave=0;
 
 int16_t snwaves[5][32]=

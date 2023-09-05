@@ -9,6 +9,8 @@
 /install-sh
 /Makefile.in
 /missing
-
+/discs
+/tapes
+/roms
 /src/.deps
 /Makefile.in

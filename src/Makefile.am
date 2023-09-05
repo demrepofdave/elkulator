@@ -23,5 +23,5 @@ elkulator_SOURCES = 2xsai.c 1770.c 6502.c adc.c adf.c config.c csw.c ddnoise.c \
 debugger.c disc.c fdi2raw.c fdi.c firstbyte.c linux.c linux-gui.c \
 linux-keydefine.c main.c mem.c palfilt.c parallel.c savestate.c scale2x.c \
 serial.c socket.c sound.c soundopenal.c ssd.c tapenoise.c uef.c ula.c \
-allegro_icon.c
+allegro_icon.c globaldefs.c
 

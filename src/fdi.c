@@ -28,6 +28,16 @@ int fdirsector=0;
 
 uint16_t CRCTable[256];
 
+void (*fdccallback)();
+void (*fdcdata)(uint8_t dat);
+void (*fdcspindown)();
+void (*fdcfinishread)();
+void (*fdcnotfound)();
+void (*fdcdatacrcerror)();
+void (*fdcheadercrcerror)();
+void (*fdcwriteprotect)();
+int  (*fdcgetdata)(int last);
+
 void setupcrc(uint16_t poly, uint16_t rvalue)
 {
 	int c = 256, bc;
