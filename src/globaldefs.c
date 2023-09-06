@@ -9,7 +9,7 @@
 
 int curdrive = 0;
 drive_t drives[MAX_DRIVES];
-char exedir[512];
+char exedir[MAX_PATH_AND_FILE_SIZE];
 int pauseit=0;
 int soundon=1;
 int output=0;

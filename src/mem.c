@@ -89,7 +89,7 @@ void loadroms()
         sndrom = rombanks[SOUND_BANK];
         adfs = rombanks[ADFS_BANK];
 
-        char path[512],p2[512];
+        char path[MAX_PATH_AND_FILE_SIZE],p2[512];
         getcwd(p2,511);
         sprintf(path,"%sroms",exedir);
         printf("path now %s\n",path);

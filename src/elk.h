@@ -210,7 +210,9 @@ extern int ddvol,ddtype;
 extern int discspd;
 extern int motorspin;
 
-extern char exedir[512];
+#define MAX_PATH_AND_FILE_SIZE 512
+
+extern char exedir[MAX_PATH_AND_FILE_SIZE];
 
 void initelk();
 void closeelk();
