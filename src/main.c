@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "uef.h"
 #undef printf
 int autoboot;
 FILE *rlog;

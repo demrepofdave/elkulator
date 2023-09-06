@@ -202,7 +202,7 @@ static const char *allegico_xpm[] = {
 "N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N."
 };
 //#if defined ALLEGRO_WITH_XWINDOWS && defined ALLEGRO_USE_CONSTRUCTOR
-extern void *allegro_icon;
+void *allegro_icon;
 CONSTRUCTOR_FUNCTION(static void _set_allegro_icon(void));
 static void _set_allegro_icon(void)
 {

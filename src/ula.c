@@ -5,6 +5,7 @@
 #include <zlib.h>
 #include "elk.h"
 #include "2xsai.h"
+#include "uef.h"
 
 void dosavescrshot();
 void saveframe();
