@@ -206,8 +206,8 @@ void debugout(char *s)
 
 void debugout(char *s)
 {
-        printf(s);
-fflush(stdout);
+        printf("%s",s);
+        fflush(stdout);
 }
 
 void startdebug()
