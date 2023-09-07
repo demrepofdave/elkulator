@@ -90,8 +90,9 @@ extern int drawmode;
 #define TAPE_REALLY 2
 extern int tapespeed;
 
+#define MAX_DRIVES 2
 
-struct
+typedef struct
 {
         void (*seek)(int drive, int track);
         void (*readsector)(int drive, int sector, int track, int side, int density);
@@ -99,9 +100,11 @@ struct
         void (*readaddress)(int drive, int track, int side, int density);
         void (*format)(int drive, int track, int side, int density);
         void (*poll)();
-} drives[2];
+} drive_t;
 
-int curdrive;
+extern drive_t drives[MAX_DRIVES];
+
+extern int curdrive;
 
 void ssd_reset();
 void ssd_load(int drive, char *fn);
@@ -151,15 +154,15 @@ void setejecttext(int drive, char *fn);
 
 #define WD1770 1
 
-void (*fdccallback)();
-void (*fdcdata)(uint8_t dat);
-void (*fdcspindown)();
-void (*fdcfinishread)();
-void (*fdcnotfound)();
-void (*fdcdatacrcerror)();
-void (*fdcheadercrcerror)();
-void (*fdcwriteprotect)();
-int  (*fdcgetdata)(int last);
+extern void (*fdccallback)();
+extern void (*fdcdata)(uint8_t dat);
+extern void (*fdcspindown)();
+extern void (*fdcfinishread)();
+extern void (*fdcnotfound)();
+extern void (*fdcdatacrcerror)();
+extern void (*fdcheadercrcerror)();
+extern void (*fdcwriteprotect)();
+extern int  (*fdcgetdata)(int last);
 
 extern int writeprot[2],fwriteprot[2];
 extern int defaultwriteprot;
@@ -207,7 +210,9 @@ extern int ddvol,ddtype;
 extern int discspd;
 extern int motorspin;
 
-char exedir[512];
+#define MAX_PATH_AND_FILE_SIZE 512
+
+extern char exedir[MAX_PATH_AND_FILE_SIZE];
 
 void initelk();
 void closeelk();

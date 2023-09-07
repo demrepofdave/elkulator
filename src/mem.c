@@ -11,7 +11,8 @@ int FASTHIGH2=0;
 //#define FASTLOW (turbo || (mrb && mrbmode && mrbmapped))
 #define FASTHIGH (FASTHIGH2 && ((pc&0xE000)!=0xC000))
 
-int output,timetolive;
+extern int output;
+extern int timetolive;
 int mrbmapped=0;
 int plus1=0;
 uint8_t readkeys(uint16_t addr);
@@ -88,7 +89,8 @@ void loadroms()
         sndrom = rombanks[SOUND_BANK];
         adfs = rombanks[ADFS_BANK];
 
-        char path[512],p2[512];
+        char path[MAX_PATH_AND_FILE_SIZE + 5]; // TODO: Fix magic number (sizeof roms)
+        char p2[512];
         getcwd(p2,511);
         sprintf(path,"%sroms",exedir);
         printf("path now %s\n",path);
@@ -222,7 +224,7 @@ uint8_t readmem(uint16_t addr)
         return os[addr&0x3FFF];
 }
 
-uint16_t pc;
+extern uint16_t pc;
 void writemem(uint16_t addr, uint8_t val)
 {
         if (debugon) debugwrite(addr,val);

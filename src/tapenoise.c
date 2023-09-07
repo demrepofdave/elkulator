@@ -20,7 +20,8 @@ SAMPLE *tsamples[2];
 
 void maketapenoise()
 {
-        char path[512],p2[512];
+        char path[MAX_PATH_AND_FILE_SIZE + 8]; // TODO: Fix magic number (sizeof ddnoise)
+        char p2[512];
         int c;
 
         getcwd(p2,511);

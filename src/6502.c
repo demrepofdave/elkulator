@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include "elk.h"
 
-int timetolive;
+extern int timetolive;
 int ins=0;
 int ulacycles;
 uint8_t a,x,y,s;
-uint16_t pc;
+extern uint16_t pc;
 CPUStatus p;
 
 int cycles;
@@ -169,8 +169,9 @@ uint8_t tempb;
                                 a=(al&0xF)|((ah&0xF)<<4);                 \
                         }
 
-int output=0;
-uint16_t oldpc2,oldpc;
+extern int output;
+extern uint16_t oldpc;
+uint16_t oldpc2;
 void exec6502()
 {
         uint16_t addr,addr2;

@@ -84,7 +84,7 @@ void loadconfig()
         char *s;
         int c;
         char s2[20];
-        char fn[256];
+        char fn[MAX_PATH_AND_FILE_SIZE + 8]; // TODO: Fix magic number (sizeof "/elk.cfg")
         sprintf(fn,"%s/elk.cfg",exedir);
         cfgfile=fopen(fn,"rt");
         tapespeed=getintcfg("tapespeed",0);
@@ -147,7 +147,7 @@ void saveconfig()
 {
         int c;
         char s[20];
-        char fn[256];
+        char fn[MAX_PATH_AND_FILE_SIZE + 8]; // TODO: Fix magic number (sizeof "/elk.cfg")
         sprintf(fn,"%s/elk.cfg",exedir);
         cfgfile=fopen(fn,"wt");
         writeintcfg("tapespeed",tapespeed);

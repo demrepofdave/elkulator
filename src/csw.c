@@ -5,7 +5,7 @@
 #include "elk.h"
 
 #define HIGHTONE 0x40
-int reallyfasttapebreak;
+extern int reallyfasttapebreak;
 int cintone=1,cindat=0,datbits=0,enddat=0;
 FILE *cswf;
 char csws[256];
@@ -13,8 +13,8 @@ FILE *cswlog;
 uint8_t *cswdat;
 int cswpoint;
 uint8_t cswhead[0x34];
-int tapelcount,tapellatch,pps;
-int cswena;
+extern int tapelcount,tapellatch, pps;
+extern int cswena;
 int cswskip=0;
 int tapespeed=0;
 

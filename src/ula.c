@@ -5,6 +5,7 @@
 #include <zlib.h>
 #include "elk.h"
 #include "2xsai.h"
+#include "uef.h"
 
 void dosavescrshot();
 void saveframe();
@@ -29,7 +30,8 @@ int irq=0,nmi=0;
 int extrom,rombank,intrombank;
 int tapeon;
 
-int soundlimit,soundon,soundcount,soundstat;
+int soundlimit,soundcount,soundstat;
+extern int soundon;
 uint8_t sndstreambuf[626];
 int sndstreamindex = 0;
 int sndstreamcount = 0;
@@ -426,8 +428,8 @@ void tapenextbyte()
 }
 
 int fasttapebreak;
-int pauseit=0;
-int cswena;
+extern int pauseit;
+extern int cswena;
 int bitcount;
 void polltape()
 {

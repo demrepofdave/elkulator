@@ -22,8 +22,9 @@ int ddtype=0;
 
 void loaddiscsamps()
 {
-        char path[512],p2[512];
-        getcwd(p2,511);
+        char path[MAX_PATH_AND_FILE_SIZE + 12]; // TODO: Magic number - fix (sizeof) ddnoise/525
+        char p2[MAX_PATH_AND_FILE_SIZE];
+        getcwd(p2,(MAX_PATH_AND_FILE_SIZE - 1));
         printf("In %s\n",p2);
         if (ddtype) sprintf(path,"%sddnoise/35",exedir);
         else        sprintf(path,"%sddnoise/525",exedir);

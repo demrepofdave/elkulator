@@ -206,8 +206,8 @@ void debugout(char *s)
 
 void debugout(char *s)
 {
-        printf(s);
-fflush(stdout);
+        printf("%s",s);
+        fflush(stdout);
 }
 
 void startdebug()
@@ -451,7 +451,8 @@ void debugwrite(uint16_t addr, uint8_t val)
         }
 }
 
-uint16_t oldpc,oldoldpc;
+extern uint16_t oldpc;
+uint16_t oldoldpc;
 void dodebugger()
 {
         int c,d,e;
