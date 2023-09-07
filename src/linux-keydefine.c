@@ -356,7 +356,7 @@ DIALOG bemdefinegui[] =
         {d_button_proc, 205,232,60,28,  FG,BG,  0,   D_CLOSE, 1,  0,              "OK",     NULL,      NULL},
         {d_button_proc, 271,232,60,28,  FG,BG,  0,   D_CLOSE, 0,  0,              "Cancel", NULL,      NULL},
 
-        {d_getkey,      8,8,522,28,     FG,BG,  0,   D_EXIT,  0,  KEY_F10,       "Menu",   NULL,      NULL},
+        {d_getkey,      8,8,522,28,     FG,BG,  0,   D_EXIT,  0,  KEY_HOME,       "Menu",   NULL,      NULL},
 
         {d_getkey,      26,56,28,28,    FG,BG,  0,   D_EXIT,  0,  KEY_ESC,        "ESC",    NULL,      NULL},
         {d_getkey,      58,56,28,28,    FG,BG,  0,   D_EXIT,  0,  KEY_1,          "1",      NULL,      NULL},
