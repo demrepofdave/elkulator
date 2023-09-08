@@ -301,7 +301,7 @@ int break_pressed()
 
 int menu_pressed()
 {
-        return key[KEY_F11];
+        return key[HOME];
 }
 
 #endif
