@@ -9,6 +9,7 @@ jobs:
       - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
       - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}."
       - name: Install required apt files
+        run: sudo apt-get update
         run: sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev
       - name: Check out repository code
         uses: actions/checkout@v3
