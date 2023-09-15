@@ -1,4 +1,4 @@
-name: GitHub Actions Demo
+name: Check and Build Elkulator
 run-name: CI Build for Linux Elkulator requested by ${{ github.actor }}
 on: [push]
 jobs:
