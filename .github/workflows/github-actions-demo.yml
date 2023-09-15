@@ -18,7 +18,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - name: Configure
-        run: ./autoconfigure.sh
+        run: ./scripts/autoconfigure.sh
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
