@@ -1,5 +1,5 @@
 name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+run-name: CI Build for Linux Elkulator requested by ${{ github.actor }}
 on: [push]
 jobs:
   Explore-GitHub-Actions:
@@ -11,7 +11,7 @@ jobs:
       - name: Install required apt files
         run: |
          sudo apt-get update
-         sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev
+         sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: List files in the repository
@@ -19,6 +19,8 @@ jobs:
           ls ${{ github.workspace }}
       - name: Configure
         run: ./autoconfigure.sh
+      - name: Check source (cppcheck)
+        run: cppcheck .
       - name: Build source
         run: make
       - run: echo "Job Complete.  Status job ${{ job.status }}."
