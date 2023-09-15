@@ -2,7 +2,7 @@ name: GitHub Actions Demo
 run-name: CI Build for Linux Elkulator requested by ${{ github.actor }}
 on: [push]
 jobs:
-  Check and Build Elkulator (Linux):
+  Check and Build Elkulator - Linux:
     runs-on: ubuntu-latest
     steps:
       - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
@@ -24,7 +24,7 @@ jobs:
         run: make
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
-  Check and Build Elkulator (Windows):
+  Check and Build Elkulator - Windows:
     runs-on: windows-latest
     steps:
       - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
