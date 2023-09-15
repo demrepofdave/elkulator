@@ -2,10 +2,9 @@ name: GitHub Actions Demo
 run-name: CI Build for Linux Elkulator requested by ${{ github.actor }}
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Check and Build Elkulator (Linux):
     runs-on: ubuntu-latest
     steps:
-      - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
       - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}."
       - name: Install required apt files
@@ -23,4 +22,16 @@ jobs:
         run: cppcheck .
       - name: Build source
         run: make
+      - run: echo "Job Complete.  Status job ${{ job.status }}."
+
+  Check and Build Elkulator (Windows):
+    runs-on: windows-latest
+    steps:
+      - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
+      - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: List files in the repository
+        run: |
+          dir ${{ github.workspace }}
       - run: echo "Job Complete.  Status job ${{ job.status }}."
