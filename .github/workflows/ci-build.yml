@@ -1,6 +1,6 @@
 name: Check and Build Elkulator
 run-name: CI Build for Linux Elkulator requested by ${{ github.actor }}
-on: [commit]
+on: [push]
 jobs:
   Check-and-Build-Elkulator-Linux:
     runs-on: ubuntu-latest
