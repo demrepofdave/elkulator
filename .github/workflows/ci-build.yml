@@ -2,8 +2,8 @@ name: Check and Build Elkulator
 run-name: CI Build for Linux Elkulator requested by ${{ github.actor }}
 on: [push]
 jobs:
-  Check-and-Build-Elkulator-Linux:
-    runs-on: ubuntu-latest
+  Build-Ubuntu-24.04:
+    runs-on: ubuntu-24.04
     steps:
       - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
       - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}."
@@ -24,7 +24,30 @@ jobs:
         run: make
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
-  Check-and-Build-Elkulator-Windows:
+  Build-Ubuntu-22.04:
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
+      - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}."
+      - name: Install required apt files
+        run: |
+         sudo apt-get update
+         sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - name: Configure
+        run: ./scripts/autoconfigure.sh
+      - name: Check source (cppcheck)
+        run: cppcheck .
+      - name: Build source
+        run: make
+      - run: echo "Job Complete.  Status job ${{ job.status }}."
+
+
+  Build-Windows-latest:
     runs-on: windows-latest
     steps:
       - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
