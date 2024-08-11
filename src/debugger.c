@@ -31,7 +31,8 @@ void _debugthread(PVOID pvoid)
         HDC hDC;
         //PAINTSTRUCT ps;
         int x;
-        int c,d;
+        int c = 0;
+        int d;
         
         usdat=malloc(256*256*4);
         if (!debugstarted)

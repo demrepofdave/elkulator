@@ -3,13 +3,17 @@
 /autom4te.cache
 /compile
 /config.status
+/COPYING
 /config.log
 /configure
 /depcomp
+/INSTALL
+/install-sh
 /discs
 /elkulator
 /Makefile.in
 /Makefile
+/missing
 /roms
 /tapes
 /src/.deps
