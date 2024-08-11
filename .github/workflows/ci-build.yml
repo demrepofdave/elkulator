@@ -2,7 +2,7 @@ name: Check and Build Elkulator
 run-name: CI Build for Linux Elkulator requested by ${{ github.actor }}
 on: [push]
 jobs:
-  Build-Ubuntu-24.04:
+  Build-Ubuntu-2404:
     runs-on: ubuntu-24.04
     steps:
       - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
@@ -24,7 +24,7 @@ jobs:
         run: make
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
-  Build-Ubuntu-22.04:
+  Build-Ubuntu-2204:
     runs-on: ubuntu-22.04
     steps:
       - run: echo "This job running on a ${{ runner.os }}, triggered by ${{ github.event_name }} event."
