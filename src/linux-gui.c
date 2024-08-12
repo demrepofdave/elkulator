@@ -712,7 +712,6 @@ void entergui()
 
         updatelinuxgui();
 
-
         set_color_depth(desktop_color_depth());
         show_mouse(screen);
         bemgui[0].x=(windx/2)-36;
@@ -726,7 +725,7 @@ void entergui()
                 allegro_gl_set_allegro_mode();
         }*/
         dp=init_dialog(bemgui,0);
-        while (x && !menu_pressed() && !key[KEY_ESC])
+        while (x && !menu_pressed() && !key[KEY_ESC] && !quited)
         {
 /*                if (opengl)
                 {
