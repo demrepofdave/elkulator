@@ -7,8 +7,8 @@
 #include "elk.h"
 
 
-static const char * ddnoise35 = "dnoise/35";   // Name of directory containing wav files to emulate noise of 3.5 inch Disk Drive
-static const char * ddnoise525 = "dnoise/525"; // Name of directory containing wav files to emulate noise of 5.25 inch Disk Drive
+static const char * ddnoise35 = "ddnoise/35";   // Name of directory containing wav files to emulate noise of 3.5 inch Disk Drive
+static const char * ddnoise525 = "ddnoise/525"; // Name of directory containing wav files to emulate noise of 5.25 inch Disk Drive
 
 int ddvol=3;
 SAMPLE *seeksmp[4][2],*seek2smp,*seek3smp;
