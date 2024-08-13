@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <zlib.h>
 #include "elk.h"
-#include "2xsai.h"
+#include "hal/2xsai.h"
 
 void dosavescrshot();
 void saveframe();

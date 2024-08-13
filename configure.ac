@@ -4,12 +4,11 @@
 AC_PREREQ([2.61])
 AC_INIT(Elkulator, 1.0, Sarah Walker <b-em@bbcmicro.com>, elkulator)
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_MACRO_DIRS([m4])
 AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_CC_C_O
-
 
 
 AC_MSG_CHECKING([whether to enable debugging])

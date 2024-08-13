@@ -698,7 +698,7 @@ DIALOG bemgui[]=
         {0,0,0,0,0,0,0,0,0,0,0,NULL,NULL,NULL}
 };
 
-BITMAP *mouse,*_mouse_sprite;
+//BITMAP *mouse,*_mouse_sprite;
 
 void entergui()
 {

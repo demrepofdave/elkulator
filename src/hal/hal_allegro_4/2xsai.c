@@ -1,7 +1,7 @@
 #include <string.h>
 #include <allegro.h>
 #include <allegro/internal/aintern.h>
-#include "2xsai.h"
+#include "hal/2xsai.h"
 
 //#define TRACE rpclog
 #define uint32 unsigned long

@@ -323,9 +323,6 @@ void startblit();
 void endblit();
 void setquit();
 
-void scale2x(BITMAP *src, BITMAP *dst, int width, int height);
-void palfilter(BITMAP *src, BITMAP *dest, int depth);
-
 void entergui();
 
 /* Plus 1 parallel port */
