@@ -10,6 +10,17 @@
 
 static bool hal_initialized = FALSE;
 
+PALETTE elkpal =
+{
+      {0,0,0},
+      {63,0,0},
+      {0,63,0},
+      {63,63,0},
+      {0,0,63},
+      {63,0,63},
+      {0,63,63},
+      {63,63,63},
+};
 
 typedef struct tbitmapTableEntry
 {
@@ -149,6 +160,67 @@ hal_result hal_install_mouse()
     if(result == HAL_OK)
     {
         install_mouse();
+    }
+    return result;
+}
+
+hal_result hal_set_elk_palette()
+{
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        set_palette(elkpal);
+    }
+    return result;
+}
+
+int hal_get_desktop_color_depth()
+{
+    int depth = -1;
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        depth = desktop_color_depth();
+    }
+    return depth;
+}
+
+hal_result hal_set_color_depth(int depth)
+{
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        set_color_depth(depth);
+    }
+    return result;
+}
+
+hal_result hal_set_gfx_mode_autodetect_windowed(int w, int h, int v_w, int v_h)
+{
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
+    }
+    return result;
+}
+
+hal_result hal_set_gfx_mode_autodetect_fullscreen(int w, int h, int v_w, int v_h)
+{
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, w, h, v_w, v_h);
+    }
+    return result;
+}
+
+hal_result hal_init_2xSaI(int depth)
+{
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        Init_2xSaI(depth);
     }
     return result;
 }

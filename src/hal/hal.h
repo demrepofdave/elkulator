@@ -32,6 +32,14 @@ hal_result hal_init(); // Initialise the HAL. This must be done before any other
 hal_result hal_set_window_title(const char * name);
 hal_result hal_set_close_button_callback( void (*handler_function)(void));
 hal_result hal_install_mouse();
+hal_result hal_init_2xSaI(int depth);
+
+// Palette and colour handling functions.
+hal_result hal_set_elk_palette();
+int        hal_get_desktop_color_depth();
+hal_result hal_set_color_depth(int depth);
+hal_result hal_set_gfx_mode_autodetect_windowed(int w, int h, int v_w, int v_h);
+hal_result hal_set_gfx_mode_autodetect_fullscreen(int w, int h, int v_w, int v_h);
 
 // Bitmap management
 hal_bitmap_handle hal_allocate_bitmap(); // Returns a handler to a BITMAP type and initialises the base BITMAP

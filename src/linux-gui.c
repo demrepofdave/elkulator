@@ -712,7 +712,7 @@ void entergui()
 
         updatelinuxgui();
 
-        set_color_depth(desktop_color_depth());
+        hal_set_color_depth(hal_get_desktop_color_depth());
         show_mouse(screen);
         bemgui[0].x=(windx/2)-36;
         bemgui[0].y=windy-8;
@@ -758,7 +758,7 @@ void entergui()
                 destroy_bitmap(guib);
                 allegro_gl_unset_allegro_mode();
         }*/
-        set_color_depth(8);
+        hal_set_color_depth(8);
 
         while (menu_pressed()) rest(100);
 

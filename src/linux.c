@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "elk.h"
 #include "hal/hal.h"
+#include "hal/hal_end_of_main.h"
 
 char ssname[260];
 char scrshotname[260];

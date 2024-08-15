@@ -340,7 +340,7 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
                         Sleep(200);
                         updatewindowsize(800,600);
                         enterfullscreen();
-//                        set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, 640, 512, 0, 0);
+//                        hal_set_gfx_mode_autodetect_fullscreen(640, 512, 0, 0);
                         setmenu(NULL);
                         fullscreen=1;
                         key[KEY_ALT]=key[KEY_ENTER]=0;
@@ -352,7 +352,7 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
                         startblit();
                         Sleep(200);
                         leavefullscreen();
-//                        set_gfx_mode(GFX_AUTODETECT_WINDOWED, 640, 512, 0, 0);
+//                        hal_set_gfx_mode_autodetect_windowed(640, 512, 0, 0);
                         setmenu(ghmenu);
                         updatewindowsize(640,512);
 //                        SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);

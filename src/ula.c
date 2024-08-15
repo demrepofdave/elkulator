@@ -1,10 +1,9 @@
 /*Elkulator v1.0 by Sarah Walker
   ULA and video emulation*/
-#include <allegro.h>
 #include <stdio.h>
+#include <string.h>
 #include <zlib.h>
 #include "elk.h"
-#include "hal/2xsai.h"
 #include "hal/hal.h"
 
 void dosavescrshot();
@@ -76,17 +75,7 @@ void clearall()
 
 uint8_t pal[16];
 int palwritenum=0,palwritenum2=0;
-PALETTE elkpal =
-{
-      {0,0,0},
-      {63,0,0},
-      {0,63,0},
-      {63,63,0},
-      {0,0,63},
-      {63,0,63},
-      {0,63,63},
-      {63,63,63},
-};
+
 
 uint8_t ulalookup[256];
 void initula()
@@ -100,23 +89,23 @@ void initula()
         handle_vidb = hal_allocate_bitmap();
 
 //        allegro_init();
-        coldepth=desktop_color_depth();
-        set_color_depth(desktop_color_depth());
+        coldepth=hal_get_desktop_color_depth();
+        hal_set_color_depth(coldepth);
         #ifdef WIN32
-        set_gfx_mode(GFX_AUTODETECT_WINDOWED,2048,2048,0,0);
+        hal_set_gfx_mode_autodetect_windowed(2048,2048,0,0);
         vidb=create_video_bitmap(800,300);
         #else
-        set_gfx_mode(GFX_AUTODETECT_WINDOWED,640,512,0,0);
+        hal_set_gfx_mode_autodetect_windowed(640,512,0,0);
         winsizex=640; winsizey=512;
         #endif
         hal_create_bitmap(handle_b16,  800*2,600);
         hal_create_bitmap(handle_b162, 640,256);
         hal_clear_bitmap(handle_b16);
-        Init_2xSaI(desktop_color_depth());
+        hal_init_2xSaI(hal_get_desktop_color_depth());
         initpaltables();
-        set_color_depth(8);
+        hal_set_color_depth(8);
         hal_create_bitmap(handle_b, 640,616);
-        set_palette(elkpal);
+        hal_set_elk_palette();
         for (c=0;c<256;c++)
         {
                 ulalookup[c]=0;
@@ -125,7 +114,7 @@ void initula()
                 if (c&0x20) ulalookup[c]|=4;
                 if (c&0x80) ulalookup[c]|=8;
         }
-        set_color_depth(desktop_color_depth());
+        hal_set_color_depth(hal_get_desktop_color_depth());
 
         /* Clear the sound stream buffer before we start filling it. */
         memset(sndstreambuf, 0, sizeof(sndstreambuf));
@@ -138,8 +127,8 @@ void enterfullscreen()
         #ifdef WIN32
         destroy_bitmap(vidb);
         #endif
-        set_color_depth(desktop_color_depth());
-        set_gfx_mode(GFX_AUTODETECT_FULLSCREEN,800,600,0,0);
+        hal_set_color_depth(hal_get_desktop_color_depth());
+        hal_set_gfx_mode_autodetect_fullscreen(800,600,0,0);
         #ifdef WIN32
         handle_vp1=hal_allocate_bitmap();
         handle_vp2=hal_allocate_bitmap();
@@ -151,8 +140,8 @@ void enterfullscreen()
         hal_clear_bitmap(handle_vidb);
         install_mouse();
         #endif
-        set_color_depth(8);
-        set_palette(elkpal);
+        hal_set_color_depth(8);
+        hal_set_elk_palette();
         winsizex=800; winsizey=600;
 }
 
@@ -167,16 +156,16 @@ void leavefullscreen()
         hal_release_bitmap(handle_vp2);
         hal_release_bitmap(handle_vp1);
         #endif
-        set_color_depth(desktop_color_depth());
+        hal_set_color_depth(hal_get_desktop_color_depth());
         #ifdef WIN32
-        set_gfx_mode(GFX_AUTODETECT_WINDOWED,2048,2048,0,0);
+        hal_set_gfx_mode_autodetect_windowed(2048,2048,0,0);
         vidb=create_video_bitmap(800,300);
         #else
-        set_gfx_mode(GFX_AUTODETECT_WINDOWED,640,512,0,0);
+        hal_set_gfx_mode_autodetect_windowed(640,512,0,0);
         winsizex=640; winsizey=512;
         #endif
-        set_color_depth(8);
-        set_palette(elkpal);
+        hal_set_color_depth(8);
+        hal_set_elk_palette();
 }
 
 void resetula()
@@ -992,7 +981,7 @@ void savescrshot()
 void dosavescrshot()
 {
         hal_bitmap_handle handle_tb = hal_allocate_bitmap();
-        set_color_depth(desktop_color_depth());
+        hal_set_color_depth(hal_get_desktop_color_depth());
         hal_create_bitmap(handle_tb,640,512);
         switch (drawmode)
         {
@@ -1029,7 +1018,7 @@ void dosavescrshot()
         }
         hal_save_bmp(handle_tb, scrshotname);
         hal_destroy_bitmap(handle_tb);
-        set_color_depth(8);
+        hal_set_color_depth(8);
         hal_release_bitmap(handle_tb);
         
         wantsavescrshot=0;

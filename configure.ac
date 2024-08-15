@@ -5,6 +5,7 @@ AC_PREREQ([2.61])
 AC_INIT(Elkulator, 1.0, Sarah Walker <b-em@bbcmicro.com>, elkulator)
 
 AM_INIT_AUTOMAKE([subdir-objects])
+# AM_INIT_AUTOMAKE
 AC_CONFIG_MACRO_DIRS([m4])
 AC_PROG_CC
 AC_PROG_CXX
@@ -49,4 +50,4 @@ AC_CHECK_LIB([alut], [alutInit], [], \
 
 AC_CHECK_LIB([m], [sin])
 
-AC_OUTPUT([Makefile src/Makefile])
+AC_OUTPUT([Makefile])
