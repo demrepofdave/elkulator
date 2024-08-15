@@ -7,6 +7,7 @@
 
 
 #define BITMAP_TABLE_SIZE 256
+#define SAMPLE_TABLE_SIZE 256
 
 static bool hal_initialized = FALSE;
 
@@ -29,7 +30,15 @@ typedef struct tbitmapTableEntry
 
 } bitmap_table_entry;
 
+typedef struct tsampleTableEntry
+{
+    bool bAllocated;
+    SAMPLE * pSample;
+
+} sample_table_entry;
+
 static bitmap_table_entry bitmap_table[BITMAP_TABLE_SIZE];
+static sample_table_entry sample_table[SAMPLE_TABLE_SIZE];
 
 // Private functions.
 hal_result isHalInitialised()
@@ -101,12 +110,47 @@ hal_result hal_debug_print_allocated_bitmap_table()
     return HAL_OK;
 }
 
+
+// Private initialisation functions.
+
+hal_result hal_init_bitmap()
+{
+    // Reset the bitmap table.
+    // Index 0 always pointe to the screen (in gfx.h)
+    hal_result result = HAL_OK;
+    int index = 0;
+    bitmap_table[0].bAllocated = TRUE;
+    bitmap_table[0].pBitmap = screen;
+    for(index = 1; index < BITMAP_TABLE_SIZE; index++)
+    {
+        bitmap_table[index].bAllocated = FALSE;
+        bitmap_table[index].pBitmap = NULL;
+    }
+    hal_debug_print_allocated_bitmap_table();
+    return result;
+}
+
+hal_result hal_init_samples()
+{
+    // Reset the sound samples table.
+    hal_result result = HAL_OK;
+    int index = 0;
+
+    for(index = 0; index < BITMAP_TABLE_SIZE; index++)
+    {
+        sample_table[index].bAllocated = FALSE;
+        sample_table[index].pSample = NULL;
+    }
+    hal_initialized = TRUE;
+    hal_debug_print_allocated_bitmap_table();
+    return result;
+}
+
 // Public functions.
 // Initialise the HAL. This must be done before any other API calls to the HAL are made.
 hal_result hal_init()
 {
     hal_result result = HAL_OK;
-    int index = 0;
 
     int ret = allegro_init();
     if (ret != 0)
@@ -118,17 +162,21 @@ hal_result hal_init()
         // Perform any resetting.
     //}
 
-    // Reset the bitmap table.
-    // Index 0 always pointe to the screen (in gfx.h)
-    bitmap_table[0].bAllocated = TRUE;
-    bitmap_table[0].pBitmap = screen;
-    for(index = 1; index < BITMAP_TABLE_SIZE; index++)
+    if(result == HAL_OK)
     {
-        bitmap_table[index].bAllocated = FALSE;
-        bitmap_table[index].pBitmap = NULL;
+        result = hal_init_bitmap();
     }
-    hal_initialized = TRUE;
-    hal_debug_print_allocated_bitmap_table();
+
+    if(result == HAL_OK)
+    {
+        result = hal_init_samples();
+    }
+
+    if(result == HAL_OK)
+    {
+        hal_initialized = TRUE;
+    }
+
     printf("hal_init: Complete - Init = %d, result = %d\n", hal_initialized, HAL_OK);
     return result;
 }
@@ -492,6 +540,5 @@ hal_result hal_bitmap_setpixel(hal_bitmap_handle handle, int y, int x, uint8_t c
 
     return result;
 }
-
 
 // End of file.

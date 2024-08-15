@@ -19,6 +19,7 @@
 
 typedef int hal_result; 
 typedef int hal_bitmap_handle;
+typedef int hal_sample_handle;
 
 // Define hal_result error codes.
 #define HAL_OK                  0
@@ -64,6 +65,12 @@ hal_result hal_save_bmp(hal_bitmap_handle handle, const char *filename);
 
 hal_result hal_bitmap_setpixel(hal_bitmap_handle handle, int y, int x, uint8_t col);
 //b->line[ula.y][(ula.x+x)>>1]=pal[col];
+
+// Sound functions - sample management
+hal_sample_handle hal_allocate_sample(); // Returns a handler to a SAMPLE type and initialises the base SAMPLE
+hal_result hal_sample_load_wav(hal_bitmap_handle handle, const char *filename);
+hal_result hal_destroy_sample(hal_sample_handle handle);
+hal_result hal_release_sample(hal_sample_handle handle); // Releases sample and returns handler to the pool.
 
 // Functions that break the HAL
 void *hal_get_bitmap_dat_ex(hal_bitmap_handle handle);
