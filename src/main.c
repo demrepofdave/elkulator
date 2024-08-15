@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "hal/hal.h"
+
 #undef printf
 int autoboot;
 FILE *rlog;
@@ -79,6 +81,7 @@ void initelk(int argc, char *argv[])
         parallelname[0]=0;serialname[0]=0;
         for (int i = 0; i < 16; i++)
             romnames[i][0] = 0;
+        hal_init();
 //        printf("Load config\n");
         loadconfig();
 //printf("commandline\n");

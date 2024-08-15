@@ -50,4 +50,5 @@ elkulator_SOURCES = src/1770.c \
                     src/allegro_icon.c \
                     src/hal/hal_allegro_4/2xsai.c \
                     src/hal/hal_allegro_4/palfilt.c \
-                    src/hal/hal_allegro_4/scale2x.c
+                    src/hal/hal_allegro_4/scale2x.c \
+                    src/hal/hal_allegro_4/hal.c

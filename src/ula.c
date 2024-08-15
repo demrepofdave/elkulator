@@ -5,6 +5,7 @@
 #include <zlib.h>
 #include "elk.h"
 #include "hal/2xsai.h"
+#include "hal/hal.h"
 
 void dosavescrshot();
 void saveframe();
@@ -54,15 +55,23 @@ struct
 } ula;
 
 int coldepth;
-BITMAP *b,*b16,*b162,*vidb;
-BITMAP *vp1,*vp2;
+
+hal_bitmap_handle handle_b;   // TODO: Document what this is - main pixel perfect drawn screen?
+hal_bitmap_handle handle_b16;  // The only bitmap written to the background screen bitmap.
+hal_bitmap_handle handle_b162; // Transforms what is in b16 (?)
+hal_bitmap_handle handle_vidb;  // TODO: Document what this is
+
+#ifdef WIN32
+BITMAP *vp1; // TODO: Document what this is
+BITMAP *vp2; // TODO: Document what this is
+#endif
 
 void clearall()
 {
-        clear(b);
-        clear(b16);
-        clear(b162);
-        clear(screen);
+        hal_clear_bitmap(handle_b);
+        hal_clear_bitmap(handle_b16);
+        hal_clear_bitmap(handle_b162);
+        hal_clear_bitmap(0); // screen
 }
 
 uint8_t pal[16];
@@ -83,6 +92,13 @@ uint8_t ulalookup[256];
 void initula()
 {
         int c;
+
+        // Initialise the hal in here for now.
+        handle_b = hal_allocate_bitmap();
+        handle_b16 = hal_allocate_bitmap();
+        handle_b162 = hal_allocate_bitmap();
+        handle_vidb = hal_allocate_bitmap();
+
 //        allegro_init();
         coldepth=desktop_color_depth();
         set_color_depth(desktop_color_depth());
@@ -93,13 +109,13 @@ void initula()
         set_gfx_mode(GFX_AUTODETECT_WINDOWED,640,512,0,0);
         winsizex=640; winsizey=512;
         #endif
-        b16=create_bitmap(800*2,600);
-        b162=create_bitmap(640,256);
-        clear(b16);
+        hal_create_bitmap(handle_b16,  800*2,600);
+        hal_create_bitmap(handle_b162, 640,256);
+        hal_clear_bitmap(handle_b16);
         Init_2xSaI(desktop_color_depth());
         initpaltables();
         set_color_depth(8);
-        b=create_bitmap(640,616);
+        hal_create_bitmap(handle_b, 640,616);
         set_palette(elkpal);
         for (c=0;c<256;c++)
         {
@@ -529,7 +545,7 @@ int numlines=0;
 int wantsavescrshot=0;
 int wantmovieframe=0;
 FILE *moviefile;
-BITMAP *moviebitmap;
+hal_bitmap_handle handle_moviebitmap;
 
 void yield()
 {
@@ -548,7 +564,9 @@ void yield()
                         {
                                 if (LINEDOUBLE) ula.y<<=1;
                                 for (x=0;x<8;x++)
-                                    b->line[ula.y][ula.x+x]=0;
+                                {
+                                    hal_bitmap_setpixel(handle_b, ula.y, ula.x+x, 0);
+                                }
                                 if (LINEDOUBLE) ula.y>>=1;
                         }
                         else if (!(ula.x&8) || !(ula.mode&4))
@@ -566,7 +584,7 @@ void yield()
                                                 for (x=0;x<8;x++)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x)>>1, pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -574,8 +592,8 @@ void yield()
                                                 for (x=0;x<8;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x)>>1, pal[col]);
+//                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+1, pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -583,10 +601,10 @@ void yield()
                                                 for (x=0;x<8;x+=4)
                                                 {
                                                         col=ulalookup[temp];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+1]=pal[col];
-                                                        b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+3]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x)>>1, pal[col]);
+//                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+1, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x+2)>>1, pal[col]);
+//                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+3, pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -594,8 +612,8 @@ void yield()
                                                 for (x=0;x<16;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x)>>1, pal[col]);
+//                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x+1), pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -603,10 +621,11 @@ void yield()
                                                 for (x=0;x<16;x+=4)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+1]=pal[col];
-                                                        b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+3]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x)>>1, pal[col]);
+//                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x+1), pal[col]);
+                                                        //b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x+2)>>1, pal[col]);
+//                                                        hal_bitmap_setpixel(handle_b, ula.y, (ula.x+x+3), pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -620,7 +639,7 @@ void yield()
                                                 for (x=0;x<8;x++)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        b->line[ula.y][ula.x+x]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x, pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -628,8 +647,8 @@ void yield()
                                                 for (x=0;x<8;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        b->line[ula.y][ula.x+x]=pal[col];
-                                                        b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+1, pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -637,10 +656,10 @@ void yield()
                                                 for (x=0;x<8;x+=4)
                                                 {
                                                         col=ulalookup[temp];
-                                                        b->line[ula.y][ula.x+x]=pal[col];
-                                                        b->line[ula.y][ula.x+x+1]=pal[col];
-                                                        b->line[ula.y][ula.x+x+2]=pal[col];
-                                                        b->line[ula.y][ula.x+x+3]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+1, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+2, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+3, pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -648,7 +667,8 @@ void yield()
                                                 for (x=0;x<16;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        b->line[ula.y][ula.x+x]=b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+1, pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -656,10 +676,10 @@ void yield()
                                                 for (x=0;x<16;x+=4)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        b->line[ula.y][ula.x+x]=pal[col];
-                                                        b->line[ula.y][ula.x+x+1]=pal[col];
-                                                        b->line[ula.y][ula.x+x+2]=pal[col];
-                                                        b->line[ula.y][ula.x+x+3]=pal[col];
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+1, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+2, pal[col]);
+                                                        hal_bitmap_setpixel(handle_b, ula.y, ula.x+x+3, pal[col]);
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -675,7 +695,9 @@ void yield()
 //                        if (!ula.x) rpclog("Blank line %i\n",ula.y);
                         if (LINEDOUBLE) ula.y<<=1;
                         for (x=0;x<8;x++)
-                            b->line[ula.y][ula.x+x]=0;
+                        {
+                            hal_bitmap_setpixel(handle_b, ula.y, ula.x+x, 0);
+                        }
                         if (LINEDOUBLE) ula.y>>=1;
                         ula.x+=8;
                         ulacycles++;
@@ -769,40 +791,55 @@ void yield()
                                         
                                         if (ula.draw)
                                         {
+                                                //printf("drawmode=%d\n", drawmode);
                                                 startblit();
                                                 switch (drawmode)
                                                 {
                                                         case SCANLINES:
-                                                        blit(b,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        hal_blit_screen(handle_b,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case LINEDBL:
                                                         #ifdef WIN32
-                                                        blit(b,vidb,0,0,0,0,640,256);
-                                                        if (videoresize) stretch_blit(vidb,screen,0,0,640,256,0,0,winsizex,winsizey);
-                                                        else             stretch_blit(vidb,screen,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        hal_blit(handle_b,handle_vidb,0,0,0,0,640,256);
+                                                        if (videoresize) hal_stretch_blit_screen(handle_vidb,0,0,640,256,0,0,winsizex,winsizey);
+                                                        else             hal_stretch_blit_screen(handle_vidb,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         #else
-                                                        for (c=0;c<512;c++) blit(b,b16,0,c>>1,0,c,640,1);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //for (c=0;c<512;c++) blit(b,b16,0,c>>1,0,c,640,1);
+                                                        for (c=0;c<512;c++) hal_blit(handle_b,handle_b16,0,c>>1,0,c,640,1);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         #endif
                                                         break;
                                                         case _2XSAI:
-                                                        blit(b,b162,0,0,0,0,640,256);
-                                                        Super2xSaI(b162,b16,0,0,0,0,320,256);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b,b162,0,0,0,0,640,256);
+                                                        //Super2xSaI(b162,b16,0,0,0,0,320,256);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
+                                                        hal_Super2xSaI(handle_b162,handle_b16,0,0,0,0,320,256);
+                                                        hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case SCALE2X:
-                                                        blit(b,b162,0,0,0,0,640,256);
-                                                        scale2x(b162,b16,320,256);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b,b162,0,0,0,0,640,256);
+                                                        //scale2x(b162,b16,320,256);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
+                                                        hal_scale2x(handle_b162,handle_b16,320,256);
+                                                        hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case EAGLE:
-                                                        blit(b,b162,0,0,0,0,640,256);
-                                                        SuperEagle(b162,b16,0,0,0,0,320,256);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b,b162,0,0,0,0,640,256);
+                                                        //SuperEagle(b162,b16,0,0,0,0,320,256);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
+                                                        hal_SuperEagle(handle_b162,handle_b16,0,0,0,0,320,256);
+                                                        hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case PAL:
-                                                        palfilter(b,b16,coldepth);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //palfilter(b,b16,coldepth);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        hal_palfilter(handle_b,handle_b16,coldepth);
+                                                        hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                 }
                                                 if (wantsavescrshot) dosavescrshot();
@@ -960,44 +997,46 @@ void savescrshot()
 
 void dosavescrshot()
 {
-        BITMAP *tb;
+        hal_bitmap_handle handle_tb = hal_allocate_bitmap();
         set_color_depth(desktop_color_depth());
-        tb=create_bitmap(640,512);
+        hal_create_bitmap(handle_tb,640,512);
         switch (drawmode)
         {
                 case SCANLINES:
-                blit(b,tb,0,0,0,0,640,512);
+                hal_blit(handle_b,handle_tb,0,0,0,0,640,512);
                 break;
                 case LINEDBL:
                 #ifdef WIN32
-                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
+                //stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
+                hal_stretch_blit(handle_vidb,handle_tb,0,0,640,256,0,0,640,512);
                 #else
-                blit(b16,tb,0,0,0,0,640,512);
+                hal_blit(handle_b16,handle_tb,0,0,0,0,640,512);
                 #endif
                 break;
                 case _2XSAI:
-                blit(b,b162,0,0,0,0,640,256);
-                Super2xSaI(b162,b16,0,0,0,0,320,256);
-                blit(b16,tb,0,0,0,0,640,512);
+                hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
+                hal_Super2xSaI(handle_b162,handle_b16,0,0,0,0,320,256);
+                hal_blit(handle_b16,handle_tb,0,0,0,0,640,512);
                 break;
                 case SCALE2X:
-                blit(b,b162,0,0,0,0,640,256);
-                scale2x(b162,b16,320,256);
-                blit(b16,tb,0,0,0,0,640,512);
+                hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
+                hal_scale2x(handle_b162,handle_b16,320,256);
+                hal_blit(handle_b16,handle_tb,0,0,0,0,640,512);
                 break;
                 case EAGLE:
-                blit(b,b162,0,0,0,0,640,256);
-                SuperEagle(b162,b16,0,0,0,0,320,256);
-                blit(b16,tb,0,0,0,0,640,512);
+                hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
+                hal_SuperEagle(handle_b162,handle_b16,0,0,0,0,320,256);
+                hal_blit(handle_b16,handle_tb,0,0,0,0,640,512);
                 break;
                 case PAL:
-                palfilter(b,b16,coldepth);
-                blit(b16,tb,0,0,0,0,640,512);
+                hal_palfilter(handle_b,handle_b16,coldepth);
+                hal_blit(handle_b16,handle_tb,0,0,0,0,640,512);
                 break;
         }
-        save_bmp(scrshotname,tb,NULL);
-        destroy_bitmap(tb);
+        hal_save_bmp(handle_tb, scrshotname, NULL);
+        hal_destroy_bitmap(handle_tb);
         set_color_depth(8);
+        hal_release_bitmap(handle_tb);
         
         wantsavescrshot=0;
 }
@@ -1011,7 +1050,8 @@ void startmovie()
     if (moviefile == NULL)
         return;
 
-    moviebitmap=create_bitmap_ex(8, 640, 256);
+    handle_moviebitmap = hal_allocate_bitmap();
+    hal_create_bitmap_ex(handle_moviebitmap, 8, 640, 256);
     sndstreamindex = 0;
     sndstreamcount = 0;
 }
@@ -1021,7 +1061,8 @@ void stopmovie()
     wantmovieframe = 0;
     if (moviefile != NULL) {
         fclose(moviefile);
-        destroy_bitmap(moviebitmap);
+        hal_destroy_bitmap(handle_moviebitmap);
+        hal_release_bitmap(handle_moviebitmap);
         moviefile = NULL;
     }
 }
@@ -1044,7 +1085,9 @@ int deflate_bitmap(int level)
 
     /* Compress the bitmap buffer. */
     strm.avail_in = 640*256;
-    strm.next_in = moviebitmap->dat;
+    // DemRepOfDave - NOTE: The following breaks the HAL model and will be corrected.
+    //strm.next_in = moviebitmap->dat;
+    strm.next_in = hal_get_bitmap_dat_ex(handle_moviebitmap);
 
     /* Run deflate() on the bitmap buffer, finishing the compression. */
     strm.avail_out = DEFLATE_CHUNK_SIZE;
@@ -1081,7 +1124,9 @@ void saveframe()
         start = sndstreamindex;
     }
 
-    blit(b,moviebitmap,0,0,0,0,640,256);
+    //blit(b,moviebitmap,0,0,0,0,640,256);
+
+    hal_blit(handle_b,handle_moviebitmap,0,0,0,0,640,256);
 
     if (deflate_bitmap(6) != Z_OK) {
         stopmovie();
@@ -1101,8 +1146,12 @@ void saveframe()
 
 void clearscreen()
 {
-        clear(screen);
-        clear(b);
-        clear(b16);
-        clear(b162);
+        //clear(screen);
+        //clear(b);
+        //clear(b16);
+        //clear(b162);
+        hal_clear_bitmap(0);
+        hal_clear_bitmap(handle_b);
+        hal_clear_bitmap(handle_b16);
+        hal_clear_bitmap(handle_b162);
 }
