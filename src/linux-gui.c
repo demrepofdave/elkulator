@@ -3,6 +3,7 @@
 
 #ifndef WIN32
 #include <allegro.h>
+#include "hal/hal.h"
 //#include <alleggl.h>
 #include "elk.h"
 

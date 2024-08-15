@@ -11,7 +11,7 @@ CLEANFILES = $(noinst_SCRIPTS)
 amrefresh:	
 
 
-elkulator_CFLAGS = $(allegro_CFLAGS) -I ./src/
+elkulator_CFLAGS = $(allegro_CFLAGS) -I ./src/ -Wno-unused-result
 
 # workaround for Win32 Allegro, which has `allegro-config' missing
 if OS_WIN

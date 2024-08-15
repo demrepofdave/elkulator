@@ -1,4 +1,6 @@
 *.o
+.deps
+.dirstamp
 /aclocal.m4
 /autom4te.cache
 /compile

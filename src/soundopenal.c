@@ -5,6 +5,7 @@
 #include <AL/al.h>
 #include <AL/alut.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include "elk.h"
 
