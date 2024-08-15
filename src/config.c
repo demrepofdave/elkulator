@@ -5,6 +5,8 @@
 #include <ctype.h>
 #include "elk.h"
 
+static const char * elk_cfg_filename = "/elk.cfg"; // Filename for elkulator config file.
+
 FILE *cfgfile;
 uint8_t cfgbuffer[1024];
 int sndex;
@@ -84,8 +86,8 @@ void loadconfig()
         char *s;
         int c;
         char s2[20];
-        char fn[256];
-        sprintf(fn,"%s/elk.cfg",exedir);
+        char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
+        sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"rt");
         tapespeed=getintcfg("tapespeed",0);
         plus1=getintcfg("plus1",0);
@@ -147,8 +149,8 @@ void saveconfig()
 {
         int c;
         char s[20];
-        char fn[256];
-        sprintf(fn,"%s/elk.cfg",exedir);
+        char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
+        sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"wt");
         writeintcfg("tapespeed",tapespeed);
         writeintcfg("plus1",plus1);

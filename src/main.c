@@ -62,7 +62,7 @@ void cleardrawit()
         drawit--;
 }*/
 
-char exedir[512];
+char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
 char tapename[512];
 char parallelname[512];
 char serialname[512];
@@ -74,7 +74,7 @@ void initelk(int argc, char *argv[])
         int c;
         char *p;
         int tapenext=0,discnext=0,romnext=-2,parallelnext=0,serialnext=0,serialdebugnext=0;
-        get_executable_name(exedir,511);
+        get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
         p=get_filename(exedir);
         p[0]=0;
         discname[0]=discname2[0]=tapename[0]=0;

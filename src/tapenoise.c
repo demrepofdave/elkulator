@@ -6,6 +6,8 @@
 #include <math.h>
 #include "elk.h"
 
+static const char * ddnoise = "ddnoise"; // Name of directory containing wav files to emulate tape noise
+
 int tpnoisep=0;
 int tmcount=0;
 int16_t tapenoise[4410];
@@ -20,12 +22,13 @@ SAMPLE *tsamples[2];
 
 void maketapenoise()
 {
-        char path[512],p2[512];
+        char path[MAX_PATH_FILENAME_BUFFER_SIZE + sizeof(ddnoise)];
+        char p2[MAX_PATH_FILENAME_BUFFER_SIZE];
         int c;
 
-        getcwd(p2,511);
-        if (ddtype) sprintf(path,"%sddnoise",exedir);
-        else        sprintf(path,"%sddnoise",exedir);
+        getcwd(p2,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+        if (ddtype) sprintf(path,"%s%s",exedir, ddnoise);
+        else        sprintf(path,"%s%s",exedir, ddnoise);
         printf("path now %s\n",path);
         chdir(path);
         tsamples[0]=load_wav("motoron.wav");

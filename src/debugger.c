@@ -31,7 +31,8 @@ void _debugthread(PVOID pvoid)
         HDC hDC;
         //PAINTSTRUCT ps;
         int x;
-        int c,d;
+        int c = 0;
+        int d;
         
         usdat=malloc(256*256*4);
         if (!debugstarted)
@@ -206,8 +207,8 @@ void debugout(char *s)
 
 void debugout(char *s)
 {
-        printf(s);
-fflush(stdout);
+        printf("%s",s);
+        fflush(stdout);
 }
 
 void startdebug()
@@ -495,7 +496,7 @@ void dodebugger()
                 c=ReadConsoleA(cinf,ins,255,(LPDWORD)&d,NULL);
                 ins[d]=0;
 #else
-		d=(int)fgets(ins,255,stdin);
+		fgets(ins,255,stdin);
 #endif
                 d=0;
                 while (ins[d]!=32 && ins[d]!=0xA && ins[d]!=0xD && ins[d]!=0) d++;

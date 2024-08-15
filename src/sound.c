@@ -63,7 +63,7 @@ int16_t snwaves[5][32]=
 void updaterectwave(int d)
 {
         int c;
-        c>>=3;
+        // c>>=3;
         for (c=0;c<d;c++) snwaves[4][c]=snperiodic[1][c]=127;
         for (;c<32;c++)   snwaves[4][c]=snperiodic[1][c]=-127;
 }

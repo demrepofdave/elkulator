@@ -214,7 +214,13 @@ extern int ddvol,ddtype;
 extern int discspd;
 extern int motorspin;
 
-extern char exedir[512];
+// Maximum file name buffer size (previously this was defined as magic number
+// in the code at 512, however it is possible that a file path on modern OS's
+// may have file paths + filename combinations that exceed 512 characters, 
+// hence bumping the value up here).
+#define MAX_PATH_FILENAME_BUFFER_SIZE 768
+
+extern char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
 
 void initelk();
 void closeelk();
@@ -269,6 +275,8 @@ void clearscreen();
 void savescrshot();
 void loadulastate(FILE *f);
 void saveulastate(FILE *f);
+void startmovie();
+void stopmovie();
 
 void reset1770();
 uint8_t read1770(uint16_t addr);

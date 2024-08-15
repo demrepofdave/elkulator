@@ -34,7 +34,7 @@ MENU keymenu[2];
 MENU dischmenu[4];
 MENU memmenu[6];
 MENU mrbmenu[4];
-MENU ulamenu[3];
+MENU ulamenu[4];
 MENU settingsmenu[7];
 MENU miscmenu[5];
 MENU mainmenu[7];
@@ -52,7 +52,7 @@ void updatelinuxgui()
         tapespdmenu[0].flags=(!tapespeed)?D_SELECTED:0;
         tapespdmenu[1].flags=(tapespeed==1)?D_SELECTED:0;
         tapespdmenu[2].flags=(tapespeed==2)?D_SELECTED:0;
-        for (x=0;x<6;x++)  displaymenu[x].flags=(drawmode==(int)displaymenu[x].dp)?D_SELECTED:0;
+        for (x=0;x<6;x++)  displaymenu[x].flags=(drawmode==(intptr_t)displaymenu[x].dp)?D_SELECTED:0;
         videomenu[1].flags=(fullscreen)?D_SELECTED:0;
         soundmenu[0].flags=(sndint)?D_SELECTED:0;
         soundmenu[1].flags=(sndex)?D_SELECTED:0;
@@ -62,15 +62,15 @@ void updatelinuxgui()
         dischmenu[2].flags=(dfsena)?D_SELECTED:0;
         memmenu[0].flags=(turbo)?D_SELECTED:0;
         memmenu[1].flags=(mrb)?D_SELECTED:0;
-        for (x=0;x<3;x++)  mrbmenu[x].flags=(mrbmode==(int)mrbmenu[x].dp)?D_SELECTED:0;
-        for (x=0;x<3;x++)  ulamenu[x].flags=(ulamode==(int)ulamenu[x].dp)?D_SELECTED:0;
+        for (x=0;x<3;x++)  mrbmenu[x].flags=(mrbmode==(intptr_t)mrbmenu[x].dp)?D_SELECTED:0;
+        for (x=0;x<3;x++)  ulamenu[x].flags=(ulamode==(intptr_t)ulamenu[x].dp)?D_SELECTED:0;
         memmenu[4].flags=(enable_jim)?D_SELECTED:0;
         joymenu[0].flags=(plus1)?D_SELECTED:0;
         joymenu[1].flags=(firstbyte)?D_SELECTED:0;
-//        for (x=0;x<5;x++)  waveformmenu[x].flags=(curwave==(int)waveformmenu[x].dp)?D_SELECTED:0;
+//        for (x=0;x<5;x++)  waveformmenu[x].flags=(curwave==(intptr_t)waveformmenu[x].dp)?D_SELECTED:0;
         ddtypemenu[0].flags=(!ddtype)?D_SELECTED:0;
         ddtypemenu[1].flags=(ddtype)?D_SELECTED:0;
-        for (x=0;x<3;x++)  ddvolmenu[x].flags=(ddvol==(int)ddvolmenu[x].dp)?D_SELECTED:0;
+        for (x=0;x<3;x++)  ddvolmenu[x].flags=(ddvol==(intptr_t)ddvolmenu[x].dp)?D_SELECTED:0;
 //        keymenu[1].flags=(keyas)?D_SELECTED:0;
         romcartsmenu[0].flags = (enable_mgc)?D_SELECTED:0;
         romcartsmenu[1].flags = (enable_db_flash_cartridge)?D_SELECTED:0;
@@ -338,7 +338,7 @@ MENU tapemenu[]=
 
 int gui_disp()
 {
-        drawmode=(int)active_menu->dp;
+        drawmode=(intptr_t)active_menu->dp;
         updatelinuxgui();
         return D_O_K;
 }
@@ -395,7 +395,7 @@ MENU waveformmenu[6]=
 
 int gui_ddtype()
 {
-        ddtype=(int)active_menu->dp;
+        ddtype=(intptr_t)active_menu->dp;
         closeddnoise();
         loaddiscsamps();
         updatelinuxgui();
@@ -411,7 +411,7 @@ MENU ddtypemenu[3]=
 
 int gui_ddvol()
 {
-        ddvol=(int)active_menu->dp;
+        ddvol=(intptr_t)active_menu->dp;
         updatelinuxgui();
         return D_O_K;
 }
@@ -506,7 +506,7 @@ MENU dischmenu[4]=
 
 int gui_mrbmode()
 {
-        mrbmode=(int)active_menu->dp;
+        mrbmode=(intptr_t)active_menu->dp;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
@@ -522,13 +522,13 @@ MENU mrbmenu[4]=
 
 int gui_ulamode()
 {
-        ulamode=(int)active_menu->dp;
+        ulamode=(intptr_t)active_menu->dp;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
 }
 
-MENU ulamenu[3]=
+MENU ulamenu[4]=
 {
         {"&Standard",gui_ulamode,NULL,0,(void *)0},
         {"&Enhanced (8-bit, dual access)",gui_ulamode,NULL,0,(void *)ULA_RAM_8BIT_DUAL_ACCESS},
@@ -674,8 +674,8 @@ int gui_db_flash_cartridge()
 
 MENU romcartsmenu[3]=
 {
-        {"Mega Games Cartridge",gui_mgc,0,NULL,0},
-        {"David's Flash ROM Cartridge",gui_db_flash_cartridge,0,NULL,0},
+        {"Mega Games Cartridge",gui_mgc,0,0,NULL},
+        {"David's Flash ROM Cartridge",gui_db_flash_cartridge,0,0,NULL},
         {NULL,NULL,NULL,0,NULL}
 };
 

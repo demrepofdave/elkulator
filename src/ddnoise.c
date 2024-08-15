@@ -6,6 +6,10 @@
 #include <string.h>
 #include "elk.h"
 
+
+static const char * ddnoise35 = "ddnoise/35";   // Name of directory containing wav files to emulate noise of 3.5 inch Disk Drive
+static const char * ddnoise525 = "ddnoise/525"; // Name of directory containing wav files to emulate noise of 5.25 inch Disk Drive
+
 int ddvol=3;
 SAMPLE *seeksmp[4][2],*seek2smp,*seek3smp;
 SAMPLE *stepsmp;
@@ -22,11 +26,12 @@ int ddtype=0;
 
 void loaddiscsamps()
 {
-        char path[512],p2[512];
-        getcwd(p2,511);
+        char path[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(ddnoise525)];
+        char p2[MAX_PATH_FILENAME_BUFFER_SIZE];
+        getcwd(p2,(MAX_PATH_FILENAME_BUFFER_SIZE - 1));
         printf("In %s\n",p2);
-        if (ddtype) sprintf(path,"%sddnoise/35",exedir);
-        else        sprintf(path,"%sddnoise/525",exedir);
+        if (ddtype) sprintf(path,"%s%s",exedir, ddnoise35);
+        else        sprintf(path,"%s%s",exedir, ddnoise525);
         printf("path now %s\n",path);
         chdir(path);
         seeksmp[0][0]=load_wav("stepo.wav");

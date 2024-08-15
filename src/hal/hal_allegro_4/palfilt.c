@@ -3,8 +3,8 @@
 #include <allegro.h>
 #include "elk.h"
 
-fixed ACoef[2],ACoef2[2];
-fixed BCoef[2],BCoef2[2];
+fixed ACoef[2],ACoef2[3];
+fixed BCoef[2],BCoef2[3];
 
 void initcoef()
 {
@@ -27,9 +27,9 @@ int ycount=0;
 inline fixed iir(fixed NewSample)
 {
         yx[ycount] = NewSample;
-        yy[ycount] = fmul(ACoef2[0],yx[ycount]);
-        yy[ycount] += fmul(ACoef2[1],yx[(ycount+1)&3]);// - BCoef2[1] * yy[(ycount+1)&3];
-        yy[ycount] += fmul(ACoef2[2],yx[(ycount+2)&3]) - fmul(BCoef2[2],yy[(ycount+2)&3]);
+        yy[ycount] = fixmul(ACoef2[0],yx[ycount]);
+        yy[ycount] += fixmul(ACoef2[1],yx[(ycount+1)&3]);// - BCoef2[1] * yy[(ycount+1)&3];
+        yy[ycount] += fixmul(ACoef2[2],yx[(ycount+2)&3]) - fixmul(BCoef2[2],yy[(ycount+2)&3]);
         ycount=(ycount-1)&3;
         return yy[(ycount+1)&3];
 }
@@ -40,9 +40,9 @@ int rycount=0;
 
 inline fixed firry(fixed NewSample) {
     //Calculate the new output
-    rx[rycount] = fmul(ACoef[0],NewSample);
+    rx[rycount] = fixmul(ACoef[0],NewSample);
     ry[rycount] = rx[0]+rx[1];
-    ry[rycount] -= fmul(BCoef[1],ry[rycount^1]);
+    ry[rycount] -= fixmul(BCoef[1],ry[rycount^1]);
     rycount^=1;
     return ry[rycount^1];
 }
@@ -53,9 +53,9 @@ int bycount=0;
 
 inline fixed firby(fixed NewSample) {
     //Calculate the new output
-    bx[bycount] = fmul(ACoef[0],NewSample);
+    bx[bycount] = fixmul(ACoef[0],NewSample);
     by[bycount] = bx[0]+bx[1];
-    by[bycount] -= fmul(BCoef[1],by[bycount^1]);
+    by[bycount] -= fixmul(BCoef[1],by[bycount^1]);
     bycount^=1;
     return by[bycount^1];
 }
@@ -109,7 +109,7 @@ void palfilter(BITMAP *src, BITMAP *dest, int depth)
 
                                 r=fixtoi(palry+paly);
                                 b=fixtoi(palby+paly);
-                                g=fixtoi((fmul(constr,palry)-fmul(constb,palby))+paly);
+                                g=fixtoi((fixmul(constr,palry)-fixmul(constb,palby))+paly);
 
                                 if (r>255) r=255;
                                 if (r<0)   r=0;
@@ -141,7 +141,7 @@ void palfilter(BITMAP *src, BITMAP *dest, int depth)
 
                                 r=fixtoi(palry+paly);
                                 b=fixtoi(palby+paly);
-                                g=fixtoi((fmul(constr,palry)-fmul(constb,palby))+paly);
+                                g=fixtoi((fixmul(constr,palry)-fixmul(constb,palby))+paly);
 
                                 if (r>255) r=255;
                                 if (r<0)   r=0;
