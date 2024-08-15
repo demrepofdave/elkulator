@@ -8,3 +8,7 @@ void Super2xSaI_ex(uint8 *src, uint32 src_pitch, uint8 *unused, BITMAP *dest, ui
 
 void SuperEagle(BITMAP * src, BITMAP * dest, int s_x, int s_y, int d_x, int d_y, int w, int h);
 void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, BITMAP *dest, uint32 width, uint32 height);
+
+// Temporary home for some functions moved from src into hal
+void scale2x(BITMAP *src, BITMAP *dst, int width, int height);
+void palfilter(BITMAP *src, BITMAP *dest, int depth);

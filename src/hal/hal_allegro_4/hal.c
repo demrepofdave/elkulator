@@ -1,17 +1,10 @@
+#include <allegro.h>
 #include "hal/hal.h"
 #include "hal/2xsai.h"
 #include "stdint.h"
 #include "stdbool.h"
 #include "stdio.h"
-#include "allegro.h"
 
-
-// Define hal_result error codes.
-#define HAL_OK                  0
-#define HAL_UNINITIALISED      -1
-#define HAL_INVALID_HANDLE     -2
-#define HAL_HANDLE_TABLE_FULL  -3
-#define HAL_BITMAP_UNALLOCATED -4
 
 #define BITMAP_TABLE_SIZE 256
 
@@ -101,8 +94,14 @@ hal_result hal_debug_print_allocated_bitmap_table()
 // Initialise the HAL. This must be done before any other API calls to the HAL are made.
 hal_result hal_init()
 {
+    hal_result result = HAL_OK;
     int index = 0;
 
+    int ret = allegro_init();
+    if (ret != 0)
+    {
+        result = HAL_UNINITIALISED;
+    }
     //if(hal_initialized)
     //{
         // Perform any resetting.
@@ -120,8 +119,40 @@ hal_result hal_init()
     hal_initialized = TRUE;
     hal_debug_print_allocated_bitmap_table();
     printf("hal_init: Complete - Init = %d, result = %d\n", hal_initialized, HAL_OK);
-    return HAL_OK;
+    return result;
 }
+
+hal_result hal_set_window_title(const char * name)
+{
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        set_window_title(name);
+    }
+    return result;
+}
+
+hal_result hal_set_close_button_callback( void (*handler_function)(void))
+{
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        set_close_button_callback(handler_function);
+    }
+    return result;
+
+}
+
+hal_result hal_install_mouse()
+{
+    hal_result result = isHalInitialised();
+    if(result == HAL_OK)
+    {
+        install_mouse();
+    }
+    return result;
+}
+
 
 hal_bitmap_handle hal_allocate_bitmap() // Returns a handler to a BITMAP type and initialises the base BITMAP
 {
@@ -243,11 +274,17 @@ hal_result hal_blit(hal_bitmap_handle source, hal_bitmap_handle dest, int source
 
     if(result == HAL_OK)
     {
-        result = isUserBitmapAssigned(dest);    // Check 2nd handle.
+        result = isValidUserHandle(dest);    // Check 2nd handle.
     }
 
     if(result == HAL_OK)
     {
+        if(source == 0)
+        {
+            // Update with latest screen pointer.
+            bitmap_table[source].pBitmap = screen;
+        }
+        
         blit(bitmap_table[source].pBitmap, bitmap_table[dest].pBitmap,  source_x, source_y, dest_x, dest_y, width, height);
     }
     return result;
@@ -359,13 +396,13 @@ hal_result hal_palfilter(hal_bitmap_handle source, hal_bitmap_handle dest, int d
     return result;
 }
 
-hal_result hal_save_bmp(hal_bitmap_handle handle, const char *filename, const struct RGB *pal)
+hal_result hal_save_bmp(hal_bitmap_handle handle, const char *filename)
 {
     hal_result result = isUserBitmapAssigned(handle); // Check 1st handle.
 
     if(result == HAL_OK)
     {
-        save_bmp(filename,bitmap_table[handle].pBitmap, pal);
+        save_bmp(filename,bitmap_table[handle].pBitmap, NULL);
     }
 
     return result;

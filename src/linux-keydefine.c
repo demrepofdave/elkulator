@@ -4,6 +4,7 @@
 #ifndef WIN32
 #include <allegro.h>
 #include "elk.h"
+#include "hal/hal.h"
 
 int keytemp[128];
 
@@ -25,29 +26,33 @@ static void move_widgets(DIALOG *d, int show)
         }
 }
 
-static BITMAP *open_dialog(DIALOG *d)
+
+static hal_bitmap_handle open_dialog(DIALOG *d)
 {
-        BITMAP *b;
+        hal_bitmap_handle handle_background;
         int x, y;
 
         move_widgets(d, 1);
         x = (SCREEN_W/2) - (d[0].w/2);
         y = (SCREEN_H/2) - (d[0].h/2);
-        b=create_bitmap(d[0].w, d[0].h);
-        blit(screen, b, x, y, 0, 0, d[0].w, d[0].h);
+        handle_background = hal_allocate_bitmap();
+        hal_create_bitmap(handle_background, d[0].w, d[0].h);
+        printf("blit now\n");
+        hal_blit(0, handle_background, x, y, 0, 0, d[0].w, d[0].h); // 0 = screen.
 
-        return b;
+        return handle_background;
 }
 
-static void close_dialog(DIALOG *d, BITMAP *b)
+static void close_dialog(DIALOG *d, hal_bitmap_handle handle)
 {
         int x, y;
 
         x = (SCREEN_W/2) - (d[0].w/2);
         y = (SCREEN_H/2) - (d[0].h/2);
-        blit(b, screen, 0, 0, x, y, d[0].w, d[0].h);
+        hal_blit_screen(handle, 0, 0, x, y, d[0].w, d[0].h);
         move_widgets(d, 0);
-        destroy_bitmap(b);
+        hal_destroy_bitmap(handle);
+        hal_release_bitmap(handle);
 }
 
 /* Constant colours. */
@@ -296,7 +301,7 @@ static int gui_keydefine_input(DIALOG *kd)
 {
         DIALOG_PLAYER *dp;
         DIALOG *d=bemdefinekeygui;
-        BITMAP *b;
+        hal_bitmap_handle handle_background;
         int i;
 
         key_to_define = kd->d2;
@@ -312,7 +317,7 @@ static int gui_keydefine_input(DIALOG *kd)
 
         populate_current_keys();
 
-        b = open_dialog(d);
+        handle_background = open_dialog(d);
         dp = init_dialog(d, 0);
 
         while (update_dialog(dp) && !menu_pressed() && !(mouse_b&2) && !key[KEY_ESC]);
@@ -326,7 +331,7 @@ static int gui_keydefine_input(DIALOG *kd)
         if (d[i].d1)
                 update_defined_keys();
 
-        close_dialog(d, b);
+        close_dialog(d, handle_background);
         return D_O_K;
 }
 
@@ -427,14 +432,14 @@ int gui_keydefine()
 {
         DIALOG_PLAYER *dp;
         DIALOG *d=bemdefinegui;
-        BITMAP *b;
+        hal_bitmap_handle handle_background;
         int i;
 
         /* Initialise the temporary mapping. */
 
         for (i = 0; i < 128; i++) keytemp[i] = keylookup[i];
 
-        b = open_dialog(d);
+        handle_background = open_dialog(d);
         dp = init_dialog(d, 0);
 
         while (update_dialog(dp) && !menu_pressed() && !(mouse_b&2) && !key[KEY_ESC]);
@@ -453,7 +458,7 @@ int gui_keydefine()
                 update_menu_keys();
         }
 
-        close_dialog(d, b);
+        close_dialog(d, handle_background);
         return D_O_K;
 }
 

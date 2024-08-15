@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include "elk.h"
+#include "unistd.h"
 
 int parallel_fd = -1;
 

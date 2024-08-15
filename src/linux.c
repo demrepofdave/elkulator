@@ -2,8 +2,9 @@
   Linux main loop*/
 #ifndef WIN32
 
-#include <allegro.h>
+#include <stdlib.h>
 #include "elk.h"
+#include "hal/hal.h"
 
 char ssname[260];
 char scrshotname[260];
@@ -43,16 +44,17 @@ int keylookup[128];
 
 int main(int argc, char *argv[])
 {
-        int ret = allegro_init();
-        if (ret != 0)
+        hal_result result = hal_init();
+
+        if (result != HAL_OK)
         {
-                fprintf(stderr, "Error %d initializing Allegro.\n", ret);
+                fprintf(stderr, "Error %d initializing HAL (Allegro).\n", result); // TODO: Pass back actual allegro error information.
                 exit(-1);
         }
         initelk(argc,argv);
-        set_window_title("Elkulator v1.0 (Press MENU, next to R-Ctrl, for menu)");
-        set_close_button_callback(native_window_close_button_handler);
-        install_mouse();
+        hal_set_window_title("Elkulator v1.0 (Press MENU, next to R-Ctrl, for menu)");
+        hal_set_close_button_callback(native_window_close_button_handler);
+        hal_install_mouse();
         while (!quited)
         {
                 runelk();

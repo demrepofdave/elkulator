@@ -3,7 +3,6 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <allegro.h>
 #include <stdio.h>
 
 #define printf rpclog

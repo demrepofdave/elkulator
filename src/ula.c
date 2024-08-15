@@ -62,8 +62,8 @@ hal_bitmap_handle handle_b162; // Transforms what is in b16 (?)
 hal_bitmap_handle handle_vidb;  // TODO: Document what this is
 
 #ifdef WIN32
-BITMAP *vp1; // TODO: Document what this is
-BITMAP *vp2; // TODO: Document what this is
+hal_bitmap_handle handle_vp1; // TODO: Document what this is
+hal_bitmap_handle handle_vp2; // TODO: Document what this is
 #endif
 
 void clearall()
@@ -141,11 +141,14 @@ void enterfullscreen()
         set_color_depth(desktop_color_depth());
         set_gfx_mode(GFX_AUTODETECT_FULLSCREEN,800,600,0,0);
         #ifdef WIN32
-        vp1=create_video_bitmap(800,600);
-        vp2=create_video_bitmap(800,600);
-        show_video_bitmap(vp2);
-        vidb=create_video_bitmap(800,300);
-        clear(vidb);
+        handle_vp1=hal_allocate_bitmap();
+        handle_vp2=hal_allocate_bitmap();
+        hal_create_video_bitmap(handle_vp1, 800,600);
+        hal_create_video_bitmap(handle_vp2, 800,600);
+        hal_show_video_bitmap(handle_vp2);
+        handle_vidb=hal_allocate_bitmap();
+        hal_create_video_bitmap(handle_vidb, 800,300);
+        hal_clear_bitmap(handle_vidb);
         install_mouse();
         #endif
         set_color_depth(8);
@@ -157,9 +160,12 @@ void leavefullscreen()
 {
         #ifdef WIN32
         remove_mouse();
-        destroy_bitmap(vidb);
-        destroy_bitmap(vp2);
-        destroy_bitmap(vp1);
+        hal_destroy_bitmap(handle_vidb);
+        hal_destroy_bitmap(handle_vp2);
+        hal_destroy_bitmap(handle_vp1);
+        hal_release_bitmap(handle_vidb);
+        hal_release_bitmap(handle_vp2);
+        hal_release_bitmap(handle_vp1);
         #endif
         set_color_depth(desktop_color_depth());
         #ifdef WIN32
@@ -807,37 +813,25 @@ void yield()
                                                         #else
                                                         //for (c=0;c<512;c++) blit(b,b16,0,c>>1,0,c,640,1);
                                                         for (c=0;c<512;c++) hal_blit(handle_b,handle_b16,0,c>>1,0,c,640,1);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         #endif
                                                         break;
                                                         case _2XSAI:
-                                                        //blit(b,b162,0,0,0,0,640,256);
-                                                        //Super2xSaI(b162,b16,0,0,0,0,320,256);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
                                                         hal_Super2xSaI(handle_b162,handle_b16,0,0,0,0,320,256);
                                                         hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case SCALE2X:
-                                                        //blit(b,b162,0,0,0,0,640,256);
-                                                        //scale2x(b162,b16,320,256);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
                                                         hal_scale2x(handle_b162,handle_b16,320,256);
                                                         hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case EAGLE:
-                                                        //blit(b,b162,0,0,0,0,640,256);
-                                                        //SuperEagle(b162,b16,0,0,0,0,320,256);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         hal_blit(handle_b,handle_b162,0,0,0,0,640,256);
                                                         hal_SuperEagle(handle_b162,handle_b16,0,0,0,0,320,256);
                                                         hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case PAL:
-                                                        //palfilter(b,b16,coldepth);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         hal_palfilter(handle_b,handle_b16,coldepth);
                                                         hal_blit_screen(handle_b16,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
@@ -1033,7 +1027,7 @@ void dosavescrshot()
                 hal_blit(handle_b16,handle_tb,0,0,0,0,640,512);
                 break;
         }
-        hal_save_bmp(handle_tb, scrshotname, NULL);
+        hal_save_bmp(handle_tb, scrshotname);
         hal_destroy_bitmap(handle_tb);
         set_color_depth(8);
         hal_release_bitmap(handle_tb);

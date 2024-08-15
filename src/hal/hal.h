@@ -12,7 +12,6 @@
 #define _HAL_H
 
 #include "stdint.h"
-#include "allegro.h"  // Temporary for now until abstraction is abstracted :)
 
 //  Possible API
 
@@ -21,9 +20,18 @@
 typedef int hal_result; 
 typedef int hal_bitmap_handle;
 
+// Define hal_result error codes.
+#define HAL_OK                  0
+#define HAL_UNINITIALISED      -1
+#define HAL_INVALID_HANDLE     -2
+#define HAL_HANDLE_TABLE_FULL  -3
+#define HAL_BITMAP_UNALLOCATED -4
 
 // General hal functions.
 hal_result hal_init(); // Initialise the HAL. This must be done before any other API calls to the HAL are made.
+hal_result hal_set_window_title(const char * name);
+hal_result hal_set_close_button_callback( void (*handler_function)(void));
+hal_result hal_install_mouse();
 
 // Bitmap management
 hal_bitmap_handle hal_allocate_bitmap(); // Returns a handler to a BITMAP type and initialises the base BITMAP
@@ -44,18 +52,13 @@ hal_result hal_SuperEagle(hal_bitmap_handle source, hal_bitmap_handle dest, int 
 hal_result hal_scale2x   (hal_bitmap_handle source, hal_bitmap_handle dest, int width, int height);
 hal_result hal_palfilter (hal_bitmap_handle source, hal_bitmap_handle dest, int depth);
 
-hal_result hal_save_bmp(hal_bitmap_handle handle, const char *filename, const struct RGB *pal);
+hal_result hal_save_bmp(hal_bitmap_handle handle, const char *filename);
 
 hal_result hal_bitmap_setpixel(hal_bitmap_handle handle, int y, int x, uint8_t col);
 //b->line[ula.y][(ula.x+x)>>1]=pal[col];
 
 // Functions that break the HAL
 void *hal_get_bitmap_dat_ex(hal_bitmap_handle handle);
-
-
-// Temporary home for some functions moved from src into hal
-void scale2x(BITMAP *src, BITMAP *dst, int width, int height);
-void palfilter(BITMAP *src, BITMAP *dest, int depth);
 
 #endif // _HAL_H
 
