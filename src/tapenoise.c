@@ -2,9 +2,10 @@
   Tape noise (not very good)*/
 
 #include <stdio.h>
-#include <allegro.h>
+#include <unistd.h>
 #include <math.h>
 #include "elk.h"
+#include "hal/hal.h"
 
 static const char * ddnoise = "ddnoise"; // Name of directory containing wav files to emulate tape noise
 
@@ -18,7 +19,7 @@ int sinewave[32];
 
 #define PI 3.142
 
-SAMPLE *tsamples[2];
+hal_sample_handle handle_tsamples[2];
 
 void maketapenoise()
 {
@@ -31,8 +32,8 @@ void maketapenoise()
         else        sprintf(path,"%s%s",exedir, ddnoise);
         printf("path now %s\n",path);
         chdir(path);
-        tsamples[0]=load_wav("motoron.wav");
-        tsamples[1]=load_wav("motoroff.wav");
+        handle_tsamples[0]=hal_allocate_sample_and_load_wav("motoron.wav");
+        handle_tsamples[1]=hal_allocate_sample_and_load_wav("motoroff.wav");
         chdir(p2);
         for (c=0;c<32;c++)
         {
@@ -40,10 +41,13 @@ void maketapenoise()
         }
 }
 
+// NOTE: Following function seems never to be called.
 void closetapenoise()
 {
-        destroy_sample(tsamples[0]);
-        destroy_sample(tsamples[1]);
+        hal_destroy_sample(handle_tsamples[0]);
+        hal_destroy_sample(handle_tsamples[1]);
+        hal_release_sample(handle_tsamples[0]);
+        hal_release_sample(handle_tsamples[1]);
 }
 
 void addhightone()
@@ -132,7 +136,7 @@ void mixtapenoise(int16_t *tapebuffer)
                 if (tnoise_sstat>=0)
                 {
 //                        rpclog("SSTAT %i %i\n",tnoise_sstat,c);
-                        if (tnoise_spos>=tsamples[tnoise_sstat]->len)
+                        if (tnoise_spos>=hal_sample_get_length(handle_tsamples[tnoise_sstat]))
                         {
                                 tnoise_spos=0;
                                 tnoise_sstat=-1;
@@ -141,8 +145,8 @@ void mixtapenoise(int16_t *tapebuffer)
                         else
                         {
 //                                if (!c) rpclog("MixS!\n");
-                                tapebuffer[c]+=((int16_t)((((int16_t *)tsamples[tnoise_sstat]->data)[(int)tnoise_spos])^0x8000)/4);
-                                tnoise_spos+=((float)tsamples[tnoise_sstat]->freq/44100.0);
+                                tapebuffer[c]+=((int16_t)((((int16_t *)hal_sample_get_data_ptr(handle_tsamples[tnoise_sstat]))[(int)tnoise_spos])^0x8000)/2);
+                                tnoise_spos+=((float)hal_sample_get_frequency(handle_tsamples[tnoise_sstat])/44100.0);
                         }
                 }
         }

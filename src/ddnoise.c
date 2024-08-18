@@ -1,9 +1,10 @@
 /*Elkulator v1.0 by Sarah Walker
   Disc drive noise*/
 
-#include <allegro.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
+#include "hal/hal.h"
 #include "elk.h"
 
 
@@ -11,9 +12,8 @@ static const char * ddnoise35 = "ddnoise/35";   // Name of directory containing 
 static const char * ddnoise525 = "ddnoise/525"; // Name of directory containing wav files to emulate noise of 5.25 inch Disk Drive
 
 int ddvol=3;
-SAMPLE *seeksmp[4][2],*seek2smp,*seek3smp;
-SAMPLE *stepsmp;
-SAMPLE *motorsmp[3];
+hal_sample_handle handle_seeksmp[4][2] = { { -1, -1}, {-1, -1}, {-1,-1}, {-1, -1} };
+hal_sample_handle handle_motorsmp[3] = { -1, -1, -1}; // TODO: Tide this initialisation up. //, *seek2smp,*seek3smp; // We seem to need the last two pointers otherwise sound goes haywire.  This suggest a memory overrun to me.
 
 float ddnoise_mpos=0;
 int ddnoise_mstat=-1;
@@ -34,31 +34,33 @@ void loaddiscsamps()
         else        sprintf(path,"%s%s",exedir, ddnoise525);
         printf("path now %s\n",path);
         chdir(path);
-        seeksmp[0][0]=load_wav("stepo.wav");
-        if (seeksmp[0][0])
+        handle_seeksmp[0][0] = hal_allocate_sample_and_load_wav("stepo.wav");
+        if(handle_seeksmp[0][0] >= 0) // valid handle.
         {
-                seeksmp[0][1]=load_wav("stepi.wav");
-                seeksmp[1][0]=load_wav("seek1o.wav");
-                seeksmp[1][1]=load_wav("seek1i.wav");
-                seeksmp[2][0]=load_wav("seek2o.wav");
-                seeksmp[2][1]=load_wav("seek2i.wav");
-                seeksmp[3][0]=load_wav("seek3o.wav");
-                seeksmp[3][1]=load_wav("seek3i.wav");
+                handle_seeksmp[0][1]=hal_allocate_sample_and_load_wav("stepi.wav");
+                handle_seeksmp[1][0]=hal_allocate_sample_and_load_wav("seek1o.wav");
+                handle_seeksmp[1][1]=hal_allocate_sample_and_load_wav("seek1i.wav");
+                handle_seeksmp[2][0]=hal_allocate_sample_and_load_wav("seek2o.wav");
+                handle_seeksmp[2][1]=hal_allocate_sample_and_load_wav("seek2i.wav");
+                handle_seeksmp[3][0]=hal_allocate_sample_and_load_wav("seek3o.wav");
+                handle_seeksmp[3][1]=hal_allocate_sample_and_load_wav("seek3i.wav");
         }
         else
         {
-                seeksmp[0][0]=load_wav("step.wav");
-                seeksmp[0][1]=load_wav("step.wav");
-                seeksmp[1][0]=load_wav("seek.wav");
-                seeksmp[1][1]=load_wav("seek.wav");
-                seeksmp[2][0]=load_wav("seek3.wav");
-                seeksmp[2][1]=load_wav("seek3.wav");
-                seeksmp[3][0]=load_wav("seek2.wav");
-                seeksmp[3][1]=load_wav("seek2.wav");
+                handle_seeksmp[0][0]=hal_allocate_sample_and_load_wav("step.wav");
+                handle_seeksmp[0][1]=hal_allocate_sample_and_load_wav("step.wav");
+                handle_seeksmp[1][0]=hal_allocate_sample_and_load_wav("seek.wav");
+                handle_seeksmp[1][1]=hal_allocate_sample_and_load_wav("seek.wav");
+                handle_seeksmp[2][0]=hal_allocate_sample_and_load_wav("seek3.wav");
+                handle_seeksmp[2][1]=hal_allocate_sample_and_load_wav("seek3.wav");
+                handle_seeksmp[3][0]=hal_allocate_sample_and_load_wav("seek2.wav");
+                handle_seeksmp[3][1]=hal_allocate_sample_and_load_wav("seek2.wav");
         }
-        motorsmp[0]=load_wav("motoron.wav");
-        motorsmp[1]=load_wav("motor.wav");
-        motorsmp[2]=load_wav("motoroff.wav");
+
+        handle_motorsmp[0] = hal_allocate_sample_and_load_wav("motoron.wav");
+        handle_motorsmp[1] = hal_allocate_sample_and_load_wav("motor.wav");
+        handle_motorsmp[2] = hal_allocate_sample_and_load_wav("motoroff.wav");
+        
         chdir(p2);
         printf("done!\n");
 }
@@ -68,14 +70,24 @@ void closeddnoise()
         int c;
         for (c=0;c<4;c++)
         {
-                if (seeksmp[c][0]) destroy_sample(seeksmp[c][0]);
-                if (seeksmp[c][1]) destroy_sample(seeksmp[c][1]);
-                seeksmp[c][0]=seeksmp[c][1]=NULL;
+                if(handle_seeksmp[c][0] != -1)
+                {
+                        hal_destroy_sample(handle_seeksmp[c][0]);
+                        hal_destroy_sample(handle_seeksmp[c][1]);
+                        hal_release_sample(handle_seeksmp[c][0]);
+                        hal_release_sample(handle_seeksmp[c][1]);
+                        handle_seeksmp[c][0]= -1;
+                        handle_seeksmp[c][1]= -1;
+                }
         }
         for (c=0;c<3;c++)
         {
-                if (motorsmp[c]) destroy_sample(motorsmp[c]);
-                motorsmp[c]=NULL;
+                if(handle_motorsmp[c] != -1)
+                {
+                        hal_destroy_sample(handle_motorsmp[c]);
+                        hal_release_sample(handle_motorsmp[c]);
+                        handle_motorsmp[c]= -1;
+                }
         }
 }
 
@@ -124,7 +136,7 @@ printf("Mixing ddnoise...\n");
                 ddbuffer[c]=0;
                 if (ddnoise_mstat>=0)
                 {
-                        if (ddnoise_mpos>=motorsmp[ddnoise_mstat]->len)
+                        if (ddnoise_mpos>=hal_sample_get_length(handle_motorsmp[ddnoise_mstat]))
                         {
                                 ddnoise_mpos=0;
                                 if (ddnoise_mstat!=1) ddnoise_mstat++;
@@ -133,8 +145,8 @@ printf("Mixing ddnoise...\n");
                         if (ddnoise_mstat!=-1)
                         {
 //                                if (!c) rpclog("MixM!\n");
-                                ddbuffer[c]+=((int16_t)((((int16_t *)motorsmp[ddnoise_mstat]->data)[(int)ddnoise_mpos])^0x8000)/2);
-                                ddnoise_mpos+=((float)motorsmp[ddnoise_mstat]->freq/44100.0);
+                                ddbuffer[c]+=((int16_t)((((int16_t *)hal_sample_get_data_ptr(handle_motorsmp[ddnoise_mstat]))[(int)ddnoise_mpos])^0x8000)/2);
+                                ddnoise_mpos+=((float)hal_sample_get_frequency(handle_motorsmp[ddnoise_mstat])/44100.0);
                         }
                 }
         }
@@ -144,7 +156,7 @@ printf("Mixing ddnoise...\n");
                 if (ddnoise_sstat>=0)
                 {
 //                        rpclog("SSTAT %i %i\n",ddnoise_sstat,c);
-                        if (ddnoise_spos>=seeksmp[ddnoise_sstat][ddnoise_sdir]->len)
+                        if (ddnoise_mpos>=hal_sample_get_length(handle_seeksmp[ddnoise_mstat][ddnoise_sdir]))
                         {
                                 if (ddnoise_sstat>0)
                                 {
@@ -159,8 +171,8 @@ printf("Mixing ddnoise...\n");
                         else
                         {
 //                                if (!c) rpclog("MixS!\n");
-                                ddbuffer[c]+=((int16_t)((((int16_t *)seeksmp[ddnoise_sstat][ddnoise_sdir]->data)[(int)ddnoise_spos])^0x8000)/2);
-                                ddnoise_spos+=((float)seeksmp[ddnoise_sstat][ddnoise_sdir]->freq/44100.0);
+                                ddbuffer[c]+=((int16_t)((((int16_t *)hal_sample_get_data_ptr(handle_seeksmp[ddnoise_mstat][ddnoise_sdir]))[(int)ddnoise_mpos])^0x8000)/2);
+                                ddnoise_spos+=((float)hal_sample_get_frequency(handle_seeksmp[ddnoise_mstat][ddnoise_sdir])/44100.0);
                         }
                 }
                 ddbuffer[c]=(ddbuffer[c]/3)*ddvol;

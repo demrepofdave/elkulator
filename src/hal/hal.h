@@ -68,9 +68,15 @@ hal_result hal_bitmap_setpixel(hal_bitmap_handle handle, int y, int x, uint8_t c
 
 // Sound functions - sample management
 hal_sample_handle hal_allocate_sample(); // Returns a handler to a SAMPLE type and initialises the base SAMPLE
+hal_sample_handle hal_allocate_sample_and_load_wav(const char *filename); // Returns a handler to a SAMPLE type and initialises the base SAMPLE, then loads the WAV file.
 hal_result hal_sample_load_wav(hal_bitmap_handle handle, const char *filename);
 hal_result hal_destroy_sample(hal_sample_handle handle);
 hal_result hal_release_sample(hal_sample_handle handle); // Releases sample and returns handler to the pool.
+
+// Sound manipulation functions.
+unsigned long hal_sample_get_length(hal_sample_handle handle);
+void * hal_sample_get_data_ptr(hal_sample_handle handle);
+int hal_sample_get_frequency(hal_sample_handle handle);
 
 // Functions that break the HAL
 void *hal_get_bitmap_dat_ex(hal_bitmap_handle handle);

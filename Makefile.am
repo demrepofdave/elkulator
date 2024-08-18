@@ -3,7 +3,7 @@
 # Makefile.am for Elkulator
 
 bin_PROGRAMS = elkulator
-noinst_SCRIPTS = ../elkulator
+noinst_SCRIPTS = elkulator
 CLEANFILES = $(noinst_SCRIPTS)
 
 # ../elkulator: elkulator
@@ -42,7 +42,6 @@ elkulator_SOURCES = src/1770.c \
                     src/serial.c \
                     src/socket.c \
                     src/sound.c \
-                    src/soundopenal.c \
                     src/ssd.c \
                     src/tapenoise.c \
                     src/uef.c \
@@ -51,5 +50,7 @@ elkulator_SOURCES = src/1770.c \
                     src/hal/hal_allegro_4/2xsai.c \
                     src/hal/hal_allegro_4/palfilt.c \
                     src/hal/hal_allegro_4/scale2x.c \
+                    src/hal/hal_allegro_4/soundopenal.c \
                     src/hal/hal_allegro_4/hal.c \
                     src/hal/hal_allegro_4/hal_sound.c
+

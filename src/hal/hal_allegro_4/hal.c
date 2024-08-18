@@ -5,6 +5,9 @@
 #include "stdbool.h"
 #include "stdio.h"
 
+#define printf rpclog
+
+void rpclog(char *format, ...);
 
 #define BITMAP_TABLE_SIZE 256
 #define SAMPLE_TABLE_SIZE 256

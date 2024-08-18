@@ -4,13 +4,21 @@
 #include "stdbool.h"
 #include "stdio.h"
 
+#define printf rpclog
+
+void rpclog(char *format, ...);
+
 #define SAMPLE_TABLE_SIZE 256
 
+//#define printf rpclog
+
+void rpclog(char *format, ...);
 
 typedef struct tsampleTableEntry
 {
     bool bAllocated;
     SAMPLE * pSample;
+    void * pNull;  // May not be needed. We shall see (could be due to buffer overrun bug).
 
 } sample_table_entry;
 
@@ -131,7 +139,6 @@ hal_result hal_release_sample(hal_sample_handle handle)
     return result;
 }
 
-
 // Create bitmap.
 hal_result hal_sample_load_wav(hal_bitmap_handle handle, const char *filename)
 {
@@ -150,6 +157,20 @@ hal_result hal_sample_load_wav(hal_bitmap_handle handle, const char *filename)
     return result;
 }
 
+hal_sample_handle hal_allocate_sample_and_load_wav(const char *filename)
+{
+    hal_sample_handle handle = hal_allocate_sample();
+    if(handle >= 0) // Valid handle.
+    {
+        if(hal_sample_load_wav(handle, filename) != HAL_OK)
+        {
+            hal_release_sample(handle);
+            handle = -1; // TODO: Simple error for now.
+        }
+    }
+    return handle;
+}
+
 hal_result hal_destroy_sample(hal_bitmap_handle handle)
 {
     hal_result result = isSampleAssigned(handle);
@@ -163,6 +184,51 @@ hal_result hal_destroy_sample(hal_bitmap_handle handle)
     hal_debug_print_allocated_sample_table();
     
     return result;
+}
+
+
+// Sound manipulation functions.
+
+unsigned long  hal_sample_get_length(hal_sample_handle handle)
+{
+    unsigned long len = -1;
+    hal_result result = isSampleAssigned(handle);
+
+    if(result == HAL_OK)
+    {
+        // TODO: Logic stuff
+        len = sample_table[handle].pSample->len;
+    }
+
+    return len;
+}
+
+void * hal_sample_get_data_ptr(hal_sample_handle handle)
+{
+    void * data_ptr = NULL;
+    hal_result result = isSampleAssigned(handle);
+
+    if(result == HAL_OK)
+    {
+        // TODO: Logic stuff
+        data_ptr = sample_table[handle].pSample->data;
+    }
+
+    return data_ptr;
+}
+
+int hal_sample_get_frequency(hal_sample_handle handle)
+{
+    int freq = -1;
+    hal_result result = isSampleAssigned(handle);
+
+    if(result == HAL_OK)
+    {
+        // TODO: Logic stuff
+        freq = sample_table[handle].pSample->freq;
+    }
+
+    return freq;
 }
 
 // End of file.
