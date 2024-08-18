@@ -58,6 +58,7 @@ void updatelinuxgui()
         soundmenu[0].flags=(sndint)?D_SELECTED:0;
         soundmenu[1].flags=(sndex)?D_SELECTED:0;
         soundmenu[2].flags=(sndddnoise)?D_SELECTED:0;
+        soundmenu[3].flags=(sndtape)?D_SELECTED:0;
         dischmenu[0].flags=(plus3)?D_SELECTED:0;
         dischmenu[1].flags=(adfsena)?D_SELECTED:0;
         dischmenu[2].flags=(dfsena)?D_SELECTED:0;
