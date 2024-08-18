@@ -78,6 +78,18 @@ unsigned long hal_sample_get_length(hal_sample_handle handle);
 void * hal_sample_get_data_ptr(hal_sample_handle handle);
 int hal_sample_get_frequency(hal_sample_handle handle);
 
+// Misc hal.
+void hal_get_executable_name(char *output, int size);
+char * hal_get_extension(char *filename);
+char * hal_get_filename(char *path);
+int hal_install_keyboard();
+void hal_install_timer(void);
+void hal_install_int_ex_in_ms(void (*handler_function)(void), long speed);
+int hal_install_joystick_autodetect();
+int hal_set_display_switch_mode_background();
+int hal_poll_joystick();
+void hal_rest(unsigned int period);
+
 // Functions that break the HAL
 void *hal_get_bitmap_dat_ex(hal_bitmap_handle handle);
 

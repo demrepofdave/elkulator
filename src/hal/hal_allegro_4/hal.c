@@ -544,4 +544,56 @@ hal_result hal_bitmap_setpixel(hal_bitmap_handle handle, int y, int x, uint8_t c
     return result;
 }
 
+void hal_get_executable_name(char *output, int size)
+{
+    get_executable_name(output, size);
+}
+
+char * hal_get_filename(char *path)
+{
+    return get_filename(path);
+}
+
+char * hal_get_extension(char *filename)
+{
+    return get_extension(filename);
+}
+
+int hal_install_keyboard()
+{
+    return install_keyboard();
+}
+
+void hal_install_timer(void)
+{
+    install_timer();
+}
+
+void hal_install_int_ex_in_ms(void (*handler_function)(void), long speed)
+{
+    install_int_ex(handler_function, MSEC_TO_TIMER(speed));
+}
+
+int hal_install_joystick_autodetect()
+{
+    return install_joystick(JOY_TYPE_AUTODETECT);
+}
+
+int hal_set_display_switch_mode_background()
+{
+    return set_display_switch_mode(SWITCH_BACKGROUND);
+}
+
+int hal_poll_joystick()
+{
+    return poll_joystick();
+}
+
+void hal_rest(unsigned int period)
+{
+    return rest(period);
+}
+
+
+
 // End of file.

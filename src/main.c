@@ -1,8 +1,8 @@
 /*Elkulator v1.0 by Tom walker
   Initialisation/Closing/Main loop*/
-#include <allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include "elk.h"
 #include "hal/hal.h"
@@ -74,8 +74,8 @@ void initelk(int argc, char *argv[])
         int c;
         char *p;
         int tapenext=0,discnext=0,romnext=-2,parallelnext=0,serialnext=0,serialdebugnext=0;
-        get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-        p=get_filename(exedir);
+        hal_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+        p=hal_get_filename(exedir);
         p[0]=0;
         discname[0]=discname2[0]=tapename[0]=0;
         parallelname[0]=0;serialname[0]=0;
@@ -203,11 +203,11 @@ void initelk(int argc, char *argv[])
         }
         if (defaultwriteprot) writeprot[0]=writeprot[1]=1;
 #ifndef WIN32
-        install_keyboard();
+        hal_install_keyboard();
 #endif
-        install_timer();
-        install_int_ex(drawitint,MSEC_TO_TIMER(20));
-        install_joystick(JOY_TYPE_AUTODETECT);
+        hal_install_timer();
+        hal_install_int_ex_in_ms(drawitint, 20); // 20 msec timer.
+        hal_install_joystick_autodetect();
         inital();
         initsound();
         loaddiscsamps();
@@ -215,7 +215,7 @@ void initelk(int argc, char *argv[])
 
         makekeyl();
         
-        set_display_switch_mode(SWITCH_BACKGROUND);
+        hal_set_display_switch_mode_background();
         
 //        initresid();
 //        resetsid();
@@ -252,7 +252,7 @@ void runelk()
                 oldbreak = break_pressed();
                 if (wantloadstate) doloadstate();
                 if (wantsavestate) dosavestate();
-                if (infocus) poll_joystick();
+                if (infocus) hal_poll_joystick();
                 if (autoboot) autoboot--;
                 ddnoiseframes++;
                 if (ddnoiseframes>=5)
@@ -262,7 +262,7 @@ void runelk()
                 }
         }
         else
-           rest(1);
+           hal_rest(1);
 }
 
 void closeelk()
