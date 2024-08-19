@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "elk.h"
+#include "hal/hal.h"
 
 static const char * elk_cfg_filename = "/elk.cfg"; // Filename for elkulator config file.
 
@@ -13,7 +14,6 @@ int sndex;
 int sndint;
 int firstbyte;
 int defaultwriteprot;
-int joffset;
 int enable_mgc;
 int enable_db_flash_cartridge;
 int enable_jim;
@@ -130,7 +130,7 @@ void loadconfig()
         
         firstbyte=getintcfg("joy_firstbyte",0);
         
-        joffset=getintcfg("joy_offset",0);
+        hal_set_joffset(getintcfg("joy_offset",0));
 
         for (c=0;c<128;c++)
         {
@@ -183,7 +183,7 @@ void saveconfig()
         
         writeintcfg("joy_firstbyte",firstbyte);
         
-        writeintcfg("joy_offset",joffset);
+        writeintcfg("joy_offset",hal_get_joffset());
         
         for (c=0;c<128;c++)
         {

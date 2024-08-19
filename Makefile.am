@@ -22,7 +22,6 @@ endif
 
 elkulator_SOURCES = src/1770.c \
                     src/6502.c \
-                    src/adc.c  \
                     src/adf.c  \
                     src/config.c  \
                     src/csw.c  \
@@ -31,7 +30,6 @@ elkulator_SOURCES = src/1770.c \
                     src/disc.c \
                     src/fdi2raw.c \
                     src/fdi.c \
-                    src/firstbyte.c \
                     src/linux.c \
                     src/linux-gui.c \
                     src/linux-keydefine.c \
@@ -48,9 +46,12 @@ elkulator_SOURCES = src/1770.c \
                     src/ula.c \
                     src/allegro_icon.c \
                     src/hal/hal_allegro_4/2xsai.c \
+                    src/hal/hal_allegro_4/adc.c  \
                     src/hal/hal_allegro_4/palfilt.c \
                     src/hal/hal_allegro_4/scale2x.c \
                     src/hal/hal_allegro_4/soundopenal.c \
+                    src/hal/hal_allegro_4/firstbyte.c \
                     src/hal/hal_allegro_4/hal.c \
                     src/hal/hal_allegro_4/hal_sound.c
+
 

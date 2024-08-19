@@ -78,6 +78,16 @@ unsigned long hal_sample_get_length(hal_sample_handle handle);
 void * hal_sample_get_data_ptr(hal_sample_handle handle);
 int hal_sample_get_frequency(hal_sample_handle handle);
 
+// Joystick control.
+hal_result hal_set_joffset(int offset);
+int hal_get_joffset();
+uint8_t hal_read_firstbyte();
+
+// ADC including joystick control
+hal_result hal_write_adc(uint8_t val);
+uint8_t hal_read_adc();
+uint8_t hal_get_plus1_stat();
+
 // Misc hal.
 void hal_get_executable_name(char *output, int size);
 char * hal_get_extension(char *filename);

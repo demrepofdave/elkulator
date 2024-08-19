@@ -2,12 +2,28 @@
   First Byte joystick emulation*/
 #include <allegro.h>
 
-#include "elk.h"
+#include "hal/hal.h"
 
-uint8_t readfirstbyte()
+int j_offset = 0;
+
+hal_result hal_set_joffset(int offset)
+{
+    hal_result result = HAL_OK;
+    offset = j_offset;
+    return result;
+}
+
+// TODO: Move this into main hal.c
+int hal_get_joffset()
+{
+    return j_offset;
+}
+
+uint8_t hal_read_firstbyte()
 {
         int c;
         uint8_t temp=0xFF;
+        int joffset = hal_get_joffset();
         if (!num_joysticks) num_joysticks++;
         if (joy[joffset%num_joysticks].stick[0].axis[1].pos<-32) temp&=~0x01;
         if (joy[joffset%num_joysticks].stick[0].axis[1].pos>=32) temp&=~0x02;

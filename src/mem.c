@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hal/hal.h"
 #include "elk.h"
 
 static const char * roms = "roms";   // Name of directory containing rom files
@@ -192,11 +193,11 @@ uint8_t readmem(uint16_t addr)
         case 0xFC00:
         {
             if ((addr&0xFFF8)==0xFCC0 && plus3) return read1770(addr);
-            if (addr==0xFCC0 && firstbyte) return readfirstbyte();
+            if (addr==0xFCC0 && firstbyte) return hal_read_firstbyte();
             if (plus1)
             {
-                    if (addr==0xFC70) return readadc();
-                    if (addr==0xFC72) return getplus1stat();
+                    if (addr==0xFC70) return hal_read_adc();
+                    if (addr==0xFC72) return hal_get_plus1_stat();
             }
             if (addr>=0xFC60 && addr<=0xFC6F && plus1) return readserial(addr);
 //          if ((addr&~0x1F)==0xFC20) return readsid(addr);
@@ -308,7 +309,7 @@ void writemem(uint16_t addr, uint8_t val)
 //                rpclog("Write MRB %02X %i %i %04X\n",val,FASTLOW,FASTHIGH2,pc);
 //                if (!val) output=1;
         }
-        if (addr==0xFC70 && plus1) writeadc(val);
+        if (addr==0xFC70 && plus1) hal_write_adc(val);
         if (addr>=0xFC60 && addr<=0xFC6F && plus1) return writeserial(addr, val);
         if (addr==0xFC71 && plus1) writeparallel(val);
         /* The Mega Games Cartridge uses FC00 to select pairs of 16K banks in

@@ -317,13 +317,6 @@ void debugwrite(uint16_t addr, uint8_t val);
 void startdebug();
 void enddebug();
 
-uint8_t readfirstbyte();
-extern int joffset;
-
-uint8_t readadc();
-void writeadc(uint8_t val);
-uint8_t getplus1stat();
-
 void initpaltables();
 
 void startblit();

@@ -1,19 +1,20 @@
 /*Elkulator v1.0 by Sarah Walker
   ADC / Plus 1 emulation*/
 #include <allegro.h>
-#include "elk.h"
+#include "hal/hal.h"
 
 uint8_t plus1stat=0x7F;
-
 int adctime=0;
 uint8_t adcdat;
 
-void writeadc(uint8_t val)
+hal_result hal_write_adc(uint8_t val)
 {
+        hal_result result = HAL_OK;
         int dat1=0,dat2=0;
         if (!num_joysticks) num_joysticks++;
         plus1stat|=0x40;
         adctime=80;
+        int joffset = hal_get_joffset();
         switch (val&3)
         {
                 case 0: dat1=-joy[joffset%num_joysticks].stick[0].axis[0].pos; break;
@@ -41,18 +42,20 @@ void writeadc(uint8_t val)
         if (dat2<-128) dat2=-128;
         adcdat=(dat1-dat2)+128;
 //        rpclog("ADC conv %02X %i %i %02X\n",val,dat1,dat2,adcdat);
+        return(result);
 }
 
-uint8_t readadc()
+uint8_t hal_read_adc()
 {
         return adcdat;
 }
 
-uint8_t getplus1stat()
+uint8_t hal_get_plus1_stat()
 {
         int c;
         if (!num_joysticks) num_joysticks++;
         plus1stat|=0x30;
+        int joffset = hal_get_joffset();
         for (c=0;c<joy[joffset%num_joysticks].num_buttons;c++) if (joy[joffset%num_joysticks].button[c].b) plus1stat&=~0x10;
         for (c=0;c<joy[(joffset+1)%num_joysticks].num_buttons;c++) if (joy[(joffset+1)%num_joysticks].button[c].b) plus1stat&=~0x20;
         return plus1stat;
