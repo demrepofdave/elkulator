@@ -1,29 +1,80 @@
-Elkulator v1.0
-==============
+# Elkulator v1.0
+
+Introduction
+============
 
 Elkulator is an Acorn Electron emulator for Windows and Linux.
 
 Elkulator is licensed under the GPL, see COPYING for more details.
 
 
-Changes since last version
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Compiling
+## Linux
 
-- Improved stability
-- CSS Sound Expansion emulation
-- Plus 1 and First Byte joystick emulation
-- Sound pitch fixed
-- FDI disc support
-- Save states added
-- Debugger added
-- Redefinable keyboard
-- Bugfix to Master RAM Board emulation
-- Few other fixes
-- Linux port
+You will need the following libraries:
+
+Allegro 4.x
+OpenAL
+ALut
+Zlib
+
+On a Debian system you should be able to install these by invoking the
+following command in a terminal window:
+
+  sudo apt-get install automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev aclocal
+
+To configure and build Elkulator, open a terminal window, navigate to the
+Elkulator directory then enter
+
+  aclocal -I m4
+  automake -a
+  autoconf
+
+This should have produced a configure script that can be used to configure
+the build process. Then type
+
+  ./configure
+  make
+
+If this is successful, typing
+
+  ./elkulator
+
+will run the emulator.
+
+Elkulator has been tested on x86-32 and x86-64 machines. No other architecture
+is guaranteed to work, and big-endian machines (eg PowerPC) almost certainly
+won't work.
+
+## Windows
+
+NOTE: The following instructions are provided as a guide, but as of September
+      2024 I have not been able to successfully build and link elkulator on 
+      Windows.
+
+TBD
+
+
+### Linux specifics
+
+The menu is not available all the time. Press the Menu or F11 keys to open it,
+then Menu or F11 to close it again. (Where available, the Menu key is
+typically found between the space bar and right Ctrl key, depicting an
+application menu on the keycap. It is not a Windows key.)
+
+The debugger is only available via the command line.
+
+Hardware line doubling mode is not available on Linux.
+
+Fullscreen mode doesn't appear to work correctly, at least on my machine.
+Elkulator takes over the screen, but the resolution never changes.
+
+Video performance is noticeably slower than on Windows. This is largely due to
+the lack of hardware acceleration support in Elkulator.
 
 
 Features
-~~~~~~~~
+========
 
 - Emulates basic 32k Electron
 - Emulation of all modes + line-by-line effects
@@ -37,7 +88,7 @@ Features
 
 
 Status
-~~~~~~
+======
 
 6502   - Enough to run all games AFAIK. Cycle accurate.
 ULA    - Cycle accurate graphics emulation.
@@ -49,7 +100,7 @@ CSS    - Using SN emulator from B-em.
 
 
 Menu
-~~~~
+====
 
 The menu options are:
 
@@ -114,7 +165,7 @@ Misc -
 
 
 Turbo boards
-~~~~~~~~~~~~
+============
 
 Elkulator can emulate an Elektuur/Slogger turbo board. This board replaces the lower
 8k of RAM in the system with the faster RAM on the board. This has the effect of speeding
@@ -136,7 +187,7 @@ Shadow - As above, but also shadows the screen memory. The screen is left in nor
 
 
 FAQ
-~~~
+===
 
 Q : How do I run a game?
 A : Load the UEF file through the tape menu. Then, at the > prompt, type
@@ -153,7 +204,7 @@ A : The PAL filter is actually doing a lot of work - processing 3 16mhz data str
 
 
 Thanks to :
-~~~~~~~~~~~
+===========
 
 Dave Moore for the website and for testing
 
@@ -175,15 +226,3 @@ development of the Acorn Electron (among others too numerous to mention)
 Sarah Walker
 
 b-em@bbcmicro.com
-
-
-<plug>
-Also check out B-em (b-em@bbcmicro.com), my BBC/Master emulator, Arculator 
-(b-em.bbcmicro.com/arculator), my Archimedes emulator, and RPCemu
-(www.riscos.info/RPCEmu), my RiscPC/A7000 emulator (that I'm not really involved
-with anymore).
-</plug>
-
-<plug>
-Also check out www.tommowalker.co.uk, for more emulators than is really necessary.
-</plug>
