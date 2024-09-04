@@ -21,24 +21,32 @@ Zlib
 On a Debian system you should be able to install these by invoking the
 following command in a terminal window:
 
-  sudo apt-get install automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev aclocal
+```
+   sudo apt-get install automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev aclocal
+```
 
 To configure and build Elkulator, open a terminal window, navigate to the
 Elkulator directory then enter
 
+```
   aclocal -I m4
   automake -a
   autoconf
+```
 
 This should have produced a configure script that can be used to configure
 the build process. Then type
 
+```
   ./configure
   make
+```
 
 If this is successful, typing
 
+```
   ./elkulator
+```
 
 will run the emulator.
 
@@ -48,14 +56,13 @@ won't work.
 
 ## Windows
 
-NOTE: The following instructions are provided as a guide, but as of September
-      2024 I have not been able to successfully build and link elkulator on 
-      Windows.
+> [!NOTE] The following instructions are provided as a guide, but as of September
+> 2024 I have not been able to successfully build and link elkulator on Windows.
 
 TBD
 
 
-### Linux specifics
+## Linux specifics
 
 The menu is not available all the time. Press the Menu or F11 keys to open it,
 then Menu or F11 to close it again. (Where available, the Menu key is
@@ -90,13 +97,13 @@ Features
 Status
 ======
 
-6502   - Enough to run all games AFAIK. Cycle accurate.
-ULA    - Cycle accurate graphics emulation.
-Sound  - Plays back samples correctly.
-Tape   - Works with UEF, HQ-UEF and CSW files. Loading is (optionally) accelerated. Read only.
-Plus 1 - ADC (joysticks), parallel and some serial support.
-Plus 3 - Two drives, ADFS + DFS, Read/Write. FDI support (though no images exist yet).
-CSS    - Using SN emulator from B-em.
+- 6502   - Enough to run all games AFAIK. Cycle accurate.
+- ULA    - Cycle accurate graphics emulation.
+- Sound  - Plays back samples correctly.
+- Tape   - Works with UEF, HQ-UEF and CSW files. Loading is (optionally) accelerated. Read only.
+- Plus 1 - ADC (joysticks), parallel and some serial support.
+- Plus 3 - Two drives, ADFS + DFS, Read/Write. FDI support (though no images exist yet).
+- CSS    - Using SN emulator from B-em.
 
 
 Menu
@@ -104,14 +111,14 @@ Menu
 
 The menu options are:
 
-File -
-    Reset         - hard-resets the Electron
-    Exit          - exit to Windows
-Tape -
-    Load tape   - loads a new UEF tape image file.
-    Rewind tape - rewinds tape to beginning.
-    Tape speed - choose between normal, fast, and really fast (really fast can break compatibilty)
-Disc -
+- File
+  - Reset         - hard-resets the Electron
+  - Exit          - exit to Windows
+- Tape
+  - Load tape   - loads a new UEF tape image file.
+  - Rewind tape - rewinds tape to beginning.
+  - Tape speed - choose between normal, fast, and really fast (really fast can break compatibilty)
+- Disc
     Load disc 0/2          - load a disc image into drives 0 and 2.
     Load disc 1/3          - load a disc image into drives 1 and 3.
     Eject disc 0/2         - removes disc image from drives 0 and 2.
@@ -121,14 +128,14 @@ Disc -
     Write protect disc 0/2 - toggles write protection on drives 0 and 2.
     Write protect disc 1/3 - toggles write protection on drives 1 and 3.
     Default write protect  - determines whether loaded discs are write protected by default
-ROM - 
+- ROM
     Load ROM cartridge 1 - Loads the first ROM cartridge
     Load ROM cartridge 2 - Loads the second ROM cartridge. Some stuff (Starship Command) comes on 2
                            ROMs and both must be loaded in order to work (these would both be in the
 			   same cartridge, but have been imaged seperately).
     Unload ROM cartridges - Unload both ROM cartridges
-Hardware - 
-    Video -
+- Hardware
+    Video
         Display type - Scanlines
 		       Line doubling
 		       2xSaI
@@ -158,10 +165,10 @@ Hardware -
     Keyboard -
 	   Redefine keyboard - lets you redefine the keyboard
            Restore default layout - restores default keyboard layout
-Misc -
-    Save screenshot - Saves a screenshot in .BMP format
-    Debugger - Enters the debugger
-    Break - Breaks into debugger (when debugger enabled)
+- Misc
+    - Save screenshot - Saves a screenshot in .BMP format
+    - Debugger - Enters the debugger
+    - Break - Breaks into debugger (when debugger enabled)
 
 
 Turbo boards
@@ -176,11 +183,9 @@ anything from this area, and some timing sensitive games (eg Firetrack) will mes
 Elkulator can also emulate a Slogger/Jafa Master RAM board. This is a far more ambitious
 afair, attempting to replace all the Electron memory. It has three modes :
 
-Off - Disabled. Same as a normal Electron.
-
-Turbo - Same as the above turbo board - only replaces 8k.
-
-Shadow - As above, but also shadows the screen memory. The screen is left in normal memory,
+- Off - Disabled. Same as a normal Electron.
+- Turbo - Same as the above turbo board - only replaces 8k.
+- Shadow - As above, but also shadows the screen memory. The screen is left in normal memory,
          and BASIC works with the 'shadow memory' on the board. The computer boasts this as
          '64k mode'. This means that you can use up to 28k in BASIC in all modes, and it runs
          noticeably faster as well. This mode is incompatible with almost all games though.
