@@ -13,10 +13,10 @@ Elkulator is licensed under the GPL, see COPYING for more details.
 
 You will need the following libraries:
 
-Allegro 4.x
-OpenAL
-ALut
-Zlib
+- Allegro 4.x
+- OpenAL
+- ALut
+- Zlib
 
 On a Debian system you should be able to install these by invoking the
 following command in a terminal window:
@@ -119,52 +119,52 @@ The menu options are:
   - Rewind tape - rewinds tape to beginning.
   - Tape speed - choose between normal, fast, and really fast (really fast can break compatibilty)
 - Disc
-    Load disc 0/2          - load a disc image into drives 0 and 2.
-    Load disc 1/3          - load a disc image into drives 1 and 3.
-    Eject disc 0/2         - removes disc image from drives 0 and 2.
-    Eject disc 1/3         - removes disc image from drives 1 and 3.
-    New disc 0/2   	   - creates a new DFS/ADFS disc and loads it into drives 0 and 2.
-    New disc 1/3           - creates a new DFS/ADFS disc and loads it into drives 1 and 3.
-    Write protect disc 0/2 - toggles write protection on drives 0 and 2.
-    Write protect disc 1/3 - toggles write protection on drives 1 and 3.
-    Default write protect  - determines whether loaded discs are write protected by default
+  - Load disc 0/2          - load a disc image into drives 0 and 2.
+  - Load disc 1/3          - load a disc image into drives 1 and 3.
+  - Eject disc 0/2         - removes disc image from drives 0 and 2.
+  - Eject disc 1/3         - removes disc image from drives 1 and 3.
+  - New disc 0/2   	   - creates a new DFS/ADFS disc and loads it into drives 0 and 2.
+  - New disc 1/3           - creates a new DFS/ADFS disc and loads it into drives 1 and 3.
+  - Write protect disc 0/2 - toggles write protection on drives 0 and 2.
+  - Write protect disc 1/3 - toggles write protection on drives 1 and 3.
+  - Default write protect  - determines whether loaded discs are write protected by default
 - ROM
-    Load ROM cartridge 1 - Loads the first ROM cartridge
-    Load ROM cartridge 2 - Loads the second ROM cartridge. Some stuff (Starship Command) comes on 2
+  - Load ROM cartridge 1 - Loads the first ROM cartridge
+  - Load ROM cartridge 2 - Loads the second ROM cartridge. Some stuff (Starship Command) comes on 2
                            ROMs and both must be loaded in order to work (these would both be in the
 			   same cartridge, but have been imaged seperately).
-    Unload ROM cartridges - Unload both ROM cartridges
+  - Unload ROM cartridges - Unload both ROM cartridges
 - Hardware
-    Video
-        Display type - Scanlines
-		       Line doubling
-		       2xSaI
-		       Scale2x
-		       Super Eagle
-		       PAL filter - choose the output mode. Select whichever you prefer.
-	Fullscreen - enables fullscreen mode. ALT+ENTER to leave.
-	Resizeable window - lets you resize the window at will. Forces Line Doubling on.
-    Disc - Plus 3 enable - toggles Plus 3 emulation.
-	   ADFS enable   - toggles the presence of the ADFS ROM
-	   DFS enable    - toggles the presence of the DFS ROM
-    Memory -
-	   Elektuur/Slogger turbo board - Emulate a turbo board (see below)
-	   Slogger/Jafa Master RAM board - Emulate a master RAM board (see below)
-	   Master RAM board mode - Select the mode of operation for the master RAM board (see below)
-    Sound -
-	   Internal sound output - Enables output of the internal Electron speaker
-	   CSS Sound Expansion - Emulate a CSS Sound Expansion cartridge
-	   Disc drive noise - Enables authentic disc drive sounds
-	   Tape noise       - Enables less authentic tape sounds
-	   Disc drive type - Select between 5.25" and 3.5" sounds
-	   Disc drive volume - Select volume of disc drive sounds
-    Joystick -
-	   Plus 1 interface - Enables Plus 1 emulation. Disables First Byte
-	   First Byte interface - Enables First Byte emulation. Disables Plus 1 and Plus 3 (due to
+  - Video
+    - Display type - Scanlines
+	  - Line doubling
+	  - 2xSaI
+	  - Scale2x
+	  - Super Eagle
+	  - PAL filter - choose the output mode. Select whichever you prefer.
+	- Fullscreen - enables fullscreen mode. ALT+ENTER to leave.
+	- Resizeable window - lets you resize the window at will. Forces Line Doubling on.
+    - Disc - Plus 3 enable - toggles Plus 3 emulation.
+	  - ADFS enable   - toggles the presence of the ADFS ROM
+	  - DFS enable    - toggles the presence of the DFS ROM
+    - Memory
+	  - Elektuur/Slogger turbo board - Emulate a turbo board (see below)
+	  - Slogger/Jafa Master RAM board - Emulate a master RAM board (see below)
+	  - Master RAM board mode - Select the mode of operation for the master RAM board (see below)
+    - Sound
+	  - Internal sound output - Enables output of the internal Electron speaker
+	  - CSS Sound Expansion - Emulate a CSS Sound Expansion cartridge
+	  - Disc drive noise - Enables authentic disc drive sounds
+	  - Tape noise       - Enables less authentic tape sounds
+	  - Disc drive type - Select between 5.25" and 3.5" sounds
+	  - Disc drive volume - Select volume of disc drive sounds
+    - Joystick
+	  - Plus 1 interface - Enables Plus 1 emulation. Disables First Byte
+	  - First Byte interface - Enables First Byte emulation. Disables Plus 1 and Plus 3 (due to
  				  conflicts)
-    Keyboard -
-	   Redefine keyboard - lets you redefine the keyboard
-           Restore default layout - restores default keyboard layout
+    - Keyboard
+	  - Redefine keyboard - lets you redefine the keyboard
+        - Restore default layout - restores default keyboard layout
 - Misc
     - Save screenshot - Saves a screenshot in .BMP format
     - Debugger - Enters the debugger
@@ -195,15 +195,18 @@ FAQ
 ===
 
 Q : How do I run a game?
+
 A : Load the UEF file through the tape menu. Then, at the > prompt, type
     CHAIN"" (for most games. A few will need *RUN).
 
 Q : Why is the 2xSaI filter so slow?
+
 A : The code itself isn't terribly fast to start with, but due to my lazyness,
     the screen rendering code is still in 8-bit, so Elkulator has to perform
     an 8-bit to 16-bit conversion every frame.
 
 Q : Why is the PAL filter even slower?
+
 A : The PAL filter is actually doing a lot of work - processing 3 16mhz data streams.
     It's made worse by my inability to optimise it properly.
 
