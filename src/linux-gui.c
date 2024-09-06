@@ -5,6 +5,7 @@
 #include <allegro.h>
 //#include <alleggl.h>
 #include "elk.h"
+#include "mem.h"
 
 #undef printf
 

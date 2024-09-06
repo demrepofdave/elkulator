@@ -2,6 +2,7 @@
   Savestate handling*/
 #include <stdio.h>
 #include "elk.h"
+#include "mem.h"
 
 void savestate()
 {

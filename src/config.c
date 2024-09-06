@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "elk.h"
+#include "mem.h"
 
 static const char * elk_cfg_filename = "/elk.cfg"; // Filename for elkulator config file.
 

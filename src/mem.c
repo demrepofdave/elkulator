@@ -1,27 +1,39 @@
 /*Elkulator v1.0 by Sarah Walker
   Memory handling*/
+
 #include <allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "mem.h"
 
 static const char * roms = "roms";   // Name of directory containing rom files
 
-int FASTLOW=0;
-int FASTHIGH2=0;
+int FASTLOW=0;   // 0 = Normal RAM use with sync / 1 = Fast RAM2 use (turbo and mrb?).
+int FASTHIGH2=0; // 0 = Normal, 1 = Fast? mrb & mrbmode==2.
 //#define FASTLOW (turbo || (mrb && mrbmode && mrbmapped))
 #define FASTHIGH (FASTHIGH2 && ((pc&0xE000)!=0xC000))
 
 extern int output;
 int mrbmapped=0;
-int plus1=0;
+int plus1=0;      // Configuration Item - 0 = Plus 1 disabled, 1 = Plus 1 enabled
+
+/* Function prototypes */
 uint8_t readkeys(uint16_t addr);
-uint8_t rombanks[16][16384];
+
+// ROM area - All 16 banks of 16k ROM available.
+uint8_t rombanks[16][SIZE_16K];
 uint8_t rombank_enabled[16];
 
-uint8_t ram[32768],ram2[32768];
-uint8_t os[16384],mrbos[16384];
+// Main Ram area, either normal RAM, and master ram board ram (if configured)
+uint8_t ram[SIZE_32K];
+uint8_t ram2[SIZE_32K];
+
+// Operating System Area, either normal OS 1.00 or Master Ram board OS 3.00
+uint8_t os[SIZE_16K];
+uint8_t mrbos[SIZE_16K];
+
 /* Use pointers to refer to banks in the general rombanks array. */
 #define DFS_BANK 3
 #define PLUS1_BANK 12
@@ -35,35 +47,40 @@ uint8_t *plus1rom;
 uint8_t sndlatch;
 int snden=0;
 int usedrom6=0;
-uint8_t ram6[16384];
+uint8_t ram6[SIZE_16K];
+
 /* Banked cartridge support providing space for multiple ROMS, added for the
    Mega Games Cartridge */
 #define NUM_BANKS 256
-uint8_t cart0[NUM_BANKS * 16384],cart1[NUM_BANKS * 16384];
+uint8_t cart0[NUM_BANKS * SIZE_16K],cart1[NUM_BANKS * SIZE_16K];
 uint8_t banks[2];
+
 /* Banks accessible via the JIM page, controlled by the paging register at
    &fcff. */
 #define JIM_BANKS 128
 uint8_t jim_ram[JIM_BANKS][256];
 int jim_page = 0;
 
-void loadrom(uint8_t dest[16384], char *name)
+/* Loads a rom file into a 16k Buffer*/
+void loadrom(uint8_t dest[SIZE_16K], char *name)
 {
     FILE *f = fopen(name, "rb");
     if (f == NULL) {
         fprintf(stderr, "Failed to load ROM file '%s'.\n", name);
         exit(1);
     }
-    fread(dest, 16384, 1, f);
+    fread(dest, SIZE_16K, 1, f);
     fclose(f);
 }
 
+/* Loads a rom file into a particular rom bank 16k Buffer */
 void loadrom_n(int bank, char *name)
 {
     loadrom(rombanks[bank], name);
     rombank_enabled[bank] = 1;
 }
 
+/* Enables roms based upon configuration items */
 void update_rom_config(void)
 {
     rombank_enabled[PLUS1_BANK] = plus1;
@@ -72,10 +89,11 @@ void update_rom_config(void)
     rombank_enabled[DFS_BANK] = (plus3 && dfsena);
 }
 
+/* Main routine to load all ROMs and correctly setup rom pointers */
 void loadroms()
 {
         for (int i = 0; i < 16; i++) {
-            memset(rombanks[i], 0, 16384);
+            memset(rombanks[i], 0, SIZE_16K);
             rombank_enabled[i] = 0;
         }
 
@@ -99,7 +117,7 @@ void loadroms()
         loadrom(os, "os");
         loadrom(mrbos, "os300.rom");
         loadrom(basic, "basic.rom");
-        memcpy(rombanks[0xb], basic, 16384);
+        memcpy(rombanks[0xb], basic, SIZE_16K);
         loadrom(adfs, "adfs.rom");
         loadrom(dfs, "dfs.rom");
         loadrom(sndrom, "sndrom");
@@ -111,7 +129,7 @@ void loadcart(char *fn)
 {
         FILE *f=fopen(fn,"rb");
         if (!f) return;
-        fread(cart0,NUM_BANKS * 16384,1,f);
+        fread(cart0,NUM_BANKS * SIZE_16K,1,f);
         fclose(f);
 }
 
@@ -119,23 +137,25 @@ void loadcart2(char *fn)
 {
         FILE *f=fopen(fn,"rb");
         if (!f) return;
-        fread(cart1,NUM_BANKS * 16384,1,f);
+        fread(cart1,NUM_BANKS * SIZE_16K,1,f);
         fclose(f);
 }
 
 void unloadcart()
 {
-        memset(cart0,0,NUM_BANKS * 16384);
-        memset(cart1,0,NUM_BANKS * 16384);
+        memset(cart0,0,NUM_BANKS * SIZE_16K);
+        memset(cart1,0,NUM_BANKS * SIZE_16K);
 }
 
+/* Dumps main bank for 32k ram to file ram.dmp */
 void dumpram()
 {
         FILE *f=fopen("ram.dmp","wb");
-        fwrite(ram,32768,1,f);
+        fwrite(ram,SIZE_32K,1,f);
         fclose(f);
 }
 
+/* Reset memory - Called as part of startup or when break is pressed? */
 void resetmem()
 {
         update_rom_config();
@@ -177,8 +197,8 @@ uint8_t readmem(uint16_t addr)
                         return readkeys(addr);
                 }
                 /* Treat cartridges specially for now. */
-                if (rombank==0) return cart0[(banks[0] * 16384) + (addr&0x3FFF)];
-                if (rombank==1) return cart1[(banks[1] * 16384) + (addr&0x3FFF)];
+                if (rombank==0) return cart0[(banks[0] * SIZE_16K) + (addr&0x3FFF)];
+                if (rombank==1) return cart1[(banks[1] * SIZE_16K) + (addr&0x3FFF)];
 
                 /* Handle other ROMs. */
                 if (rombank_enabled[rombank])
@@ -230,18 +250,7 @@ void writemem(uint16_t addr, uint8_t val)
 {
         if (debugon) debugwrite(addr,val);
         writec[addr]=31;
-//        if (addr==0x5820) rpclog("Write 5820\n");
-//        if (addr==0x5B10) rpclog("Write 5B10\n");
-//        if (addr==0x5990) rpclog("Write 5990\n");
-//        if (addr==0x5D70) rpclog("Write 5D70\n");
-//        if (addr==0x6798) rpclog("Write 6798\n");
-//        if (addr==0x5C00) rpclog("Write 5C00\n");
-//        if (addr==0x6710) rpclog("Write 6710\n");
-//        if (addr==0x5FC0) rpclog("Write 5FC0\n");
-//        if (addr==0x6490) rpclog("Write 6490\n");
-//        if (addr==0x5820) rpclog("Write 5820\n");
-//        if (addr>=0x5800 && addr<0x8000) rpclog("Write %04X %02X %04X %i %i\n",addr,val,pc,FASTHIGH,FASTHIGH2);
-//if (addr>0xFC00) rpclog("Write %04X %02X\n",addr,val);
+
         if (addr<0x2000)
         {
                 if (FASTLOW) ram2[addr]=val;
@@ -282,23 +291,21 @@ void writemem(uint16_t addr, uint8_t val)
             break;
         }
         if ((addr&0xFFF8)==0xFCC0 && plus3) write1770(addr,val);
-//        if ((addr&~0x1F)==0xFC20) writesid(addr,val);
 
         if (addr==0xFC98)
         {
-//                rpclog("FC98 write %02X\n",val);
                 sndlatch=val;
         }
         if (addr==0xFC99)
         {
-//                rpclog("FC99 write %02X\n",val);
                 if ((val&1) && !snden)
                 {
-//                        rpclog("Writesound! %02X\n",sndlatch);
                         writesound(sndlatch);
                 }
                 snden=val&1;
         }
+
+        /* Master RAM board - RAM control */
         if (addr==0xFC7F && mrb)
         {
                 mrbmapped=!(val&0x80);
@@ -308,20 +315,38 @@ void writemem(uint16_t addr, uint8_t val)
 //                rpclog("Write MRB %02X %i %i %04X\n",val,FASTLOW,FASTHIGH2,pc);
 //                if (!val) output=1;
         }
-        if (addr==0xFC70 && plus1) writeadc(val);
-        if (addr>=0xFC60 && addr<=0xFC6F && plus1) return writeserial(addr, val);
-        if (addr==0xFC71 && plus1) writeparallel(val);
+
+        /* ADC expansion - Only available if plus1 is enabled*/
+        if (addr==0xFC70 && plus1)
+        {
+                writeadc(val);
+        } 
+
+        /* 6850 ACIA - Only available if plus1 is enabled */
+        if (addr>=0xFC60 && addr<=0xFC6F && plus1)
+        {
+                return writeserial(addr, val);
+        }
+
+        /* Centronics Parallel Interface - Only available if plus1 is enabled */
+        if (addr==0xFC71 && plus1)
+        {
+                writeparallel(val);
+        } 
+
         /* The Mega Games Cartridge uses FC00 to select pairs of 16K banks in
            the two sets of ROMs. */
         if (enable_mgc && (addr == 0xfc00)) {
             fprintf(stderr, "bank = %i\n", val); banks[0] = val; banks[1] = val;
         }
+
         /* DB: My cartridge uses FC73 to select 32K regions in a flash ROM.
            For convenience we use the same paired 16K ROM arrangement as for
            the MGC. */
         if (enable_db_flash_cartridge && (addr == 0xfc73)) {
             fprintf(stderr, "bank = %i\n", val); banks[0] = val; banks[1] = val;
         }
+
         /* Support the JIM paging register when enabled directly or indirectly. */
         if (enable_jim && (addr == 0xfcff)) {
             jim_page = val;
@@ -329,42 +354,74 @@ void writemem(uint16_t addr, uint8_t val)
         }
 }
 
+// Represents the internal mapping of the keyboard to memory locations
+// 0x9FFF to 0xBFFE.
+//
+// See page 218 of the Advanced User Guide for the Acorn Electron
+// for full details.
+//
+// Note the mappings are repeated twice as some Allegro distinguishes
+// between keys more than the electron.  For example Left Shift and Right shift
+// are mapped to the Electron shift key.
+//
 int keys[2][14][4]=
 {
         {
-                {KEY_RIGHT,KEY_END,0,KEY_SPACE},
-                {KEY_LEFT,KEY_DOWN,KEY_ENTER,KEY_DEL},
-                {KEY_MINUS,KEY_UP,KEY_QUOTE,0},
-                {KEY_0,KEY_P,KEY_COLON,KEY_SLASH},
-                {KEY_9,KEY_O,KEY_L,KEY_STOP},
-                {KEY_8,KEY_I,KEY_K,KEY_COMMA},
-                {KEY_7,KEY_U,KEY_J,KEY_M},
-                {KEY_6,KEY_Y,KEY_H,KEY_N},
-                {KEY_5,KEY_T,KEY_G,KEY_B},
-                {KEY_4,KEY_R,KEY_F,KEY_V},
-                {KEY_3,KEY_E,KEY_D,KEY_C},
-                {KEY_2,KEY_W,KEY_S,KEY_X},
-                {KEY_1,KEY_Q,KEY_A,KEY_Z},
-                {KEY_ESC,KEY_ALT,KEY_LCONTROL,KEY_LSHIFT}
+                /* Bit 0, Bit 1, Bit 2, Bit 3 */
+                {KEY_RIGHT, KEY_END,  0,            KEY_SPACE}, // Column 0, Address 0xBFFE
+                {KEY_LEFT,  KEY_DOWN, KEY_ENTER,    KEY_DEL},   // Column 1, Address 0xBFFD
+                {KEY_MINUS, KEY_UP,   KEY_QUOTE,    0},         // Column 2, Address 0xBFFB
+                {KEY_0,     KEY_P,    KEY_COLON,    KEY_SLASH}, // Column 3, Address 0xBFF7
+                {KEY_9,     KEY_O,    KEY_L,        KEY_STOP},  // Column 4, Address 0xBFEF
+                {KEY_8,     KEY_I,    KEY_K,        KEY_COMMA}, // Column 5, Address 0xBFDF
+                {KEY_7,     KEY_U,    KEY_J,        KEY_M},     // Column 6, Address 0xBFBF
+                {KEY_6,     KEY_Y,    KEY_H,        KEY_N},     // Column 7, Address 0xBF7F
+                {KEY_5,     KEY_T,    KEY_G,        KEY_B},     // Column 8, Address 0xBEFF
+                {KEY_4,     KEY_R,    KEY_F,        KEY_V},     // Column 9, Address 0xBDFF
+                {KEY_3,     KEY_E,    KEY_D,        KEY_C},     // Column A, Address 0xBBFF
+                {KEY_2,     KEY_W,    KEY_S,        KEY_X},     // Column B, Address 0xB7FF
+                {KEY_1,     KEY_Q,    KEY_A,        KEY_Z},     // Column C, Address 0xAFFF
+                {KEY_ESC,   KEY_ALT,  KEY_LCONTROL, KEY_LSHIFT} // Column D, Address 0x9FFF
         },
         {
-                {KEY_RIGHT,KEY_END,0,KEY_SPACE},
-                {KEY_LEFT,KEY_DOWN,KEY_ENTER,KEY_BACKSPACE},
-                {KEY_MINUS,KEY_UP,KEY_QUOTE,0},
-                {KEY_0,KEY_P,KEY_SEMICOLON,KEY_SLASH},
-                {KEY_9,KEY_O,KEY_L,KEY_STOP},
-                {KEY_8,KEY_I,KEY_K,KEY_COMMA},
-                {KEY_7,KEY_U,KEY_J,KEY_M},
-                {KEY_6,KEY_Y,KEY_H,KEY_N},
-                {KEY_5,KEY_T,KEY_G,KEY_B},
-                {KEY_4,KEY_R,KEY_F,KEY_V},
-                {KEY_3,KEY_E,KEY_D,KEY_C},
-                {KEY_2,KEY_W,KEY_S,KEY_X},
-                {KEY_1,KEY_Q,KEY_A,KEY_Z},
-                {KEY_ESC,KEY_TAB,KEY_RCONTROL,KEY_RSHIFT}
+                /* Bit 0, Bit 1, Bit 2, Bit 3 */
+                {KEY_RIGHT, KEY_END,          0,     KEY_SPACE},      // Column 0, Address 0xBFFE
+                {KEY_LEFT,  KEY_DOWN, KEY_ENTER,     KEY_BACKSPACE},  // Column 1, Address 0xBFFD
+                {KEY_MINUS, KEY_UP,   KEY_QUOTE,     0},              // Column 2, Address 0xBFFB
+                {KEY_0,     KEY_P,    KEY_SEMICOLON, KEY_SLASH},      // Column 3, Address 0xBFF7
+                {KEY_9,     KEY_O,    KEY_L,         KEY_STOP},       // Column 4, Address 0xBFEF
+                {KEY_8,     KEY_I,    KEY_K,         KEY_COMMA},      // Column 5, Address 0xBFDF
+                {KEY_7,     KEY_U,    KEY_J,         KEY_M},          // Column 6, Address 0xBFBF
+                {KEY_6,     KEY_Y,    KEY_H,         KEY_N},          // Column 7, Address 0xBF7F
+                {KEY_5,     KEY_T,    KEY_G,         KEY_B},          // Column 8, Address 0xBEFF
+                {KEY_4,     KEY_R,    KEY_F,         KEY_V},          // Column 9, Address 0xBDFF
+                {KEY_3,     KEY_E,    KEY_D,         KEY_C},          // Column A, Address 0xBBFF
+                {KEY_2,     KEY_W,    KEY_S,         KEY_X},          // Column B, Address 0xB7FF
+                {KEY_1,     KEY_Q,    KEY_A,         KEY_Z},          // Column C, Address 0xAFFF
+                {KEY_ESC,   KEY_TAB,  KEY_RCONTROL,  KEY_RSHIFT}      // Column D, Address 0x9FFF
         }
 };
 
+// Allegro allows 128 keys to be used.
+//
+// This array contains a mapping for each and every one of them.
+//
+// Binary format for each entry is: edddcccc
+//    e = 1 - The allegro key is mapped to an electron key.
+//        0 - The allegro key is not mapped to an electron key (not in use)
+//    d = bit number for mapping the key to the electron key colum bitmap.
+//          - 000 = Mapped to bit 0
+//          - 001 = Mapped to bit 1
+//          - 010 = Mapped to bit 2
+//          - 011 = Mapped to bit 3
+//    c = The address bitmap mask for the key (tells us which Column address this key belongs to)
+//          - 0000 = Address bitmap shifted by 0 = 00000001 = When applied if matches to address for column 0 = BFFE
+//          - 0001 = Address bitmap shifted by 1 = 00000010 = When applied if matches to address for column 0 = BFFD
+//          - 0010 = Address bitmap shifted by 2 = 00000100 = When applied if matches to address for column 0 = BFFB
+//          - 0011 = Address bitmap shifted by 3 = 00001000 = When applied if matches to address for column 0 = BFF7
+//          - 0100 = Address bitmap shifted by 4 = 00010000 = When applied if matches to address for column 0 = BFEF
+//          ...
+//
 int keyl[128];
 
 void makekeyl()
@@ -380,7 +437,12 @@ void makekeyl()
                 {
                         for (e=0;e<2;e++)
                         {
-                                keyl[keys[e][c][d]]=c|(d<<4)|0x80;
+                                // This creates a bitmap of 1dddcccc.
+                                // Top bit set means this entry is defined.
+                                // c = the column number wshich is used to create the address mask
+                                // d is bit number, used to correctly set the bit in the electrons memory address (if key is pressed)
+                                // For examples see above.
+                                keyl[keys[e][c][d]] = c|(d<<4) | 0x80;
                         }
                 }
         }
@@ -397,42 +459,36 @@ uint8_t readkeys(uint16_t addr)
         uint8_t temp=0;
         for (d=0;d<128;d++)
         {
-                if (key[d] && keyl[keylookup[d]]&0x80 && !(addr&(1<<(keyl[keylookup[d]]&15)))) temp|=1<<((keyl[keylookup[d]]&0x30)>>4);
-//                if (autoboot && (d==KEY_LSHIFT || d==KEY_RSHIFT) && !(addr&(1<<(keyl[d]&15)))) temp|=1<<((keyl[keylookup[d]]&0x30)>>4);
-        }
-  //      if (autoboot && !(addr&(1<<(keyl[KEY_LSHIFT]&15)))) temp|=1<<((keyl[keylookup[KEY_LSHIFT]]&0x30)>>4);
-//        rpclog("Readkey %i %04X %02X %02X %04X\n",autoboot,addr,temp,keyl[KEY_LSHIFT],1<<(keyl[KEY_LSHIFT]&15));
-/*        for (c=0;c<14;c++)
-        {
-                if (!(addr&(1<<c)))
+                if (key[d] &&                      // Is allegro key active
+                    keyl[keylookup[d]] & 0x80 &&   // Is allegro key mapped and in use
+                    !(addr & (1 << (keyl[keylookup[d]] & 0xF))))  // Does address mask = 0, if so this the address is correct so 
                 {
-                        if (key[keylookup[keys[0][c][0]]]) temp|=1;
-                        if (key[keylookup[keys[0][c][1]]]) temp|=2;
-                        if (key[keylookup[keys[0][c][2]]]) temp|=4;
-                        if (key[keylookup[keys[0][c][3]]]) temp|=8;
-                        if (key[keylookup[keys[1][c][0]]]) temp|=1;
-                        if (key[keylookup[keys[1][c][1]]]) temp|=2;
-                        if (key[keylookup[keys[1][c][2]]]) temp|=4;
-                        if (key[keylookup[keys[1][c][3]]]) temp|=8;
+                        temp|= 1 << ((keyl[keylookup[d]] & 0x30 ) >> 4);  // Set the bitmap for key to 1 in memory location.
                 }
-        }*/
+        }
+
+        // At this point the data for the address is complete, return it.
         return temp;
 }
 
+/* Appends memory to a specified file (based on configuration) */
 void savememstate(FILE *f)
 {
-        fwrite(ram,32768,1,f);
-        if (mrb) fwrite(ram2,32768,1,f);
-        if (plus3 && dfsena) fwrite(dfs,16384,1,f);
-        if (sndex)  fwrite(sndrom,16384,1,f);
-        if (usedrom6) fwrite(ram6,16384,1,f);
+        fwrite(ram,SIZE_32K,1,f);
+        if (mrb) fwrite(ram2,SIZE_32K,1,f);
+        if (plus3 && dfsena) fwrite(dfs,SIZE_16K,1,f);
+        if (sndex)  fwrite(sndrom,SIZE_16K,1,f);
+        if (usedrom6) fwrite(ram6,SIZE_16K,1,f);
 }
 
+/* Reads memory from a specified file (based on already read configuration) */
 void loadmemstate(FILE *f)
 {
-        fread(ram,32768,1,f);
-        if (mrb) fread(ram2,32768,1,f);
-        if (plus3 && dfsena) fread(dfs,16384,1,f);
-        if (sndex)  fread(sndrom,16384,1,f);
-        if (usedrom6) fread(ram6,16384,1,f);
+        fread(ram,SIZE_32K,1,f);
+        if (mrb) fread(ram2,SIZE_32K,1,f);
+        if (plus3 && dfsena) fread(dfs,SIZE_16K,1,f);
+        if (sndex)  fread(sndrom,SIZE_16K,1,f);
+        if (usedrom6) fread(ram6,SIZE_16K,1,f);
 }
+
+/* End of File */

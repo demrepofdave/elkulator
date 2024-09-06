@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <zlib.h>
 #include "elk.h"
+#include "mem.h"
 #include "2xsai.h"
 
 void dosavescrshot();

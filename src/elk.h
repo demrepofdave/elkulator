@@ -35,11 +35,7 @@ extern int nmi,irq;
 extern int rombank,intrombank;
 extern int cycles,ulacycles;
 extern int extrom;
-extern uint8_t ram[32768];
 extern uint16_t pc;
-
-uint8_t readmem(uint16_t addr);
-void writemem(uint16_t addr, uint8_t val);
 
 extern int cswena;
 extern int tapeon;
@@ -194,7 +190,6 @@ extern int enable_db_flash_cartridge;
 extern int enable_jim;
 
 extern int keylookup[128];
-extern int plus1;
 extern uint8_t plus1stat;
 extern int adctime;
 
@@ -243,16 +238,6 @@ void inital();
 void addsnd(uint8_t dat);
 void mixbuffer(int16_t *d);
 void givealbufferdd(int16_t *buf);
-
-void loadroms();
-void loadrom_n(int, char *fn);
-void resetmem();
-void dumpram();
-void loadcart(char *fn);
-void loadcart2(char *fn);
-void unloadcart();
-void loadmemstate(FILE *f);
-void savememstate(FILE *f);
 
 void reset6502();
 void reset6502e();

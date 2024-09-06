@@ -3,13 +3,20 @@
 #include <allegro.h>
 #include <stdio.h>
 #include "elk.h"
+#include "mem.h"
 
 int timetolive;
 int ins=0;
 int ulacycles;
-uint8_t a,x,y,s;
-uint16_t pc;
-CPUStatus p;
+
+/* Acorn Electron 6502 Registers*/
+uint8_t a;  /* Accumulator   */
+uint8_t x;  /* X Register    */
+uint8_t y;  /* Y Register    */
+uint8_t s;  /* Stack Pointer */
+
+uint16_t pc; /* Program Counter  */
+CPUStatus p; /* Status Registers */
 
 int cycles;
 int cyccount=1;
@@ -70,7 +77,9 @@ void setsbc(uint8_t temp)
         setzn(tempw&0xFF);
 }
 
-int realnmi,realirq;
+int realnmi; // When set, signifies the nmi routine is waiting to be triggered.
+int realirq;
+
 void doints()
 {
         yield();
@@ -169,8 +178,10 @@ uint8_t tempb;
                                 a=(al&0xF)|((ah&0xF)<<4);                 \
                         }
 
-int output=0;
-uint16_t oldpc2,oldpc;
+int output=0; /* the purpose of this variable appears to be depricated (no longer used)*/
+uint16_t oldpc2;
+uint16_t oldpc;
+
 void exec6502()
 {
         uint16_t addr,addr2;
@@ -1692,6 +1703,8 @@ void exec6502()
 //                        output=1;
                 }*/
                 yield();
+
+                /* If a non-maskable interrupt has occured, handle it */
                 if (realnmi)
                 {
                         realnmi=0;
@@ -1699,9 +1712,11 @@ void exec6502()
                         temp|=(p.i)?4:0;    temp|=(p.d)?8:0;
                         temp|=(p.v)?0x40:0; temp|=(p.n)?0x80:0;
                         temp|=0x30;
+                        /* Store current program counter and status register to stack */
                         writemem(0x100+s,pc>>8);   s--; cycles+=cyccount;
                         writemem(0x100+s,pc&0xFF); s--; cycles+=cyccount;
                         writemem(0x100+s,temp);    s--; cycles+=cyccount;
+                        /* Set interrupt flag and reset PC to address stored in the interrupt vector? */
                         pc=readmem(0xFFFA);             cycles+=cyccount;
                         pc|=(readmem(0xFFFB)<<8);       cycles+=cyccount;
                         p.i=1;
@@ -1732,11 +1747,20 @@ void exec6502()
                         cpureset=0;
                         reset6502();
                 }
-                      if (motoron)
-                      {
-                                if (fdctime) { fdctime-=oldcycs; if (fdctime<=0) fdccallback(); }
-                                disctime-=oldcycs; if (disctime<=0) { disctime+=discspd; disc_poll(); }
-                      }
+
+                if (motoron)
+                {
+                        if (fdctime)
+                        {
+                                fdctime-=oldcycs; if (fdctime<=0) fdccallback();
+                        }
+                        disctime-=oldcycs; 
+                        if (disctime<=0)
+                        { 
+                                disctime+=discspd; disc_poll(); 
+                        }
+                }
+
                 otherstuffcount-=oldcycs;
                 if (otherstuffcount<0)
                 {
@@ -1758,28 +1782,21 @@ void exec6502()
                         }
                         if (plus1) pollserial(oldcycs);
                 }
-                        if (tapespeed==TAPE_REALLY)
+
+                if (tapespeed==TAPE_REALLY)
+                {
+                        if (pc==0xF699 || pc==0xF7E5 || (pc==0xfa51 && p.z))
                         {
-                                if (pc==0xF699 || pc==0xF7E5 || (pc==0xfa51 && p.z))
-                                {
-                                        reallyfasttapepoll();
-//                                        justrealfasttaped=1;
-                                }
+                                reallyfasttapepoll();
                         }
-//                        else
-//                        {
-//                if (tapewrite)
-//                {
-                        tapewrite-=oldcycs;
-                        if (tapewrite<=0)
-                        {
-//                                tapewrite+=1628;
-                                //tapenextbyte();
-                                polltape();
-                        }
-//                        }
-//                }
-//                if (pc==0xF905) printf("F905 from %04X %04X %i\n",oldpc,oldpc2,p.i);
+                }
+                tapewrite-=oldcycs;
+
+                if (tapewrite<=0)
+                {
+                        polltape();
+                }
+
                 if (timetolive)
                 {
                         timetolive--;
@@ -1788,26 +1805,6 @@ void exec6502()
         }
         cycles-=128;
         ulacycles-=128;
-        #if 0
-                if (tapeon)
-                {
-                        if (tapelcount<=0)
-                        {
-/*                                if (justrealfasttaped)
-                                {
-                                        tapelcount=tapellatch;
-                                        justrealfasttaped=0;
-                                }
-                                else
-                                {*/
-                                        polltape();
-                                        tapelcount+=tapellatch;
-//                                }
-                        }
-                        else
-                           tapelcount-=96;
-                }
-        #endif
 }
 
 void save6502state(FILE *f)

@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "mem.h"
+
 #undef printf
 int autoboot;
 FILE *rlog;
