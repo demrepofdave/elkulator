@@ -2,7 +2,12 @@
   Linux keyboard redefinition GUI*/
 
 #ifndef WIN32
-#include <allegro.h>
+
+#ifdef HAL_ALLEGRO_5
+    #include <allegro5/allegro.h>
+#else
+    #include <allegro.h>
+#endif
 #include "elk.h"
 #include "hal/hal.h"
 

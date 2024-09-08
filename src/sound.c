@@ -1,7 +1,12 @@
 /*Elkulator v1.0 by Sarah Walker
   CSS SN sound chip emulation*/
 
-#include <allegro.h>
+#ifdef HAL_ALLEGRO_5
+    #include <allegro5/allegro.h>
+#else
+    #include <allegro.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include "elk.h"
@@ -84,9 +89,20 @@ static int8_t snperiodic2[32] =
 };
 
 
+#ifdef HAL_ALLEGRO_5
+al_fixed sncount[4],snlatch[4],snstat[4];
+#else
 fixed sncount[4],snlatch[4],snstat[4];
+#endif
+
 int snvols[3125<<1][4],snnoise2[3125<<1];
+
+#ifdef HAL_ALLEGRO_5
+al_fixed snlatchs[3125<<1][4];
+#else
 fixed snlatchs[3125<<1][4];
+#endif
+
 int snline=0,snlinec=0;
 
 //#define BUFLEN 3125

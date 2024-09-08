@@ -20,6 +20,27 @@ else
 elkulator_LDADD = $(allegro_LIBS) -lz -lopenal -lalut -lz
 endif
 
+if ENABLE_ALLEGRO5
+elkulator_hal_src = src/hal/hal_allegro_5/adc.c  \
+                    src/hal/hal_allegro_5/soundopenal.c \
+                    src/hal/hal_allegro_5/firstbyte.c \
+                    src/hal/hal_allegro_5/hal.c \
+                    src/hal/hal_allegro_5/hal_sound.c \
+                    src/hal/hal_allegro_5/linux-gui.c \
+                    src/hal/hal_allegro_5/linux-keydefine.c
+else
+elkulator_hal_src = src/hal/hal_allegro_4/2xsai.c \
+                    src/hal/hal_allegro_4/adc.c  \
+                    src/hal/hal_allegro_4/palfilt.c \
+                    src/hal/hal_allegro_4/scale2x.c \
+                    src/hal/hal_allegro_4/soundopenal.c \
+                    src/hal/hal_allegro_4/firstbyte.c \
+                    src/hal/hal_allegro_4/hal.c \
+                    src/hal/hal_allegro_4/hal_sound.c \
+                    src/hal/hal_allegro_4/linux-gui.c \
+                    src/hal/hal_allegro_4/linux-keydefine.c
+endif
+
 elkulator_SOURCES = src/1770.c \
                     src/6502.c \
                     src/adf.c  \
@@ -31,8 +52,6 @@ elkulator_SOURCES = src/1770.c \
                     src/fdi2raw.c \
                     src/fdi.c \
                     src/linux.c \
-                    src/linux-gui.c \
-                    src/linux-keydefine.c \
                     src/main.c \
                     src/mem.c \
                     src/parallel.c \
@@ -45,13 +64,6 @@ elkulator_SOURCES = src/1770.c \
                     src/uef.c \
                     src/ula.c \
                     src/allegro_icon.c \
-                    src/hal/hal_allegro_4/2xsai.c \
-                    src/hal/hal_allegro_4/adc.c  \
-                    src/hal/hal_allegro_4/palfilt.c \
-                    src/hal/hal_allegro_4/scale2x.c \
-                    src/hal/hal_allegro_4/soundopenal.c \
-                    src/hal/hal_allegro_4/firstbyte.c \
-                    src/hal/hal_allegro_4/hal.c \
-                    src/hal/hal_allegro_4/hal_sound.c
+                    $(elkulator_hal_src) 
 
 
