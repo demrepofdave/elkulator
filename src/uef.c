@@ -10,10 +10,7 @@ static int reallyfasttapebreak;
 
 #define INT_HIGHTONE 0x40
 
-<<<<<<< HEAD
 extern int tapelcount,tapellatch,pps;
-=======
-static int tapelcount,tapellatch,pps;
 extern int cswena;
 int inchunk=0,chunkid=0,chunklen=0;
 int chunkpos=0,chunkdatabits=8;
