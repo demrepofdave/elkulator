@@ -6,13 +6,14 @@
 #include <string.h>
 #include "elk.h"
 
+static const char * roms = "roms";   // Name of directory containing rom files
+
 int FASTLOW=0;
 int FASTHIGH2=0;
 //#define FASTLOW (turbo || (mrb && mrbmode && mrbmapped))
 #define FASTHIGH (FASTHIGH2 && ((pc&0xE000)!=0xC000))
 
 extern int output;
-extern int timetolive;
 int mrbmapped=0;
 int plus1=0;
 uint8_t readkeys(uint16_t addr);
@@ -89,10 +90,10 @@ void loadroms()
         sndrom = rombanks[SOUND_BANK];
         adfs = rombanks[ADFS_BANK];
 
-        char path[MAX_PATH_AND_FILE_SIZE + 5]; // TODO: Fix magic number (sizeof roms)
-        char p2[512];
-        getcwd(p2,511);
-        sprintf(path,"%sroms",exedir);
+        char path[MAX_PATH_FILENAME_BUFFER_SIZE + sizeof(roms)];
+        char p2[MAX_PATH_FILENAME_BUFFER_SIZE];
+        getcwd(p2,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+        sprintf(path,"%s%s",exedir, roms);
         printf("path now %s\n",path);
         chdir(path);
         loadrom(os, "os");
@@ -421,7 +422,7 @@ uint8_t readkeys(uint16_t addr)
 void savememstate(FILE *f)
 {
         fwrite(ram,32768,1,f);
-        if (mrb) fwrite(ram+32768,32768,1,f);
+        if (mrb) fwrite(ram2,32768,1,f);
         if (plus3 && dfsena) fwrite(dfs,16384,1,f);
         if (sndex)  fwrite(sndrom,16384,1,f);
         if (usedrom6) fwrite(ram6,16384,1,f);
@@ -430,7 +431,7 @@ void savememstate(FILE *f)
 void loadmemstate(FILE *f)
 {
         fread(ram,32768,1,f);
-        if (mrb) fread(ram+32768,32768,1,f);
+        if (mrb) fread(ram2,32768,1,f);
         if (plus3 && dfsena) fread(dfs,16384,1,f);
         if (sndex)  fread(sndrom,16384,1,f);
         if (usedrom6) fread(ram6,16384,1,f);

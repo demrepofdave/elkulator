@@ -153,8 +153,9 @@ void initmenu()
         CheckMenuItem(ghmenu,IDM_MRB_TURBO,(mrbmode==1)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_MRB_SHADOW,(mrbmode==2)?MF_CHECKED:MF_UNCHECKED);
 
-        CheckMenuItem(ghmenu,IDM_ULA_STANDARD,(ulamode==0)?MF_CHECKED:MF_UNCHECKED);
-        CheckMenuItem(ghmenu,IDM_ULA_ENHANCED,(ulamode==1)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_ULA_STANDARD,(ulamode==ULA_CONVENTIONAL)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_ULA_ENHANCED_8BIT_DUAL,(ulamode==ULA_RAM_8BIT_DUAL_ACCESS)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_ULA_ENHANCED_8BIT_SINGLE,(ulamode==ULA_RAM_8BIT_SINGLE_ACCESS)?MF_CHECKED:MF_UNCHECKED);
 
         CheckMenuItem(ghmenu,IDM_VIDEO_SCANLINES,(drawmode==0)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_VIDEO_LINEDBL,(drawmode==1)?MF_CHECKED:MF_UNCHECKED);
@@ -540,10 +541,14 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 //                        stopwaiting();
                         break;
                         case IDM_ULA_STANDARD:
-                        case IDM_ULA_ENHANCED:
+                        case IDM_ULA_ENHANCED_8BIT_SINGLE:
+                        case IDM_ULA_ENHANCED_8BIT_DUAL:
                         ulamode=wParam-IDM_ULA_STANDARD;
-                        CheckMenuItem(ghmenu,IDM_ULA_STANDARD,(ulamode==0)?MF_CHECKED:MF_UNCHECKED);
-                        CheckMenuItem(ghmenu,IDM_ULA_ENHANCED,(ulamode==1)?MF_CHECKED:MF_UNCHECKED);
+                        /* Adjust ulamode to account for a "missing" entry. */
+                        if (ulamode) ulamode += 1;
+                        CheckMenuItem(ghmenu,IDM_ULA_STANDARD,(ulamode==ULA_CONVENTIONAL)?MF_CHECKED:MF_UNCHECKED);
+                        CheckMenuItem(ghmenu,IDM_ULA_ENHANCED_8BIT_DUAL,(ulamode==ULA_RAM_8BIT_DUAL_ACCESS)?MF_CHECKED:MF_UNCHECKED);
+                        CheckMenuItem(ghmenu,IDM_ULA_ENHANCED_8BIT_SINGLE,(ulamode==ULA_RAM_8BIT_SINGLE_ACCESS)?MF_CHECKED:MF_UNCHECKED);
                         reset6502e();
                         resetula();
                         break;

@@ -9,7 +9,6 @@ char ssname[260];
 char scrshotname[260];
 char moviename[260];
 
-extern int tapespeed;
 int fullscreen=0;
 int gotofullscreen=0;
 int videoresize=0;
@@ -27,8 +26,6 @@ char discname[260];
 char discname2[260];
 int quited=0;
 int infocus=1;
-
-
 
 void native_window_close_button_handler(void)
 {
@@ -53,7 +50,6 @@ int main(int argc, char *argv[])
                 exit(-1);
         }
         initelk(argc,argv);
-        set_window_title("Elkulator 1.0 (Press HOME for menu)");
         set_close_button_callback(native_window_close_button_handler);
         install_mouse();
         while (!quited)

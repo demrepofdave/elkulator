@@ -6,6 +6,19 @@
 #include <string.h>
 #include "elk.h"
 
+void (*fdccallback)();
+void (*fdcdata)(uint8_t dat);
+void (*fdcspindown)();
+void (*fdcfinishread)();
+void (*fdcnotfound)();
+void (*fdcdatacrcerror)();
+void (*fdcheadercrcerror)();
+void (*fdcwriteprotect)();
+int  (*fdcgetdata)(int last);
+
+struct drives drives[2];
+int curdrive;
+
 int discchanged[2]={0,0};
 
 struct

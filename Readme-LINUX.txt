@@ -35,24 +35,28 @@ If this is successful, typing
 
 will run the emulator.
 
-Elkulator has been tested on x86-32 and x86-64 machines. No other architecture is guaranteed
-to work, and big-endian machines (eg PowerPC) almost certainly won't work.
+Elkulator has been tested on x86-32 and x86-64 machines. No other architecture
+is guaranteed to work, and big-endian machines (eg PowerPC) almost certainly
+won't work.
 
 
 Linux specifics
 ~~~~~~~~~~~~~~~
 
-The menu is not available all the time. Press F11 to open it, then F11 to close again.
+The menu is not available all the time. Press the Menu or F11 keys to open it,
+then Menu or F11 to close it again. (Where available, the Menu key is
+typically found between the space bar and right Ctrl key, depicting an
+application menu on the keycap. It is not a Windows key.)
 
 The debugger is only available via the command line.
 
 Hardware line doubling mode is not available on Linux.
 
-Fullscreen mode doesn't appear to work correctly, at least on my machine. Elkulator takes over
-the screen, but the resolution never changes.
+Fullscreen mode doesn't appear to work correctly, at least on my machine.
+Elkulator takes over the screen, but the resolution never changes.
 
-Video performance is noticeably slower than on Windows. This is largely due to the lack
-of hardware acceleration support in Elkulator.
+Video performance is noticeably slower than on Windows. This is largely due to
+the lack of hardware acceleration support in Elkulator.
 
 
 Sarah Walker

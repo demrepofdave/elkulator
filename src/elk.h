@@ -22,6 +22,14 @@ typedef struct
 } CPUStatus;
 extern CPUStatus p;
 
+enum
+{
+        ULA_CONVENTIONAL = 0,
+        ULA_RAM_8BIT = 2,
+        ULA_RAM_8BIT_DUAL_ACCESS = 2,
+        ULA_RAM_8BIT_SINGLE_ACCESS = 3
+};
+
 extern uint8_t opcode;
 extern int nmi,irq;
 extern int rombank,intrombank;
@@ -34,7 +42,6 @@ uint8_t readmem(uint16_t addr);
 void writemem(uint16_t addr, uint8_t val);
 
 extern int cswena;
-extern int tapelcount,tapellatch;
 extern int tapeon;
 void polltape();
 void polluef();
@@ -92,7 +99,7 @@ extern int tapespeed;
 
 #define MAX_DRIVES 2
 
-typedef struct
+struct drives
 {
         void (*seek)(int drive, int track);
         void (*readsector)(int drive, int sector, int track, int side, int density);
@@ -100,10 +107,9 @@ typedef struct
         void (*readaddress)(int drive, int track, int side, int density);
         void (*format)(int drive, int track, int side, int density);
         void (*poll)();
-} drive_t;
+};
 
-extern drive_t drives[MAX_DRIVES];
-
+extern struct drives drives[2];
 extern int curdrive;
 
 void ssd_reset();
@@ -210,9 +216,13 @@ extern int ddvol,ddtype;
 extern int discspd;
 extern int motorspin;
 
-#define MAX_PATH_AND_FILE_SIZE 512
+// Maximum file name buffer size (previously this was defined as magic number
+// in the code at 512, however it is possible that a file path on modern OS's
+// may have file paths + filename combinations that exceed 512 characters, 
+// hence bumping the value up here).
+#define MAX_PATH_FILENAME_BUFFER_SIZE 768
 
-extern char exedir[MAX_PATH_AND_FILE_SIZE];
+extern char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
 
 void initelk();
 void closeelk();
@@ -267,6 +277,8 @@ void clearscreen();
 void savescrshot();
 void loadulastate(FILE *f);
 void saveulastate(FILE *f);
+void startmovie();
+void stopmovie();
 
 void reset1770();
 uint8_t read1770(uint16_t addr);

@@ -31,7 +31,8 @@ void _debugthread(PVOID pvoid)
         HDC hDC;
         //PAINTSTRUCT ps;
         int x;
-        int c,d;
+        int c = 0;
+        int d;
         
         usdat=malloc(256*256*4);
         if (!debugstarted)
@@ -452,7 +453,6 @@ void debugwrite(uint16_t addr, uint8_t val)
 }
 
 extern uint16_t oldpc;
-uint16_t oldoldpc;
 void dodebugger()
 {
         int c,d,e;
@@ -462,7 +462,7 @@ void dodebugger()
         char ins[256];
         if (!opcode)
         {
-                sprintf(outs,"BRK %04X! %04X %04X\n",pc,oldpc,oldoldpc);
+                sprintf(outs,"BRK %04X! %04X\n",pc,oldpc);
                 debugout(outs);
         }
         if (!opcode) debug=1;
@@ -496,7 +496,7 @@ void dodebugger()
                 c=ReadConsoleA(cinf,ins,255,(LPDWORD)&d,NULL);
                 ins[d]=0;
 #else
-		d=(int)fgets(ins,255,stdin);
+		fgets(ins,255,stdin);
 #endif
                 d=0;
                 while (ins[d]!=32 && ins[d]!=0xA && ins[d]!=0xD && ins[d]!=0) d++;

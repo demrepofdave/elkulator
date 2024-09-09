@@ -1,6 +1,6 @@
 extern int pauseit;
 extern int output;
-extern int reallyfasttapebreak;
+static int reallyfasttapebreak;
 /*Elkulator v1.0 by Sarah Walker*/
 /*UEF handling*/
 #include <allegro.h>
@@ -10,11 +10,11 @@ extern int reallyfasttapebreak;
 
 #define INT_HIGHTONE 0x40
 
+<<<<<<< HEAD
 extern int tapelcount,tapellatch,pps;
-int intone=0;
-gzFile uef;
+=======
+static int tapelcount,tapellatch,pps;
 extern int cswena;
-
 int inchunk=0,chunkid=0,chunklen=0;
 int chunkpos=0,chunkdatabits=8;
 float chunkf;
@@ -256,6 +256,6 @@ void closeuef()
         if (uef)
 	{
            	gzclose(uef);
-		uef=(gzFile *)NULL;
+		uef=NULL;
 	}
 }

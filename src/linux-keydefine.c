@@ -306,7 +306,7 @@ static int gui_keydefine_input(DIALOG *kd)
         d[4].dp2 = &d[3];
         d[5].dp2 = &d[3];
 
-        sprintf(msg_redefine, "Redefining %s", kd->dp2 != NULL ? kd->dp2 : kd->dp);
+        sprintf(msg_redefine, "Redefining %s", kd->dp2 != NULL ? (char *)kd->dp2 : (char *)kd->dp);
 
         /* Initialise the current key list. */
 
