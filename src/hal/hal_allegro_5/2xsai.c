@@ -1,11 +1,8 @@
 
 #include <string.h>
 
-#ifdef HAL_ALLEGRO_5
-    #include <allegro5/allegro.h>
-#else
-    #include <allegro.h>
-	#include <allegro/internal/aintern.h>
+#include <allegro5/allegro.h>
+//#include <allegro/internal/aintern.h>
 #endif
 
 #include "hal/2xsai.h"

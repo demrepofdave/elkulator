@@ -10,11 +10,7 @@
 
 /*Modified by Sarah Walker to work with Allegro*/
 
-#ifdef HAL_ALLEGRO_5
-    #include <allegro5/allegro.h>
-#else
-    #include <allegro.h>
-#endif
+#include <allegro5/allegro.h>
 
 #ifndef MAX
 #define MAX(a,b)    (((a) > (b)) ? (a) : (b))

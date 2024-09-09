@@ -29,7 +29,7 @@ static sample_table_entry sample_table[SAMPLE_TABLE_SIZE];
 hal_result isValidSampleHandle(hal_sample_handle handle)
 {
     // Also check hal is initialized (can't be a valid handle if hal is not initialized)
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
 
     if(result = HAL_OK && (handle < 0 || handle >= SAMPLE_TABLE_SIZE))
     {
@@ -94,7 +94,7 @@ hal_result hal_init_sample()
 hal_sample_handle hal_allocate_sample()
 {
     hal_sample_handle handle = HAL_UNINITIALISED; // HAL not initialised error
-    if(isHalInitialised() == HAL_OK)
+    if(hal_isInitialised() == HAL_OK)
     {
         // Speed isn't important here so we plod along.
         handle = HAL_HANDLE_TABLE_FULL;

@@ -1,8 +1,4 @@
-#ifdef HAL_ALLEGRO_5
-    #include <allegro5/allegro.h>
-#else
-    #include <allegro.h>
-#endif
+#include <allegro5/allegro.h>
 
 #include "hal/hal.h"
 //#include "hal/2xsai.h"
@@ -49,7 +45,7 @@ static bitmap_table_entry bitmap_table[BITMAP_TABLE_SIZE];
 static sample_table_entry sample_table[SAMPLE_TABLE_SIZE];
 
 // Private functions.
-hal_result isHalInitialised()
+hal_result hal_isInitialised()
 {
     hal_result result = HAL_UNINITIALISED;
 
@@ -63,7 +59,7 @@ hal_result isHalInitialised()
 hal_result isValidHandle(hal_bitmap_handle handle)
 {
     // Also check hal is initialized (can't be a valid handle if hal is not initialized)
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
 
     if(result = HAL_OK && (handle < 0 || handle >= BITMAP_TABLE_SIZE))
     {
@@ -76,7 +72,7 @@ hal_result isValidHandle(hal_bitmap_handle handle)
 hal_result isValidUserHandle(hal_bitmap_handle handle)
 {
     // Also check hal is initialized (can't be a valid handle if hal is not initialized)
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
 
     if(result = HAL_OK && (handle < 1 || handle >= BITMAP_TABLE_SIZE)) // Don't include screen handle (at index 0) - not a user defined handle.
     {
@@ -191,7 +187,7 @@ hal_result hal_init()
 
 hal_result hal_set_window_title(const char * name)
 {
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //set_window_title(name);
@@ -201,7 +197,7 @@ hal_result hal_set_window_title(const char * name)
 
 hal_result hal_set_close_button_callback( void (*handler_function)(void))
 {
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //set_close_button_callback(handler_function);
@@ -212,7 +208,7 @@ hal_result hal_set_close_button_callback( void (*handler_function)(void))
 
 hal_result hal_install_mouse()
 {
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //install_mouse();
@@ -222,7 +218,7 @@ hal_result hal_install_mouse()
 
 hal_result hal_set_elk_palette()
 {
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //set_palette(elkpal);
@@ -233,7 +229,7 @@ hal_result hal_set_elk_palette()
 int hal_get_desktop_color_depth()
 {
     int depth = -1;
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //depth = desktop_color_depth();
@@ -243,7 +239,7 @@ int hal_get_desktop_color_depth()
 
 hal_result hal_set_color_depth(int depth)
 {
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //set_color_depth(depth);
@@ -253,7 +249,7 @@ hal_result hal_set_color_depth(int depth)
 
 hal_result hal_set_gfx_mode_autodetect_windowed(int w, int h, int v_w, int v_h)
 {
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
@@ -263,7 +259,7 @@ hal_result hal_set_gfx_mode_autodetect_windowed(int w, int h, int v_w, int v_h)
 
 hal_result hal_set_gfx_mode_autodetect_fullscreen(int w, int h, int v_w, int v_h)
 {
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, w, h, v_w, v_h);
@@ -273,7 +269,7 @@ hal_result hal_set_gfx_mode_autodetect_fullscreen(int w, int h, int v_w, int v_h
 
 hal_result hal_init_2xSaI(int depth)
 {
-    hal_result result = isHalInitialised();
+    hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
         //Init_2xSaI(depth);
@@ -285,7 +281,7 @@ hal_result hal_init_2xSaI(int depth)
 hal_bitmap_handle hal_allocate_bitmap() // Returns a handler to a BITMAP type and initialises the base BITMAP
 {
     hal_bitmap_handle handle = HAL_UNINITIALISED; // HAL not initialised error
-    if(isHalInitialised() == HAL_OK)
+    if(hal_isInitialised() == HAL_OK)
     {
         // Speed isn't important here so we plod along.
         handle = HAL_HANDLE_TABLE_FULL;

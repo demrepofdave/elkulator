@@ -1,11 +1,7 @@
 /*Elkulator v1.0 by Sarah Walker
   PAL filter*/
-#ifdef HAL_ALLEGRO_5
-    #include <allegro5/allegro.h>
-#else
-    #include <allegro.h>
-#endif
 
+#include <allegro5/allegro.h>
 #include "elk.h"
 
 al_fixed ACoef[2],ACoef2[3];

@@ -30,6 +30,7 @@ typedef int hal_sample_handle;
 
 // General hal functions.
 hal_result hal_init(); // Initialise the HAL. This must be done before any other API calls to the HAL are made.
+hal_result hal_isInitialised();
 hal_result hal_set_window_title(const char * name);
 hal_result hal_set_close_button_callback( void (*handler_function)(void));
 hal_result hal_install_mouse();

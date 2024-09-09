@@ -1,11 +1,7 @@
 /*Elkulator v1.0 by Sarah Walker
   First Byte joystick emulation*/
 
-#ifdef HAL_ALLEGRO_5
-    #include <allegro5/allegro.h>
-#else
-    #include <allegro.h>
-#endif
+#include <allegro5/allegro.h>
 
 #include "hal/hal.h"
 
