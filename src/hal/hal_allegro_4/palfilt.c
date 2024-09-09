@@ -24,7 +24,7 @@ void initcoef()
 fixed yy[NCoef+2]; //output samples
 fixed yx[NCoef+2]; //input samples
 int ycount=0;
-inline fixed iir(fixed NewSample)
+static inline fixed iir(fixed NewSample)
 {
         yx[ycount] = NewSample;
         yy[ycount] = fixmul(ACoef2[0],yx[ycount]);
@@ -38,7 +38,7 @@ fixed ry[2]; //output samples
 fixed rx[2]; //input samples
 int rycount=0;
 
-inline fixed firry(fixed NewSample) {
+static inline fixed firry(fixed NewSample) {
     //Calculate the new output
     rx[rycount] = fixmul(ACoef[0],NewSample);
     ry[rycount] = rx[0]+rx[1];
@@ -51,7 +51,7 @@ fixed by[2]; //output samples
 fixed bx[2]; //input samples
 int bycount=0;
 
-inline fixed firby(fixed NewSample) {
+static inline fixed firby(fixed NewSample) {
     //Calculate the new output
     bx[bycount] = fixmul(ACoef[0],NewSample);
     by[bycount] = bx[0]+bx[1];
