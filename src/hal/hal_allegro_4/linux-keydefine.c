@@ -3,11 +3,7 @@
 
 #ifndef WIN32
 
-#ifdef HAL_ALLEGRO_5
-    #include <allegro5/allegro.h>
-#else
-    #include <allegro.h>
-#endif
+#include <allegro.h>
 #include "elk.h"
 #include "hal/hal.h"
 

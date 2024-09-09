@@ -44,11 +44,14 @@ AM_CONDITIONAL(OS_LINUX, test "$OS" = "linux")
 # NOTE: For the following Autoconf macro to be supported, you need to extract
 #       allegro.m4 from the DOS/Windows Allegro sources (the file is contained
 #       in `misc') and copy it to this directory or MSYS's `/share/aclocal'.
-#if test "$OS" != "win"; then
-#   AM_PATH_ALLEGRO(, , AC_MSG_ERROR(building Elkulator requires Allegro to be installed))
-#fi
-AC_CHECK_HEADER([allegro5/allegro.h],[],
-	[AC_MSG_FAILURE([The Allegro version 5 library is needed but not installed], 1)],[])
+if test "$enable_allegro5" = "yes"; then
+   AC_CHECK_HEADER([allegro5/allegro.h],[],
+	    [AC_MSG_FAILURE([The Allegro version 5 library is needed but not installed], 1)],[])
+else 
+   if test "$OS" != "win"; then
+       AM_PATH_ALLEGRO(, , AC_MSG_ERROR(building Elkulator requires Allegro to be installed))
+   fi
+fi
 
 AC_CHECK_LIB([z], [gzopen], [], \
 	[echo "You need to install the zlib library."
