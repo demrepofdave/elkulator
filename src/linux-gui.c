@@ -727,7 +727,7 @@ void entergui()
                 allegro_gl_set_allegro_mode();
         }*/
         dp=init_dialog(bemgui,0);
-        while (x && !menu_pressed() && !key[KEY_ESC])
+        while (x && !menu_pressed() && !key[KEY_ESC] && !quited)
         {
 /*                if (opengl)
                 {

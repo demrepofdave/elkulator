@@ -27,6 +27,11 @@ char discname2[260];
 int quited=0;
 int infocus=1;
 
+void native_window_close_button_handler(void)
+{
+       quited = 1;
+}
+
 void startblit()
 {
 }
@@ -45,6 +50,7 @@ int main(int argc, char *argv[])
                 exit(-1);
         }
         initelk(argc,argv);
+        set_close_button_callback(native_window_close_button_handler);
         install_mouse();
         while (!quited)
         {
