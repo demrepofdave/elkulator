@@ -73,28 +73,29 @@ void initelk(int argc, char *argv[])
 {
         int c;
         char *p;
-        int tapenext=0,discnext=0,romnext=-2,parallelnext=0,serialnext=0,serialdebugnext=0;
+        int tapenext=0;
+        int discnext=0;
+        int romnext=-2;
+        int parallelnext=0;
+        int serialnext=0;
+        int serialdebugnext=0;
+
         hal_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+
         p=hal_get_filename(exedir);
+
         p[0]=0;
         discname[0]=discname2[0]=tapename[0]=0;
         parallelname[0]=0;serialname[0]=0;
         for (int i = 0; i < 16; i++)
+        {
             romnames[i][0] = 0;
-//        printf("Load config\n");
+        }
+
         loadconfig();
-//printf("commandline\n");
 
         for (c=1;c<argc;c++)
         {
-//printf("%i\n",c); fflush(stdout);
-//                printf("%i : %s\n",c,argv[c]);
-/*                if (!strcasecmp(argv[c],"-1770"))
-                {
-                        I8271=0;
-                        WD1770=1;
-                }
-                else*/
 #ifndef WIN32
                 if (!strcasecmp(argv[c],"--help"))
                 {
@@ -144,18 +145,29 @@ void initelk(int argc, char *argv[])
                         debug=debugon=1;
                 }
                 else if (tapenext)
-                   strcpy(tapename,argv[c]);
+                {
+                        strcpy(tapename,argv[c]);
+                }
                 else if (discnext)
                 {
-                        if (discnext==2) strcpy(discname2,argv[c]);
-                        else             strcpy(discname,argv[c]);
+                        if (discnext==2)
+                        {
+                                strcpy(discname2,argv[c]);
+                        } 
+                        else             
+                        {
+                                strcpy(discname,argv[c]);
+                        }
                         discnext=0;
                 }
                 else if (romnext > -2)
                 {
                     if (romnext == -1)
+                    {
                         romnext = atoi(argv[c]);
-                    else if (romnext < 16) {
+                    }
+                    else if (romnext < 16) 
+                    {
                         fprintf(stderr, "Loading %s in bank %d\n", argv[c], romnext);
                         strcpy(romnames[romnext],argv[c]);
                         romnext = -2;
@@ -176,14 +188,14 @@ void initelk(int argc, char *argv[])
                         serial_debug = atoi(argv[c]);
                         serialdebugnext=0;
                 }
-                if (tapenext) tapenext--;
+                if (tapenext)
+                {
+                        tapenext--;
+                }
         }
-//printf("initalmain\n"); fflush(stdout);
 
         initalmain(0,NULL);
-//printf("loadroms\n"); fflush(stdout);
         loadroms();
-//printf("reset6502\n");
         reset6502();
         initula();
         resetula();
@@ -194,14 +206,26 @@ void initelk(int argc, char *argv[])
         loadtape(tapename);
         loaddisc(0,discname);
         loaddisc(1,discname2);
+
         /* For temporary compatibility: */
-        if (romnames[0][0] != 0) loadcart(romnames[0]);
-        if (romnames[1][0] != 0) loadcart2(romnames[1]);
+        if (romnames[0][0] != 0) 
+        {
+                loadcart(romnames[0]);
+        }
+        if (romnames[1][0] != 0) 
+        {
+                loadcart2(romnames[1]);
+        }
+
         /* Load ROMs normally. */
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 16; i++)
+        {
             if (romnames[i][0] != 0) loadrom_n(i, romnames[i]);
         }
-        if (defaultwriteprot) writeprot[0]=writeprot[1]=1;
+        if (defaultwriteprot)
+        {
+                writeprot[0]=writeprot[1]=1;
+        }
 #ifndef WIN32
         hal_install_keyboard();
 #endif
@@ -216,10 +240,7 @@ void initelk(int argc, char *argv[])
         makekeyl();
         
         hal_set_display_switch_mode_background();
-        
-//        initresid();
-//        resetsid();
-//        setsidtype(0,0);
+      
 }
 
 int ddnoiseframes=0;
@@ -269,7 +290,4 @@ void closeelk()
 {
         stopmovie();
         saveconfig();
-//        dumpram();
-//        dumpregs();
-//        printf("Closing!\n");
 }

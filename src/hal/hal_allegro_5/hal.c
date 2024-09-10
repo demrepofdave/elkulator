@@ -156,8 +156,29 @@ hal_result hal_init()
 {
     hal_result result = HAL_OK;
 
-    int ret = 0; //allegro_init();
-    if (ret != 0)
+    bool allegro_ok = al_init();
+
+    if(allegro_ok)
+    {
+        allegro_ok = al_init_native_dialog_addon();
+    }
+
+    if(allegro_ok)
+    {
+        allegro_ok = al_init_primitives_addon();
+    }
+
+    if(allegro_ok)
+    {
+        allegro_ok = al_install_keyboard();
+    }
+
+    if(allegro_ok)
+    {
+        allegro_ok = al_init_image_addon();
+    }
+
+    if (!allegro_ok)
     {
         result = HAL_UNINITIALISED;
     }
@@ -190,7 +211,7 @@ hal_result hal_set_window_title(const char * name)
     hal_result result = hal_isInitialised();
     if(result == HAL_OK)
     {
-        //set_window_title(name);
+        al_set_new_window_title(name);
     }
     return result;
 }

@@ -526,17 +526,6 @@ int gui_eject1()
         return;
 }
 
-int gui_wprot0()
-{
-        writeprot[0]=!writeprot[0];
-        if (fwriteprot[0]) fwriteprot[0]=1;
-}
-int gui_wprot1()
-{
-        writeprot[1]=!writeprot[1];
-        if (fwriteprot[1]) fwriteprot[1]=1;
-}
-
 int gui_wprotd()
 {
         defaultwriteprot=!defaultwriteprot;
@@ -949,7 +938,12 @@ void gui_allegro_event(ALLEGRO_EVENT *event)
             break;
         
         case IDM_DISC_WPROT:  // gui_wprot0 // gui_wprot1
-            disc_wprot(event);
+            int drive = menu_get_num(event);
+            writeprot[drive]=!writeprot[drive];
+            if (fwriteprot[drive])
+            {
+                fwriteprot[drive]=1;
+            }
             break;
 
         case IDM_DISC_WPROT_D:
