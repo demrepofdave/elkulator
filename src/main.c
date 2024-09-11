@@ -10,7 +10,7 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_primitives.h>
 
-#undef printf
+//#undef printf
 
 int autoboot;
 int quited=0;
@@ -45,6 +45,7 @@ void rpclog(char *format, ...)
 int drawit=0;
 
 char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
+//ALLEGRO_PATH *exedir;
 char tapename[512];
 char parallelname[512];
 char serialname[512];
@@ -58,8 +59,8 @@ char romnames[16][1024];
 
 static double main_calc_timer(int speed)
 {
-    double secs = ((double)128 / 2000000.0);
-    log_debug("main: main_calc_timer is %gs", secs);
+    double secs = ((double)speed / 2000000.0);
+    printf("main: main_calc_timer is %gs\n", secs);
     return secs;
 }
 
@@ -95,12 +96,25 @@ void initelk(int argc, char *argv[])
                 allegro_ok = al_install_keyboard();
         }
 
+        allegro_ok = al_init_image_addon();
+
         if(allegro_ok)
         {
-                allegro_ok = al_init_image_addon();
+                printf("Allegro initialisation is ok\n");
+        }
+        else
+        {
+                printf("Allegro initialisation failed!\n");
         }
 
-        hal_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+
+        //hal_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+
+        ALLEGRO_PATH *alpath = al_get_standard_path(ALLEGRO_EXENAME_PATH);
+        const char *tmpstrdir = al_path_cstr(alpath, '/');
+        strcpy(exedir, "./");
+        printf("Allegro path = %s\n", (char*) exedir);
+        fflush(stdout);
 
         display = video_init();
         tmp_display = display;
@@ -112,9 +126,9 @@ void initelk(int argc, char *argv[])
         }
         al_register_event_source(queue, al_get_display_event_source(display));
 
-        p=hal_get_filename(exedir);
+        //p=hal_get_filename(exedir);
 
-        p[0]=0;
+        //p[0]=0;
         discname[0]=discname2[0]=tapename[0]=0;
         parallelname[0]=0;serialname[0]=0;
         for (int i = 0; i < 16; i++)
@@ -259,10 +273,10 @@ void initelk(int argc, char *argv[])
 #ifndef WIN32
         hal_install_keyboard();
 #endif
-        //inital();
-        //initsound();
-        //loaddiscsamps();
-        //maketapenoise();
+        inital();
+        initsound();
+        loaddiscsamps();
+        maketapenoise();
 
         //makekeyl();
         
@@ -279,17 +293,17 @@ void initelk(int argc, char *argv[])
  //       exit(1);
  //   }
 
-        tapenoise_init(queue);
+        //tapenoise_init(queue);
 
-        main_reset();
+        //main_reset();
 
-        joystick_init(queue);
+        //joystick_init(queue);
 
         tmp_display = display;
 
         gui_allegro_init(queue, display);
 
-        if (!(timer = al_create_timer(main_calc_timer(100)))) {
+        if (!(timer = al_create_timer(main_calc_timer(10000)))) {
             log_fatal("main: unable to create timer");
             exit(1);
         }
@@ -303,8 +317,8 @@ void initelk(int argc, char *argv[])
         al_register_event_source(queue, al_get_mouse_event_source());
 
         // lovebug
-        if (fullscreen)
-            video_enterfullscreen();
+        //if (fullscreen)
+        //    video_enterfullscreen();
         // lovebug end
       
 }
@@ -333,11 +347,11 @@ void runelk(ALLEGRO_EVENT *event)
                         reset6502();
                         resetit=0;
                 }
-                if (break_pressed() && !oldbreak)
-                {
-                        reset6502();
-                }
-                oldbreak = break_pressed();
+//                if (break_pressed() && !oldbreak)
+//                {
+//                        reset6502();
+//                }
+                //oldbreak = break_pressed();
                 if (wantloadstate) doloadstate();
                 if (wantsavestate) dosavestate();
                 if (infocus) hal_poll_joystick();
@@ -368,7 +382,7 @@ void main_init(int argc, char *argv[])
 
 }
 
-static double last_switch_in = 0.0;
+//static double last_switch_in = 0.0;
 
 void main_run()
 {
@@ -383,6 +397,7 @@ void main_run()
     {
         al_wait_for_event(queue, &event);
 
+        //printf("Event %d\n", (int) event.type);
         switch(event.type)
         {
             case ALLEGRO_EVENT_KEY_DOWN:
@@ -430,23 +445,23 @@ void main_run()
             case ALLEGRO_EVENT_MENU_CLICK:
                 main_pause("menu active");
                 gui_allegro_event(&event);
-                main_resume();
+ //               main_resume();
                 break;
             case ALLEGRO_EVENT_DISPLAY_RESIZE:
 //                video_update_window_size(&event);
                 break;
             case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
                 /* bodge for when OUT events immediately follow an IN event */
-                if ((event.any.timestamp - last_switch_in) > 0.01) {
-                    key_lost_focus();
-                    if (autopause) //  && !debug_core)
-                        main_pause("auto-paused");
-                }
+//                if ((event.any.timestamp - last_switch_in) > 0.01) {
+//                    key_lost_focus();
+//                    if (autopause) //  && !debug_core)
+//                        main_pause("auto-paused");
+//                }
                 break;
             case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
-                last_switch_in = event.any.timestamp;
-                if (autopause)
-                    main_resume();
+//                last_switch_in = event.any.timestamp;
+//                if (autopause)
+//                    main_resume();
         }
     }
     log_debug("main: end loop");
@@ -476,6 +491,7 @@ void main_resume(void)
 
 int main(int argc, char *argv[])
 {
+        printf("Entering Elkulator!\n");
         hal_result result = hal_init();
 
         if (result != HAL_OK)

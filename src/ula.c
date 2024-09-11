@@ -102,7 +102,7 @@ void initula()
         hal_create_bitmap(handle_b162, 640,256);
         hal_clear_bitmap(handle_b16);
         hal_init_2xSaI(hal_get_desktop_color_depth());
-        initpaltables();
+//        initpaltables();
         hal_set_color_depth(8);
         hal_create_bitmap(handle_b, 640,616);
         hal_set_elk_palette();

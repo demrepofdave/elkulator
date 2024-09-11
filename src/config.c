@@ -23,7 +23,11 @@ char *getstringcfg(char *name)
         char *t;
         int c;
         int a,b;
-        if (!cfgfile) return NULL;
+        if (!cfgfile)
+        {
+              //printf("getstringcfg(%s) - Cannot read - no file open!\n", name);
+              return NULL;
+        } 
 //        rpclog("Looking for %s\n",name);
         fseek(cfgfile,0,SEEK_SET);
         while (1)
@@ -66,9 +70,9 @@ int getintcfg(char *name, int def)
         int c;
         char *s=getstringcfg(name);
         if (!s) return def;
-//        rpclog("Returned string %s for %s\n",s,name);
+        //printf("Returned string %s for %s\n",s,name);
         sscanf(s,"%i",&c);
-//        rpclog("c is %i\n",c);
+        //printf("c is %i\n",c);
         return c;
 }
 
@@ -88,7 +92,10 @@ void loadconfig()
         char s2[20];
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
+        printf("Config file with path = %s\n", fn);
         cfgfile=fopen(fn,"rt");
+
+        printf("file open returns %d", (int)cfgfile);
         tapespeed=getintcfg("tapespeed",0);
         plus1=getintcfg("plus1",0);
         plus3=getintcfg("plus3",0);

@@ -47,6 +47,9 @@ static sample_table_entry sample_table[SAMPLE_TABLE_SIZE];
 static int colblack;
 static int colwhite;
 
+int winsizex=800;
+int winsizey=600;
+
 static ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *b, *b16, *b32;
 
@@ -61,16 +64,18 @@ ALLEGRO_DISPLAY *video_init(void)
 #else
     al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE);
 #endif
-    int vsync = get_config_int("video", "allegro_vsync", -1);
-    if (vsync >= 0) {
-        int temp;
-        al_set_new_display_option(ALLEGRO_VSYNC, 2, ALLEGRO_SUGGEST);
-        log_debug("video: config vsync=%d, actual=%d", vsync, al_get_new_display_option(ALLEGRO_VSYNC, &temp));
-    }
-    video_set_window_size(true);
+    //int vsync = get_config_int("video", "allegro_vsync", -1);
+    //if (vsync >= 0) {
+    //    int temp;
+    //    al_set_new_display_option(ALLEGRO_VSYNC, 2, ALLEGRO_SUGGEST);
+    //    log_debug("video: config vsync=%d, actual=%d", vsync, al_get_new_display_option(ALLEGRO_VSYNC, &temp));
+    //}
+    //video_set_window_size(true);
 
-    if ((display = al_create_display(winsizex, winsizey)) == NULL) {
-        log_fatal("video: unable to create display");
+    if ((display = al_create_display(winsizex, winsizey)) == NULL)
+    {
+        //log_fatal("video: unable to create display");
+        printf("video: unable to create display\n");
         exit(1);
     }
 
@@ -82,32 +87,32 @@ ALLEGRO_DISPLAY *video_init(void)
     colwhite = 0xffffffff;
     border_col = al_map_rgb(0, 0, 0);
 
-    nula_default_palette();
+    //nula_default_palette();
 
-    for (int c = 0; c < 8; c++)
-        nula_flash[c] = 1;
-    for (int temp = 0; temp < 256; temp++) {
-        int temp2 = temp;
-        for (int c = 0; c < 16; c++) {
-            int left = 0;
-            if (temp2 & 2)
-                left |= 1;
-            if (temp2 & 8)
-                left |= 2;
-            if (temp2 & 32)
-                left |= 4;
-            if (temp2 & 128)
-                left |= 8;
-            table4bpp[3][temp][c] = left;
-            temp2 <<= 1;
-            temp2 |= 1;
-        }
-        for (int c = 0; c < 16; c++) {
-            table4bpp[2][temp][c] = table4bpp[3][temp][c >> 1];
-            table4bpp[1][temp][c] = table4bpp[3][temp][c >> 2];
-            table4bpp[0][temp][c] = table4bpp[3][temp][c >> 3];
-        }
-    }
+    //for (int c = 0; c < 8; c++)
+    //    nula_flash[c] = 1;
+    //for (int temp = 0; temp < 256; temp++) {
+    //    int temp2 = temp;
+    //    for (int c = 0; c < 16; c++) {
+    //        int left = 0;
+    //        if (temp2 & 2)
+    //            left |= 1;
+    //        if (temp2 & 8)
+    //            left |= 2;
+    //        if (temp2 & 32)
+    //            left |= 4;
+    //        if (temp2 & 128)
+    //            left |= 8;
+    //        table4bpp[3][temp][c] = left;
+    //        temp2 <<= 1;
+    //        temp2 |= 1;
+    //    }
+    //    for (int c = 0; c < 16; c++) {
+    //        table4bpp[2][temp][c] = table4bpp[3][temp][c >> 1];
+    //        table4bpp[1][temp][c] = table4bpp[3][temp][c >> 2];
+    //        table4bpp[0][temp][c] = table4bpp[3][temp][c >> 3];
+    //    }
+    //}
     b = al_create_bitmap(1280, 800);
     al_set_target_bitmap(b);
     al_clear_to_color(al_map_rgb(0, 0,0));

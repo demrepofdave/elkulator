@@ -5,7 +5,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdio.h>
 
-#define printf rpclog
+//#define printf rpclog
 
 void rpclog(char *format, ...);
 
