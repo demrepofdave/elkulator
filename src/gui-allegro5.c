@@ -2,7 +2,11 @@
   Linux GUI*/
 
 #ifndef WIN32
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_primitives.h>
 #include "hal/hal_allegro_5/gui-allegro.h"
 #include "hal/hal.h"
 #include "elk.h"
@@ -11,6 +15,22 @@
 
 static ALLEGRO_MENU *disc_menu;
 static ALLEGRO_MENU *rom_menu;
+
+
+static inline int menu_id_num(menu_id_t id, int num)
+{
+    return (num << 8) | id;
+}
+
+static inline menu_id_t menu_get_id(ALLEGRO_EVENT *event)
+{
+    return event->user.data1 & 0xff;
+}
+
+static inline int menu_get_num(ALLEGRO_EVENT *event)
+{
+    return event->user.data1 >> 8;
+}
 
 void setejecttext(int d, char *s)
 {
@@ -191,7 +211,7 @@ static ALLEGRO_MENU *create_rom_menu(void)
 //};
 static ALLEGRO_MENU *create_display_menu(void)
 {
-    ALLEGRO_MENU *menu = create_video_menu();
+    ALLEGRO_MENU *menu = al_create_menu();
     add_checkbox_item(menu, "Scanlines",     menu_id_num(IDM_DISPLAY_FILTER, 0), drawmode == 0);
     add_checkbox_item(menu, "Line doubling", menu_id_num(IDM_DISPLAY_FILTER, 0), drawmode == 1);
     add_checkbox_item(menu, "2xSaI",         menu_id_num(IDM_DISPLAY_FILTER, 0), drawmode == 2);
@@ -208,9 +228,9 @@ static ALLEGRO_MENU *create_display_menu(void)
 //        {"Fullscreen",gui_fullscreen,NULL,0,NULL},
 //        {NULL,NULL,NULL,0,NULL}
 //};
-static ALLEGRO_MENU *create_settings_menu(void)
+static ALLEGRO_MENU *create_video_menu(void)
 {
-    ALLEGRO_MENU *menu = create_video_menu();
+    ALLEGRO_MENU *menu = al_create_menu();
     al_append_menu_item(menu, "Display Type", 0, 0, NULL, create_display_menu());
     add_checkbox_item(menu, "Fullscreen", IDM_SETTINGS_FULLSCREEN, fullscreen); // TODO: fullscreen?
     return menu;
@@ -330,7 +350,7 @@ static ALLEGRO_MENU *create_memory_menu(void)
 //        {"&DFS enable",gui_dfs,NULL,0,NULL},
 //        {NULL,NULL,NULL,0,NULL}
 //};
-static ALLEGRO_MENU *create_discch_menu(void)
+static ALLEGRO_MENU *create_disch_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
     add_checkbox_item(menu, "Plus 3 enable", IDM_DISCCH_PLUS_THREE, plus3);
@@ -358,7 +378,7 @@ static ALLEGRO_MENU *create_joystick_menu(void)
 //        {"Redefine keyboard",gui_keydefine,NULL,0,NULL},
 //        {NULL,NULL,NULL,0,NULL}
 //};
-static ALLEGRO_MENU *create_joystick_menu(void)
+static ALLEGRO_MENU *create_keyboard_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
     al_append_menu_item(menu, "Redefine keyboard", IDM_KEYBOARD_REDEFINE, 0, NULL, NULL);
@@ -439,56 +459,56 @@ void gui_allegro_destroy(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display)
     al_set_display_menu(display, NULL);
 }
 
-int gui_load0()
-{
-        char tempname[260];
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        memcpy(tempname,discname,260);
-        ret=file_select_ex("Please choose a disc image",tempname,"SSD;DSD;IMG;ADF;ADL;FDI",260,xsize,ysize);
-        if (ret)
-        {
-                closedisc(0);
-                memcpy(discname,tempname,260);
-                loaddisc(0,discname);
-                if (defaultwriteprot) writeprot[0]=1;
-        }
-        return;
-}
+//void gui_load0()
+//{
+//        char tempname[260];
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        memcpy(tempname,discname,260);
+//        ret=file_select_ex("Please choose a disc image",tempname,"SSD;DSD;IMG;ADF;ADL;FDI",260,xsize,ysize);
+//        if (ret)
+//        {
+//                closedisc(0);
+//                memcpy(discname,tempname,260);
+//                loaddisc(0,discname);
+//                if (defaultwriteprot) writeprot[0]=1;
+//        }
+//        return;
+//}
 
-int gui_romload0()
-{
-        char tempname[260];
-        tempname[0]=0;
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        ret=file_select_ex("Please choose a ROM image",tempname,"ROM",260,xsize,ysize);
-        if (ret)
-        {
-                                loadcart(tempname);
-                                reset6502e();
-                                resetula();
-        }
-        return;
-}
+//void gui_romload0()
+//{
+//        char tempname[260];
+//        tempname[0]=0;
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        ret=file_select_ex("Please choose a ROM image",tempname,"ROM",260,xsize,ysize);
+//        if (ret)
+//        {
+//                                loadcart(tempname);
+//                                reset6502e();
+//                                resetula();
+//        }
+//        return;
+//}
 
-int gui_romload1()
-{
-        char tempname[260];
-        tempname[0]=0;
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        ret=file_select_ex("Please choose a ROM image",tempname,"ROM",260,xsize,ysize);
-        if (ret)
-        {
-                                loadcart2(tempname);
-                                reset6502e();
-                                resetula();
-        }
-        return;
-}
+//void gui_romload1()
+//{
+//        char tempname[260];
+//        tempname[0]=0;
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        ret=file_select_ex("Please choose a ROM image",tempname,"ROM",260,xsize,ysize);
+//        if (ret)
+//        {
+//                                loadcart2(tempname);
+//                                reset6502e();
+//                                resetula();
+//        }
+//        return;
+//}
 
-int gui_romeject0()
+void gui_romeject0()
 {
                         unloadcart();
                         reset6502e();
@@ -496,92 +516,91 @@ int gui_romeject0()
         return;
 }
 
-int gui_load1()
-{
-        char tempname[260];
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        memcpy(tempname,discname2,260);
-        ret=file_select_ex("Please choose a disc image",tempname,"SSD;DSD;IMG;ADF;ADL;FDI",260,xsize,ysize);
-        if (ret)
-        {
-                closedisc(1);
-                memcpy(discname2,tempname,260);
-                loaddisc(1,discname2);
-                if (defaultwriteprot) writeprot[1]=1;
-        }
-        return;
-}
+//void gui_load1()
+//{
+//        char tempname[260];
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        memcpy(tempname,discname2,260);
+//        ret=file_select_ex("Please choose a disc image",tempname,"SSD;DSD;IMG;ADF;ADL;FDI",260,xsize,ysize);
+//        if (ret)
+//        {
+//                closedisc(1);
+//                memcpy(discname2,tempname,260);
+//                loaddisc(1,discname2);
+//                if (defaultwriteprot) writeprot[1]=1;
+//        }
+//        return;
+//}
 
-int gui_eject0()
+void gui_eject0()
 {
         closedisc(0);
         discname[0]=0;
         return;
 }
-int gui_eject1()
+void gui_eject1()
 {
         closedisc(1);
         discname2[0]=0;
         return;
 }
 
-int gui_wprotd()
+void gui_wprotd()
 {
         defaultwriteprot=!defaultwriteprot;
 }
 
-int gui_normal()
+void gui_normal()
 {
         tapespeed=0;
 }
-int gui_fast()
+void gui_fast()
 {
         tapespeed=1;
 }
-int gui_rfast()
+void gui_rfast()
 {
         tapespeed=2;
 }
 
-int gui_loadt()
-{
-        char tempname[260];
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        memcpy(tempname,tapename,260);
-        ret=file_select_ex("Please choose a tape image",tempname,"UEF;CSW",260,xsize,ysize);
-        if (ret)
-        {
-                closeuef();
-                closecsw();
-                memcpy(tapename,tempname,260);
-                loadtape(tapename);
-//                tapeloaded=1;
-        }
-        return;
-}
+//void gui_loadt()
+//{
+//        char tempname[260];
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        memcpy(tempname,tapename,260);
+//        ret=file_select_ex("Please choose a tape image",tempname,"UEF;CSW",260,xsize,ysize);
+//        if (ret)
+//        {
+//                closeuef();
+//                closecsw();
+//                memcpy(tapename,tempname,260);
+//                loadtape(tapename);
+//        }
+//        return;
+//}
 
-int gui_rewind()
+void gui_rewind()
 {
         closeuef();
         closecsw();
         loadtape(tapename);
 }
 
-int gui_ejectt()
+void gui_ejectt()
 {
         closeuef();
         closecsw();
 }
 
 
-int gui_disp()
+void gui_disp()
 {
 //        drawmode=(intptr_t)active_menu->dp;
 }
 
-int gui_fullscreen()
+void gui_fullscreen()
 {
         if (fullscreen)
         {
@@ -595,7 +614,7 @@ int gui_fullscreen()
         }
 }
 
-int gui_waveform()
+void gui_waveform()
 {
 //        curwave=(int)active_menu->dp;
 }
@@ -610,7 +629,7 @@ int gui_waveform()
 //        {NULL,NULL,NULL,0,NULL}
 //};
 
-int gui_ddtype()
+void gui_ddtype()
 {
  //       ddtype=(intptr_t)active_menu->dp;
         closeddnoise();
@@ -618,71 +637,71 @@ int gui_ddtype()
 }
 
 
-int gui_ddvol()
+void gui_ddvol()
 {
  //       ddvol=(intptr_t)active_menu->dp;
 }
 
-int gui_internalsnd()
+void gui_internalsnd()
 {
         sndint=!sndint;
 }
-int gui_sndex()
+void gui_sndex()
 {
         sndex=!sndex;
         resetit=1;
 }
-int gui_ddnoise()
+void gui_ddnoise()
 {
         sndddnoise=!sndddnoise;
         return;
 }
-int gui_tnoise()
+void gui_tnoise()
 {
         sndtape=!sndtape;
         return;
 }
-/*int gui_filter()
+/*void gui_filter()
 {
         soundfilter=!soundfilter;
         return;
 }*/
 
-int gui_plus3()
+void gui_plus3()
 {
         plus3=!plus3;
         if (plus3) firstbyte=0;
         resetit=1;
         return;
 }
-int gui_adfs()
+void gui_adfs()
 {
         adfsena=!adfsena;
         resetit=1;
         return;
 }
-int gui_dfs()
+void gui_dfs()
 {
         dfsena=!dfsena;
         resetit=1;
         return;
 }
 
-int gui_mrbmode()
+void gui_mrbmode()
 {
   //      mrbmode=(intptr_t)active_menu->dp;
         resetit=1;
         return;
 }
 
-int gui_ulamode()
+void gui_ulamode()
 {
   //      ulamode=(intptr_t)active_menu->dp;
         resetit=1;
         return;
 }
 
-int gui_turbo()
+void gui_turbo()
 {
         turbo=!turbo;
         if (turbo) mrb=0;
@@ -690,7 +709,7 @@ int gui_turbo()
         return;
 }
 
-int gui_mrb()
+void gui_mrb()
 {
         mrb=!mrb;
         if (mrb) turbo=0;
@@ -698,14 +717,14 @@ int gui_mrb()
         return;
 }
 
-int gui_jim()
+void gui_jim()
 {
         enable_jim=!enable_jim;
         resetit=1;
         return;
 }
 
-int gui_plus1()
+void gui_plus1()
 {
         plus1=!plus1;
         if (plus1) firstbyte=0;
@@ -713,7 +732,7 @@ int gui_plus1()
         return;
 }
 
-int gui_first()
+void gui_first()
 {
         firstbyte=!firstbyte;
         if (firstbyte) plus1=plus3=0;
@@ -721,54 +740,54 @@ int gui_first()
         return;
 }
 
-int gui_scrshot()
-{
-        char tempname[260];
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        tempname[0]=0;
-        ret=file_select_ex("Please enter filename",tempname,"BMP",260,xsize,ysize);
-        if (ret)
-        {
-                memcpy(scrshotname,tempname,260);
-                savescrshot(scrshotname);
-        }
-        return;
-}
+//void gui_scrshot()
+//{
+//        char tempname[260];
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        tempname[0]=0;
+//        ret=file_select_ex("Please enter filename",tempname,"BMP",260,xsize,ysize);
+//        if (ret)
+//        {
+//                memcpy(scrshotname,tempname,260);
+//                savescrshot(scrshotname);
+//        }
+//        return;
+//}
 
-int gui_startmovie()
-{
-        char tempname[260];
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        tempname[0]=0;
-        ret=file_select_ex("Please enter filename",tempname,"VID",260,xsize,ysize);
-        if (ret)
-        {
-                memcpy(moviename,tempname,260);
-                startmovie(moviename);
-        }
-        return;
-}
+//void gui_startmovie()
+//{
+//        char tempname[260];
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        tempname[0]=0;
+//        ret=file_select_ex("Please enter filename",tempname,"VID",260,xsize,ysize);
+//        if (ret)
+//        {
+//                memcpy(moviename,tempname,260);
+//                startmovie(moviename);
+//        }
+//        return;
+//}
 
-int gui_stopmovie()
+void gui_stopmovie()
 {
     stopmovie(moviename);
     return;
 }
 
-int gui_startdebugging()
+void gui_startdebugging()
 {
     debug=debugon=1;
     startdebug();
 }
 
-int gui_mgc()
+void gui_mgc()
 {
         enable_mgc=!enable_mgc;
         return;
 }
-int gui_db_flash_cartridge()
+void gui_db_flash_cartridge()
 {
         enable_db_flash_cartridge=!enable_db_flash_cartridge;
         return;
@@ -821,62 +840,63 @@ int gui_db_flash_cartridge()
 //}
 #endif
 
-int gui_loads()
-{
-        char tempname[260];
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        memcpy(tempname,ssname,260);
-        ret=file_select_ex("Please choose a save state",tempname,"SNP",260,xsize,ysize);
-        if (ret)
-        {
-                memcpy(ssname,tempname,260);
-                loadstate(ssname);
-        }
-        return;
-}
+//void gui_loads()
+//{
+//        char tempname[260];
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        memcpy(tempname,ssname,260);
+//        ret=file_select_ex("Please choose a save state",tempname,"SNP",260,xsize,ysize);
+//        if (ret)
+//        {
+//                memcpy(ssname,tempname,260);
+//                loadstate(ssname);
+//        }
+//        return;
+//}
 
-static void file_load_state(ALLEGRO_EVENT *event)
-{
-    ALLEGRO_DISPLAY *display = (ALLEGRO_DISPLAY *)(event->user.data2);
-    ALLEGRO_FILECHOOSER *chooser = al_create_native_file_dialog(savestate_name, "Load state from file", "*.snp", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
-    if (chooser) {
-        if (al_show_native_file_dialog(display, chooser)) {
-            if (al_get_native_file_dialog_count(chooser) > 0)
-                loadstate(al_get_native_file_dialog_path(chooser, 0));
-        }
-        al_destroy_native_file_dialog(chooser);
-    }
-}
+//static void file_load_state(ALLEGRO_EVENT *event)
+//{
+//    ALLEGRO_DISPLAY *display = (ALLEGRO_DISPLAY *)(event->user.data2);
+//    ALLEGRO_FILECHOOSER *chooser = al_create_native_file_dialog(savestate_name, "Load state from file", "*.snp", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+//    if (chooser) {
+//        if (al_show_native_file_dialog(display, chooser)) {
+//            if (al_get_native_file_dialog_count(chooser) > 0)
+//                loadstate(al_get_native_file_dialog_path(chooser, 0));
+//        }
+//        al_destroy_native_file_dialog(chooser);
+//    }
+//}
 
-int gui_saves()
-{
-        char tempname[260];
-        int ret;
-        int xsize=windx-32,ysize=windy-16;
-        memcpy(tempname,ssname,260);
-        ret=file_select_ex("Please choose a save state",tempname,"SNP",260,xsize,ysize);
-        if (ret)
-        {
-                memcpy(ssname,tempname,260);
-                savestate(ssname);
-        }
-        return;
-}
-static void file_save_state(ALLEGRO_EVENT *event)
-{
-    ALLEGRO_FILECHOOSER *chooser;
-    ALLEGRO_DISPLAY *display;
+//void gui_saves()
+//{
+//        char tempname[260];
+//        int ret;
+//        int xsize=windx-32,ysize=windy-16;
+//        memcpy(tempname,ssname,260);
+//        ret=file_select_ex("Please choose a save state",tempname,"SNP",260,xsize,ysize);
+//        if (ret)
+//        {
+//                memcpy(ssname,tempname,260);
+//                savestate(ssname);
+//        }
+//        return;
+//}
 
-    if ((chooser = al_create_native_file_dialog(savestate_name, "Save state to file", "*.snp", ALLEGRO_FILECHOOSER_SAVE))) {
-        display = (ALLEGRO_DISPLAY *)(event->user.data2);
-        if (al_show_native_file_dialog(display, chooser)) {
-            if (al_get_native_file_dialog_count(chooser) > 0)
-                savestate(al_get_native_file_dialog_path(chooser, 0));
-        }
-        al_destroy_native_file_dialog(chooser);
-    }
-}
+//static void file_save_state(ALLEGRO_EVENT *event)
+//{
+//    ALLEGRO_FILECHOOSER *chooser;
+//    ALLEGRO_DISPLAY *display;
+//
+//    if ((chooser = al_create_native_file_dialog(savestate_name, "Save state to file", "*.snp", ALLEGRO_FILECHOOSER_SAVE))) {
+//        display = (ALLEGRO_DISPLAY *)(event->user.data2);
+//        if (al_show_native_file_dialog(display, chooser)) {
+//            if (al_get_native_file_dialog_count(chooser) > 0)
+//                savestate(al_get_native_file_dialog_path(chooser, 0));
+//        }
+//        al_destroy_native_file_dialog(chooser);
+//    }
+//}
 
 /* Menus event handler */
 void gui_allegro_event(ALLEGRO_EVENT *event)
@@ -896,11 +916,11 @@ void gui_allegro_event(ALLEGRO_EVENT *event)
             break;
 
         case IDM_FILE_LOAD_STATE:
-            file_load_state(event); // (gui_loads)
+//            file_load_state(event); // (gui_loads)
             break;
 
         case IDM_FILE_SAVE_STATE:
-            file_save_state(event); // gui_saves
+//            file_save_state(event); // gui_saves
             break;
 
         case IDM_FILE_EXIT:
@@ -931,13 +951,14 @@ void gui_allegro_event(ALLEGRO_EVENT *event)
         //    disc_choose(event, "autoboot in", all_dext, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
         //    break;
         case IDM_DISC_LOAD:  // gui_load0 / gui_load1
-            disc_choose(event, "load into", all_dext, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+//            disc_choose(event, "load into", all_dext, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
             break;
         case IDM_DISC_EJECT:  // gui_eject0 // gui_eject1
-            disc_eject(event);
+//            disc_eject(event);
             break;
         
         case IDM_DISC_WPROT:  // gui_wprot0 // gui_wprot1
+        {
             int drive = menu_get_num(event);
             writeprot[drive]=!writeprot[drive];
             if (fwriteprot[drive])
@@ -945,6 +966,7 @@ void gui_allegro_event(ALLEGRO_EVENT *event)
                 fwriteprot[drive]=1;
             }
             break;
+        }
 
         case IDM_DISC_WPROT_D:
             defaultwriteprot = !defaultwriteprot;
@@ -979,150 +1001,150 @@ void gui_allegro_event(ALLEGRO_EVENT *event)
         //    break;
 
 
-        case IDM_TAPE_LOAD:
-            tape_load_ui(event);
-            break;
-        case IDM_TAPE_REWIND:
-            tape_rewind();
-            break;
-        case IDM_TAPE_EJECT:
-            tape_eject();
-            break;
-        case IDM_TAPE_SPEED_NORMAL:
-            tape_normal(event);
-            break;
-        case IDM_TAPE_SPEED_FAST:
-            tape_fast(event);
-            break;
-        case IDM_TAPE_CAT:
-            gui_tapecat_start();
-            break;
-        case IDM_ROMS_LOAD:
-            rom_load(event);
-            break;
-        case IDM_ROMS_CLEAR:
-            rom_clear(event);
-            break;
-        case IDM_ROMS_RAM:
-            rom_ram_toggle(event);
-            break;
-        case IDM_MODEL:
-            change_model(event);
-            break;
-        case IDM_VIDEO_DISPTYPE:
-            video_set_disptype(radio_event_simple(event, vid_dtype_user));
-            break;
-        case IDM_VIDEO_BORDERS:
-            video_set_borders(radio_event_simple(event, vid_fullborders));
-            break;
-        case IDM_VIDEO_WIN_MULT:
-            video_set_multipier(radio_event_simple(event, vid_win_multiplier));
-            break;
-        case IDM_VIDEO_WINSIZE:
-            video_set_borders(vid_fullborders);
-            break;
-        case IDM_VIDEO_FULLSCR:
-            toggle_fullscreen();
-            break;
-        case IDM_VIDEO_PAL:
-            vid_pal = !vid_pal;
-            break;
-        case IDM_VIDEO_NULA:
-            nula_disable = !nula_disable;
-            break;
-        case IDM_VIDEO_LED_LOCATION:
-            video_set_led_location(radio_event_simple(event, vid_ledlocation));
-            break;
-        case IDM_VIDEO_LED_VISIBILITY:
-            video_set_led_visibility(radio_event_simple(event, vid_ledvisibility));
-            break;
-        case IDM_VIDEO_MODE7_FONT:
-            change_mode7_font(event);
-            break;
-        case IDM_SOUND_INTERNAL:
-            sound_internal = !sound_internal;
-            break;
-        case IDM_SOUND_BEEBSID:
-            sound_beebsid = !sound_beebsid;
-            break;
-        case IDM_SOUND_PAULA:
-            sound_paula = !sound_paula;
-            break;
-        case IDM_SOUND_DAC:
-            sound_dac = !sound_dac;
-            break;
-        case IDM_SOUND_DDNOISE:
-            sound_ddnoise = !sound_ddnoise;
-            break;
-        case IDM_SOUND_TAPE:
-            sound_tape = !sound_tape;
-            break;
-        case IDM_SOUND_FILTER:
-            sound_filter = !sound_filter;
-            break;
-        case IDM_WAVE:
-            curwave = radio_event_simple(event, curwave);
-            break;
-        case IDM_DISC_TYPE:
-            change_ddnoise_dtype(event);
-            break;
-        case IDM_DISC_VOL:
-            ddnoise_vol = radio_event_simple(event, ddnoise_vol);
-            break;
-        case IDM_SPEED:
-            main_setspeed(radio_event_simple(event, emuspeed));
-            break;
-        case IDM_AUTOSKIP:
-            autoskip = !autoskip;
-            break;
-        case IDM_DEBUGGER:
-            debug_toggle_core();
-            break;
-        case IDM_DEBUG_BREAK:
-            debug_step = 1;
-            break;
-        case IDM_KEY_REDEFINE:
-            gui_keydefine_open();
-            break;
-        case IDM_KEY_AS:
-            keyas = !keyas;
-            break;
-        case IDM_KEY_LOGICAL:
-            keylogical = !keylogical;
-            key_reset();
-            break;
-        case IDM_KEY_PAD:
-            keypad = !keypad;
-            break;
-        case IDM_JIM_SIZE:
-            mem_jim_setsize(radio_event_simple(event, mem_jim_size));
-            break;
-        case IDM_AUTO_PAUSE:
-            autopause = !autopause;
-            break;
-        case IDM_MOUSE_AMX:
-            mouse_amx = !mouse_amx;
-            break;
-        case IDM_TRIACK_SEGA_ADAPTER:
-            tricky_sega_adapter = !tricky_sega_adapter;
-            remap_joystick(0);
-            remap_joystick(1);
-            break;
-        case IDM_JOYSTICK:
-            change_joystick(0, radio_event_with_deselect(event, joystick_index[0]));
-            break;
-        case IDM_JOYSTICK2:
-            change_joystick(1, radio_event_with_deselect(event, joystick_index[1]));
-        case IDM_MOUSE_STICK:
-            mouse_stick = !mouse_stick;
-            break;
-        case IDM_JOYMAP:
-            joymap_index[0] = radio_event_simple(event, joymap_index[0]);
-            remap_joystick(0);
-        case IDM_JOYMAP2:
-            joymap_index[1] = radio_event_simple(event, joymap_index[1]);
-            remap_joystick(1);
-            break;
+//        case IDM_TAPE_LOAD:
+//            tape_load_ui(event);
+//            break;
+//        case IDM_TAPE_REWIND:
+//            tape_rewind();
+//            break;
+//        case IDM_TAPE_EJECT:
+//            tape_eject();
+//            break;
+//        case IDM_TAPE_SPEED_NORMAL:
+//            tape_normal(event);
+//            break;
+//        case IDM_TAPE_SPEED_FAST:
+//            tape_fast(event);
+//            break;
+//        case IDM_TAPE_CAT:
+//            gui_tapecat_start();
+//            break;
+//        case IDM_ROMS_LOAD:
+//            rom_load(event);
+//            break;
+//        case IDM_ROMS_CLEAR:
+//            rom_clear(event);
+//            break;
+//        case IDM_ROMS_RAM:
+//            rom_ram_toggle(event);
+//            break;
+//        case IDM_MODEL:
+//            change_model(event);
+//            break;
+//        case IDM_VIDEO_DISPTYPE:
+//            video_set_disptype(radio_event_simple(event, vid_dtype_user));
+//            break;
+//        case IDM_VIDEO_BORDERS:
+//            video_set_borders(radio_event_simple(event, vid_fullborders));
+//            break;
+//        case IDM_VIDEO_WIN_MULT:
+//            video_set_multipier(radio_event_simple(event, vid_win_multiplier));
+//            break;
+//        case IDM_VIDEO_WINSIZE:
+//            video_set_borders(vid_fullborders);
+//            break;
+//        case IDM_VIDEO_FULLSCR:
+//            toggle_fullscreen();
+//            break;
+//        case IDM_VIDEO_PAL:
+//            vid_pal = !vid_pal;
+//            break;
+//        case IDM_VIDEO_NULA:
+//            nula_disable = !nula_disable;
+//            break;
+//        case IDM_VIDEO_LED_LOCATION:
+//            video_set_led_location(radio_event_simple(event, vid_ledlocation));
+//            break;
+//        case IDM_VIDEO_LED_VISIBILITY:
+//            video_set_led_visibility(radio_event_simple(event, vid_ledvisibility));
+//            break;
+//        case IDM_VIDEO_MODE7_FONT:
+//            change_mode7_font(event);
+//            break;
+//        case IDM_SOUND_INTERNAL:
+//            sound_internal = !sound_internal;
+//            break;
+//        case IDM_SOUND_BEEBSID:
+//            sound_beebsid = !sound_beebsid;
+//            break;
+//        case IDM_SOUND_PAULA:
+//            sound_paula = !sound_paula;
+//            break;
+//        case IDM_SOUND_DAC:
+//            sound_dac = !sound_dac;
+//            break;
+//        case IDM_SOUND_DDNOISE:
+//            sound_ddnoise = !sound_ddnoise;
+//            break;
+//        case IDM_SOUND_TAPE:
+//            sound_tape = !sound_tape;
+//            break;
+//        case IDM_SOUND_FILTER:
+//            sound_filter = !sound_filter;
+//            break;
+//        case IDM_WAVE:
+//            curwave = radio_event_simple(event, curwave);
+//            break;
+//        case IDM_DISC_TYPE:
+//            change_ddnoise_dtype(event);
+//            break;
+//        case IDM_DISC_VOL:
+//            ddnoise_vol = radio_event_simple(event, ddnoise_vol);
+//            break;
+//        case IDM_SPEED:
+//            main_setspeed(radio_event_simple(event, emuspeed));
+//            break;
+//        case IDM_AUTOSKIP:
+//            autoskip = !autoskip;
+//            break;
+//        case IDM_DEBUGGER:
+//            debug_toggle_core();
+//            break;
+//        case IDM_DEBUG_BREAK:
+//            debug_step = 1;
+//            break;
+//        case IDM_KEY_REDEFINE:
+//            gui_keydefine_open();
+//            break;
+//        case IDM_KEY_AS:
+//            keyas = !keyas;
+//            break;
+//        case IDM_KEY_LOGICAL:
+//            keylogical = !keylogical;
+//            key_reset();
+//            break;
+//        case IDM_KEY_PAD:
+//            keypad = !keypad;
+//            break;
+//        case IDM_JIM_SIZE:
+//            mem_jim_setsize(radio_event_simple(event, mem_jim_size));
+//            break;
+//        case IDM_AUTO_PAUSE:
+//            autopause = !autopause;
+//            break;
+//        case IDM_MOUSE_AMX:
+//            mouse_amx = !mouse_amx;
+//            break;
+//        case IDM_TRIACK_SEGA_ADAPTER:
+//            tricky_sega_adapter = !tricky_sega_adapter;
+//            remap_joystick(0);
+//            remap_joystick(1);
+//            break;
+//        case IDM_JOYSTICK:
+//            change_joystick(0, radio_event_with_deselect(event, joystick_index[0]));
+//            break;
+//        case IDM_JOYSTICK2:
+//            change_joystick(1, radio_event_with_deselect(event, joystick_index[1]));
+//        case IDM_MOUSE_STICK:
+//            mouse_stick = !mouse_stick;
+//            break;
+//        case IDM_JOYMAP:
+//            joymap_index[0] = radio_event_simple(event, joymap_index[0]);
+//            remap_joystick(0);
+//        case IDM_JOYMAP2:
+//            joymap_index[1] = radio_event_simple(event, joymap_index[1]);
+//            remap_joystick(1);
+//            break;
     }
 }
 

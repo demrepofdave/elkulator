@@ -1,9 +1,5 @@
 
-#ifdef HAL_ALLEGRO_5
-    #include <allegro5/allegro.h>
-#else
-    #include <allegro.h>
-#endif
+#include <allegro5/allegro.h>
 
 /* XPM */
 static const char *allegico_xpm[] = {
@@ -208,12 +204,10 @@ static const char *allegico_xpm[] = {
 "N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N.N."
 };
 //#if defined ALLEGRO_WITH_XWINDOWS && defined ALLEGRO_USE_CONSTRUCTOR
-#ifndef HAL_ALLEGRO_5
-extern void *allegro_icon;
-CONSTRUCTOR_FUNCTION(static void _set_allegro_icon(void));
-static void _set_allegro_icon(void)
-{
-    allegro_icon = allegico_xpm;
-}
-#endif
+//extern void *allegro_icon;
+//CONSTRUCTOR_FUNCTION(static void _set_allegro_icon(void));
+//static void _set_allegro_icon(void)
+//{
+//    allegro_icon = allegico_xpm;
+//}
 //#endif

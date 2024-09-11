@@ -1,11 +1,7 @@
 /*Elkulator v1.0 by Sarah Walker
   Memory handling*/
 
-#ifdef HAL_ALLEGRO_5
-    #include <allegro5/allegro.h>
-#else
-    #include <allegro.h>
-#endif
+#include <allegro5/allegro.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -336,7 +332,7 @@ void writemem(uint16_t addr, uint8_t val)
         }
 }
 
-#ifndef HAL_ALLEGRO_5
+#if 0
 int keys[2][14][4]=
 {
         {
@@ -375,9 +371,10 @@ int keys[2][14][4]=
 
 int keyl[128];
 #endif
+
 void makekeyl()
 {
-#ifndef HAL_ALLEGRO_5
+#if 0
         int c,d,e;
         memset(keyl,0,sizeof(keyl));
 
@@ -405,7 +402,7 @@ uint8_t readkeys(uint16_t addr)
 {
         int d;
         uint8_t temp=0;
-#ifndef HAL_ALLEGRO_5
+#if 0
         for (d=0;d<128;d++)
         {
                 if (key[d] && keyl[keylookup[d]]&0x80 && !(addr&(1<<(keyl[keylookup[d]]&15)))) temp|=1<<((keyl[keylookup[d]]&0x30)>>4);

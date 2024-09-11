@@ -15,31 +15,16 @@ elkulator_CFLAGS = $(allegro_CFLAGS) -I ./src/ -Wno-unused-result
 
 # workaround for Win32 Allegro, which has `allegro-config' missing
 if OS_WIN
-elkulator_LDADD = -lalleg -lz -lopenal -lalut
+elkulator_LDADD = -lallegro_audio -lallegro_acodec -lallegro_primitives -lallegro_dialog -lallegro_image -lallegro_font -lallegro -lz -lm
 else
-elkulator_LDADD = $(allegro_LIBS) -lz -lopenal -lalut -lz
+elkulator_LDADD = -lallegro_audio -lallegro_acodec -lallegro_primitives -lallegro_dialog -lallegro_image -lallegro_font -lallegro_main -lallegro -lz -lm -lpthread
 endif
 
-if ENABLE_ALLEGRO5
 elkulator_hal_src = src/hal/hal_allegro_5/adc.c  \
                     src/hal/hal_allegro_5/soundopenal.c \
                     src/hal/hal_allegro_5/firstbyte.c \
                     src/hal/hal_allegro_5/hal.c \
-                    src/hal/hal_allegro_5/hal_sound.c \
-                    src/hal/hal_allegro_5/linux-gui.c \
-                    src/hal/hal_allegro_5/linux-keydefine.c
-else
-elkulator_hal_src = src/hal/hal_allegro_4/2xsai.c \
-                    src/hal/hal_allegro_4/adc.c  \
-                    src/hal/hal_allegro_4/palfilt.c \
-                    src/hal/hal_allegro_4/scale2x.c \
-                    src/hal/hal_allegro_4/soundopenal.c \
-                    src/hal/hal_allegro_4/firstbyte.c \
-                    src/hal/hal_allegro_4/hal.c \
-                    src/hal/hal_allegro_4/hal_sound.c \
-                    src/hal/hal_allegro_4/linux-gui.c \
-                    src/hal/hal_allegro_4/linux-keydefine.c
-endif
+                    src/hal/hal_allegro_5/hal_sound.c
 
 elkulator_SOURCES = src/1770.c \
                     src/6502.c \
@@ -64,6 +49,7 @@ elkulator_SOURCES = src/1770.c \
                     src/uef.c \
                     src/ula.c \
                     src/allegro_icon.c \
+                    src/gui-allegro5.c \
                     $(elkulator_hal_src) 
 
 
