@@ -301,6 +301,7 @@ void initelk(int argc, char *argv[])
 
         tmp_display = display;
 
+        printf("display=%p\n", (void*) display);
         gui_allegro_init(queue, display);
 
         if (!(timer = al_create_timer(main_calc_timer(10000)))) {
@@ -462,6 +463,7 @@ void main_run()
 //                last_switch_in = event.any.timestamp;
 //                if (autopause)
 //                    main_resume();
+                break;
         }
     }
     log_debug("main: end loop");

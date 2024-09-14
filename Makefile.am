@@ -24,7 +24,8 @@ elkulator_hal_src = src/hal/hal_allegro_5/adc.c  \
                     src/hal/hal_allegro_5/soundopenal.c \
                     src/hal/hal_allegro_5/firstbyte.c \
                     src/hal/hal_allegro_5/hal.c \
-                    src/hal/hal_allegro_5/hal_sound.c
+                    src/hal/hal_allegro_5/hal_sound.c \
+                    src/allegro5/vidalleg.c
 
 elkulator_SOURCES = src/1770.c \
                     src/6502.c \
