@@ -17,9 +17,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - name: Configure
-        run: |
-         ./autogen.sh
-         ./configure
+        run: ./scripts/autoconfigure.sh
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
@@ -41,9 +39,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - name: Configure
-        run: |
-         ./autogen.sh
-         ./configure
+        run: ./scripts/autoconfigure.sh
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
@@ -65,9 +61,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - name: Configure
-        run: |
-         ./autogen.sh
-         ./configure
+        run: ./scripts/autoconfigure.sh
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
@@ -87,9 +81,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Configure
-        run: |
-         ./autogen.sh
-         ./configure
+        run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
@@ -109,9 +101,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Configure
-        run: |
-         ./autogen.sh
-         ./configure
+        run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
@@ -131,9 +121,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Configure
-        run: |
-         ./autogen.sh
-         ./configure
+        run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
