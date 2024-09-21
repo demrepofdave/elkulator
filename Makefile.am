@@ -26,8 +26,6 @@ if ENABLE_ALLEGRO5
 elkulator_hal_src = src/allegro_5/adc.c  \
                     src/allegro_5/soundopenal.c \
                     src/allegro_5/firstbyte.c \
-                    src/allegro_5/hal.c \
-                    src/allegro_5/hal_sound.c \
                     src/allegro_5/linux-gui.c \
                     src/allegro_5/linux-keydefine.c
 else
@@ -37,8 +35,6 @@ elkulator_hal_src = src/allegro_4/2xsai.c \
                     src/allegro_4/scale2x.c \
                     src/allegro_4/soundopenal.c \
                     src/allegro_4/firstbyte.c \
-                    src/allegro_4/hal.c \
-                    src/allegro_4/hal_sound.c \
                     src/allegro_4/linux-gui.c \
                     src/allegro_4/linux-keydefine.c
 endif
