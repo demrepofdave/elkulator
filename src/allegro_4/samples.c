@@ -3,6 +3,7 @@
 
 SAMPLE *seeksmp[4][2];
 SAMPLE *motorsmp[3];
+SAMPLE *tsamples[2];
 
 //typedef enum 
 //{
@@ -115,5 +116,57 @@ void sample_motor_destroy_all()
             destroy_sample(motorsmp[index]);
             motorsmp[index] = NULL;
         } 
+    }
+}
+
+
+bool sample_tape_noise_motor_load(uint8_t index, const char * filename) // Don't know what a is at the moment.
+{
+    tsamples[index] = load_wav(filename);
+    return (tsamples[index] != NULL);
+}
+
+unsigned long sample_tape_noise_get_length(uint8_t index)
+{
+    int length = 0;
+    if(tsamples[index])
+    {
+        length = tsamples[index]->len;
+    }
+    return (length);
+}
+
+void * sample_tape_noise_get_data_ptr(uint8_t index)
+{
+    void * data = 0;
+    if(tsamples[index])
+    {
+        data = tsamples[index]->data;
+    }
+    return (data);
+}
+
+int sample_tape_noise_get_frequency(uint8_t index)
+{
+    int freq = 0;
+    if(tsamples[index])
+    {
+        freq = tsamples[index]->freq;
+    }
+    return (freq);
+}    
+
+void sample_tape_noise_destroy_all()
+{
+    if(tsamples[0])
+    {
+        destroy_sample(tsamples[0]);
+        tsamples[0] = NULL;
+    }
+
+    if(tsamples[1])
+    {
+        destroy_sample(tsamples[1]);
+        tsamples[1] = NULL;
     }
 }
