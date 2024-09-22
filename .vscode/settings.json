@@ -4,6 +4,7 @@
         "unistd.h": "c",
         "elk.h": "c",
         "2xsai.h": "c",
-        "video.h": "c"
+        "video.h": "c",
+        "allegro.h": "c"
     }
 }
