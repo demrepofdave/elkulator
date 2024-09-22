@@ -5,6 +5,7 @@
 */
 
 #include <string.h>
+#include <unistd.h>
 #include "elk.h"
 
 int parallel_fd = -1;

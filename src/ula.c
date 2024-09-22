@@ -1,10 +1,10 @@
 /*Elkulator v1.0 by Sarah Walker
   ULA and video emulation*/
 #include <allegro.h>
+#include "allegro_4/video.h"
 #include <stdio.h>
 #include <zlib.h>
 #include "elk.h"
-#include "2xsai.h"
 
 void dosavescrshot();
 void saveframe();
@@ -54,30 +54,9 @@ struct
 } ula;
 
 int coldepth;
-BITMAP *b,*b16,*b162,*vidb;
-BITMAP *vp1,*vp2;
-
-void clearall()
-{
-        clear(b);
-        clear(b16);
-        clear(b162);
-        clear(screen);
-}
 
 uint8_t pal[16];
 int palwritenum=0,palwritenum2=0;
-PALETTE elkpal =
-{
-      {0,0,0},
-      {63,0,0},
-      {0,63,0},
-      {63,63,0},
-      {0,0,63},
-      {63,0,63},
-      {0,63,63},
-      {63,63,63},
-};
 
 uint8_t ulalookup[256];
 void initula()
@@ -85,7 +64,7 @@ void initula()
         int c;
 //        allegro_init();
         coldepth=desktop_color_depth();
-        set_color_depth(desktop_color_depth());
+        video_set_desktop_color_depth();
         #ifdef WIN32
         set_gfx_mode(GFX_AUTODETECT_WINDOWED,2048,2048,0,0);
         vidb=create_video_bitmap(800,300);
@@ -93,14 +72,9 @@ void initula()
         set_gfx_mode(GFX_AUTODETECT_WINDOWED,640,512,0,0);
         winsizex=640; winsizey=512;
         #endif
-        b16=create_bitmap(800*2,600);
-        b162=create_bitmap(640,256);
-        clear(b16);
-        Init_2xSaI(desktop_color_depth());
+        video_init();
         initpaltables();
-        set_color_depth(8);
-        b=create_bitmap(640,616);
-        set_palette(elkpal);
+        video_init2();
         for (c=0;c<256;c++)
         {
                 ulalookup[c]=0;
@@ -109,7 +83,7 @@ void initula()
                 if (c&0x20) ulalookup[c]|=4;
                 if (c&0x80) ulalookup[c]|=8;
         }
-        set_color_depth(desktop_color_depth());
+        video_set_desktop_color_depth();
 
         /* Clear the sound stream buffer before we start filling it. */
         memset(sndstreambuf, 0, sizeof(sndstreambuf));
@@ -122,7 +96,7 @@ void enterfullscreen()
         #ifdef WIN32
         destroy_bitmap(vidb);
         #endif
-        set_color_depth(desktop_color_depth());
+        video_set_desktop_color_depth();
         set_gfx_mode(GFX_AUTODETECT_FULLSCREEN,800,600,0,0);
         #ifdef WIN32
         vp1=create_video_bitmap(800,600);
@@ -132,8 +106,7 @@ void enterfullscreen()
         clear(vidb);
         install_mouse();
         #endif
-        set_color_depth(8);
-        set_palette(elkpal);
+        video_set_depth_and_elk_palette();
         winsizex=800; winsizey=600;
 }
 
@@ -145,7 +118,7 @@ void leavefullscreen()
         destroy_bitmap(vp2);
         destroy_bitmap(vp1);
         #endif
-        set_color_depth(desktop_color_depth());
+        video_set_desktop_color_depth();
         #ifdef WIN32
         set_gfx_mode(GFX_AUTODETECT_WINDOWED,2048,2048,0,0);
         vidb=create_video_bitmap(800,300);
@@ -153,8 +126,7 @@ void leavefullscreen()
         set_gfx_mode(GFX_AUTODETECT_WINDOWED,640,512,0,0);
         winsizex=640; winsizey=512;
         #endif
-        set_color_depth(8);
-        set_palette(elkpal);
+        video_set_depth_and_elk_palette();
 }
 
 void resetula()
@@ -548,7 +520,11 @@ void yield()
                         {
                                 if (LINEDOUBLE) ula.y<<=1;
                                 for (x=0;x<8;x++)
-                                    b->line[ula.y][ula.x+x]=0;
+                                {
+                                    video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), 0);
+                                    // b->line[ula.y][ula.x+x]=0;
+                                }
+
                                 if (LINEDOUBLE) ula.y>>=1;
                         }
                         else if (!(ula.x&8) || !(ula.mode&4))
@@ -566,7 +542,8 @@ void yield()
                                                 for (x=0;x<8;x++)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        //b->line[ula.y][(ula.x+x)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -574,8 +551,8 @@ void yield()
                                                 for (x=0;x<8;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        //b->line[ula.y][(ula.x+x)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -583,10 +560,10 @@ void yield()
                                                 for (x=0;x<8;x+=4)
                                                 {
                                                         col=ulalookup[temp];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+1]=pal[col];
-                                                        b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+3]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        //b->line[ula.y][(ula.x+x)>>1]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x+2)>>1), pal[col]);
+                                                        //b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -594,8 +571,8 @@ void yield()
                                                 for (x=0;x<16;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+//                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -603,10 +580,10 @@ void yield()
                                                 for (x=0;x<16;x+=4)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+1]=pal[col];
-                                                        b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
-//                                                        b->line[ula.y][ula.x+x+3]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        //b->line[ula.y][(ula.x+x)>>1]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x+2)>>1), pal[col]);
+                                                        //b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -620,7 +597,8 @@ void yield()
                                                 for (x=0;x<8;x++)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        b->line[ula.y][ula.x+x]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
+                                                        //b->line[ula.y][ula.x+x]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -628,8 +606,10 @@ void yield()
                                                 for (x=0;x<8;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        b->line[ula.y][ula.x+x]=pal[col];
-                                                        b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+1), pal[col]);
+                                                        //b->line[ula.y][ula.x+x]=pal[col];
+                                                        //b->line[ula.y][ula.x+x+1]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -637,18 +617,27 @@ void yield()
                                                 for (x=0;x<8;x+=4)
                                                 {
                                                         col=ulalookup[temp];
-                                                        b->line[ula.y][ula.x+x]=pal[col];
-                                                        b->line[ula.y][ula.x+x+1]=pal[col];
-                                                        b->line[ula.y][ula.x+x+2]=pal[col];
-                                                        b->line[ula.y][ula.x+x+3]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+1), pal[col]);
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+2), pal[col]);
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+3), pal[col]);
+                                                        //b->line[ula.y][ula.x+x]=pal[col];
+                                                        //b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        //b->line[ula.y][ula.x+x+2]=pal[col];
+                                                        //b->line[ula.y][ula.x+x+3]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
-                                                case 4: case 6: case 7:
+                                                case 4: 
+                                                case 6: 
+                                                case 7:
                                                 for (x=0;x<16;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        b->line[ula.y][ula.x+x]=b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+1), pal[col]);
+                                                        //b->line[ula.y][ula.x+x]=pal[col];
+                                                        //b->line[ula.y][ula.x+x+1]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -656,10 +645,14 @@ void yield()
                                                 for (x=0;x<16;x+=4)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        b->line[ula.y][ula.x+x]=pal[col];
-                                                        b->line[ula.y][ula.x+x+1]=pal[col];
-                                                        b->line[ula.y][ula.x+x+2]=pal[col];
-                                                        b->line[ula.y][ula.x+x+3]=pal[col];
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+1), pal[col]);
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+2), pal[col]);
+                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+3), pal[col]);
+                                                        //b->line[ula.y][ula.x+x]=pal[col];
+                                                        //b->line[ula.y][ula.x+x+1]=pal[col];
+                                                        //b->line[ula.y][ula.x+x+2]=pal[col];
+                                                        //b->line[ula.y][ula.x+x+3]=pal[col];
                                                         temp<<=1;
                                                 }
                                                 break;
@@ -675,7 +668,10 @@ void yield()
 //                        if (!ula.x) rpclog("Blank line %i\n",ula.y);
                         if (LINEDOUBLE) ula.y<<=1;
                         for (x=0;x<8;x++)
-                            b->line[ula.y][ula.x+x]=0;
+                        {
+                            video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), 0);
+                            //b->line[ula.y][ula.x+x]=0;
+                        }
                         if (LINEDOUBLE) ula.y>>=1;
                         ula.x+=8;
                         ulacycles++;
@@ -773,7 +769,8 @@ void yield()
                                                 switch (drawmode)
                                                 {
                                                         case SCANLINES:
-                                                        blit(b,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        video_blit(BIT_MAIN,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case LINEDBL:
                                                         #ifdef WIN32
@@ -781,28 +778,42 @@ void yield()
                                                         if (videoresize) stretch_blit(vidb,screen,0,0,640,256,0,0,winsizex,winsizey);
                                                         else             stretch_blit(vidb,screen,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         #else
-                                                        for (c=0;c<512;c++) blit(b,b16,0,c>>1,0,c,640,1);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        for (c=0;c<512;c++)
+                                                        {
+                                                                video_blit(BIT_MAIN,BIT_B16,0,c>>1,0,c,640,1);
+                                                                //blit(b,b16,0,c>>1,0,c,640,1);
+                                                        }
+                                                        video_blit(BIT_B16,BIT_SCREEN, 0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         #endif
                                                         break;
                                                         case _2XSAI:
-                                                        blit(b,b162,0,0,0,0,640,256);
-                                                        Super2xSaI(b162,b16,0,0,0,0,320,256);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        video_blit(BIT_MAIN,BIT_B162,0,0,0,0,640,256);
+                                                        //blit(b,b162,0,0,0,0,640,256);
+                                                        Super2xSaI(BIT_B162,BIT_B16,0,0,0,0,320,256);
+                                                        video_blit(BIT_B16,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case SCALE2X:
-                                                        blit(b,b162,0,0,0,0,640,256);
-                                                        scale2x(b162,b16,320,256);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        video_blit(BIT_MAIN,BIT_B162,0,0,0,0,640,256);
+                                                        //blit(b,b162,0,0,0,0,640,256);
+                                                        scale2x(BIT_B162,BIT_B16,320,256);
+                                                        //scale2x(b162,b16,320,256);
+                                                        video_blit(BIT_B16,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                         case EAGLE:
-                                                        blit(b,b162,0,0,0,0,640,256);
-                                                        SuperEagle(b162,b16,0,0,0,0,320,256);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        video_blit(BIT_MAIN,BIT_B162,0,0,0,0,640,256);
+                                                        //blit(b,b162,0,0,0,0,640,256);
+                                                        SuperEagle(BIT_B162,BIT_B16,0,0,0,0,320,256);
+                                                        video_blit(BIT_B16,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
-                                                        case PAL:
-                                                        palfilter(b,b16,coldepth);
-                                                        blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        case PAL: // TODO: Not currently working (blank screen)
+                                                        palfilter(BIT_MAIN,BIT_B16,coldepth);
+                                                        //palfilter(b,b16,coldepth);
+                                                        video_blit(BIT_B16,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
                                                         break;
                                                 }
                                                 if (wantsavescrshot) dosavescrshot();
@@ -958,45 +969,47 @@ void savescrshot()
         wantsavescrshot=1;
 }
 
+// TODO: Disable for now.
 void dosavescrshot()
 {
-        BITMAP *tb;
-        set_color_depth(desktop_color_depth());
-        tb=create_bitmap(640,512);
-        switch (drawmode)
-        {
-                case SCANLINES:
-                blit(b,tb,0,0,0,0,640,512);
-                break;
-                case LINEDBL:
-                #ifdef WIN32
-                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
-                #else
-                blit(b16,tb,0,0,0,0,640,512);
-                #endif
-                break;
-                case _2XSAI:
-                blit(b,b162,0,0,0,0,640,256);
-                Super2xSaI(b162,b16,0,0,0,0,320,256);
-                blit(b16,tb,0,0,0,0,640,512);
-                break;
-                case SCALE2X:
-                blit(b,b162,0,0,0,0,640,256);
-                scale2x(b162,b16,320,256);
-                blit(b16,tb,0,0,0,0,640,512);
-                break;
-                case EAGLE:
-                blit(b,b162,0,0,0,0,640,256);
-                SuperEagle(b162,b16,0,0,0,0,320,256);
-                blit(b16,tb,0,0,0,0,640,512);
-                break;
-                case PAL:
-                palfilter(b,b16,coldepth);
-                blit(b16,tb,0,0,0,0,640,512);
-                break;
-        }
-        save_bmp(scrshotname,tb,NULL);
-        destroy_bitmap(tb);
+//        BITMAP *tb;
+//        video_set_desktop_color_depth();
+//        tb=create_bitmap(640,512);
+//        switch (drawmode)
+//        {
+//                case SCANLINES:
+//                blit(b,tb,0,0,0,0,640,512);
+//                video_blit(BIT_MAIN,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
+//                break;
+//                case LINEDBL:
+//                #ifdef WIN32
+//                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
+//                #else
+//                blit(b16,tb,0,0,0,0,640,512);
+//                #endif
+//                break;
+//                case _2XSAI:
+//                blit(b,b162,0,0,0,0,640,256);
+//                Super2xSaI(b162,b16,0,0,0,0,320,256);
+//                blit(b16,tb,0,0,0,0,640,512);
+//                break;
+//                case SCALE2X:
+//                blit(b,b162,0,0,0,0,640,256);
+//                scale2x(b162,b16,320,256);
+//                blit(b16,tb,0,0,0,0,640,512);
+//                break;
+//                case EAGLE:
+//                blit(b,b162,0,0,0,0,640,256);
+//                SuperEagle(b162,b16,0,0,0,0,320,256);
+//                blit(b16,tb,0,0,0,0,640,512);
+//                break;
+//                case PAL:
+//                palfilter(b,b16,coldepth);
+//                blit(b16,tb,0,0,0,0,640,512);
+//                break;
+//        }
+//        save_bmp(scrshotname,tb,NULL);
+//        destroy_bitmap(tb);
         set_color_depth(8);
         
         wantsavescrshot=0;
@@ -1066,43 +1079,37 @@ int deflate_bitmap(int level)
     return Z_OK;
 }
 
+// TODO: disable for now
 void saveframe()
 {
     if (moviefile == NULL)
         return;
 
-    int start;
-    if (sndstreamcount == 624) {
+//    int start;
+//    if (sndstreamcount == 624) {
         /* Take the last 625 samples. */
-        start = (sndstreamindex + 1) % sizeof(sndstreambuf);
-    } else if (sndstreamcount == 626) {
+//        start = (sndstreamindex + 1) % sizeof(sndstreambuf);
+//    } else if (sndstreamcount == 626) {
         /* Take the first 625 samples from the 626 obtained and leave the last
            one for the next frame. */
-        start = sndstreamindex;
-    }
+//        start = sndstreamindex;
+//    }
 
-    blit(b,moviebitmap,0,0,0,0,640,256);
+//    blit(b,moviebitmap,0,0,0,0,640,256);
 
-    if (deflate_bitmap(6) != Z_OK) {
-        stopmovie();
-        return;
-    }
+//    if (deflate_bitmap(6) != Z_OK) {
+//        stopmovie();
+//        return;
+//    }
 
-    int remaining = sizeof(sndstreambuf) - start;
-    if (remaining >= 625)
-        fwrite(&sndstreambuf[start], 1, 625, moviefile);
-    else {
-        fwrite(&sndstreambuf[start], 1, remaining, moviefile);
-        fwrite(sndstreambuf, 1, 625 - remaining, moviefile);
-    }
+//    int remaining = sizeof(sndstreambuf) - start;
+//    if (remaining >= 625)
+//        fwrite(&sndstreambuf[start], 1, 625, moviefile);
+//    else {
+//        fwrite(&sndstreambuf[start], 1, remaining, moviefile);
+//        fwrite(sndstreambuf, 1, 625 - remaining, moviefile);
+//    }
 
     sndstreamcount = 0;
 }
 
-void clearscreen()
-{
-        clear(screen);
-        clear(b);
-        clear(b16);
-        clear(b162);
-}

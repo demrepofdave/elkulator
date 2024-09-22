@@ -3,7 +3,6 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <allegro.h>
 #include <stdio.h>
 
 #define printf rpclog
@@ -271,7 +270,6 @@ void clearintula(uint8_t num);
 void receive(uint8_t val);
 void enterfullscreen();
 void leavefullscreen();
-void clearall();
 void clearscreen();
 void savescrshot();
 void loadulastate(FILE *f);
@@ -330,9 +328,6 @@ void initpaltables();
 void startblit();
 void endblit();
 void setquit();
-
-void scale2x(BITMAP *src, BITMAP *dst, int width, int height);
-void palfilter(BITMAP *src, BITMAP *dest, int depth);
 
 void entergui();
 

@@ -5,6 +5,7 @@
 #include <allegro.h>
 //#include <alleggl.h>
 #include "elk.h"
+#include "video.h"
 
 #undef printf
 
@@ -763,6 +764,6 @@ void entergui()
 
         while (menu_pressed()) rest(100);
 
-        clearscreen();
+        video_clearall();
 }
 #endif

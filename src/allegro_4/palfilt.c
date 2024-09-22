@@ -1,7 +1,8 @@
 /*Elkulator v1.0 by Sarah Walker
   PAL filter*/
 #include <allegro.h>
-#include "elk.h"
+#include "video.h"
+//#include "elk.h"
 
 fixed ACoef[2],ACoef2[3];
 fixed BCoef[2],BCoef2[3];
@@ -76,12 +77,17 @@ void initpaltables()
         initcoef();
 }
 
-void palfilter(BITMAP *src, BITMAP *dest, int depth)
+void palfilter(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int depth)
 {
         int x,y,c;
         int r,g,b;
+
+        BITMAP * bitmapSource = getBitmap(bitmapSourceIndex);
+        BITMAP * bitmapDest   = getBitmap(bitmapDestIndex);
+
         fixed constr=ftofix(-0.509f),constb=ftofix(0.194);
         fixed paly,palry,palby;
+
         for (y=0;y<512;y+=2)
         {
                 yx[2]=yx[1]=yx[0]=0;
@@ -93,7 +99,7 @@ void palfilter(BITMAP *src, BITMAP *dest, int depth)
                 {
                         for (x=0;x<640;x++)
                         {
-                                c=src->line[y][x]&7;
+                                c=bitmapSource->line[y][x]&7;
                                 r=(c&1)?255:0; g=(c&2)?255:0; b=(c&4)?255:0;
                                 paly=ytable[c];
 
@@ -118,14 +124,14 @@ void palfilter(BITMAP *src, BITMAP *dest, int depth)
                                 if (b>255) b=255;
                                 if (b<0)   b=0;
 
-                                ((uint32_t *)dest->line[y])[x]=makecol(r,g,b);
+                                ((uint32_t *)bitmapDest->line[y])[x]=makecol(r,g,b);
                         }
                 }
                 else
                 {
                         for (x=0;x<640;x++)
                         {
-                                c=src->line[y][x]&7;
+                                c=bitmapSource->line[y][x]&7;
                                 r=(c&1)?255:0; g=(c&2)?255:0; b=(c&4)?255:0;
                                 paly=ytable[c];
 
@@ -150,7 +156,7 @@ void palfilter(BITMAP *src, BITMAP *dest, int depth)
                                 if (b>255) b=255;
                                 if (b<0)   b=0;
 
-                                ((uint16_t *)dest->line[y])[x]=makecol(r,g,b);
+                                ((uint16_t *)bitmapDest->line[y])[x]=makecol(r,g,b);
                         }
                 }
         }

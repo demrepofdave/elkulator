@@ -1,4 +1,4 @@
-SUBDIRS = src
+#SUBDIRS = src
 
 # SUBDIRS = src src/allegro_4
 
@@ -27,7 +27,8 @@ elkulator_hal_src = src/allegro_5/adc.c  \
                     src/allegro_5/soundopenal.c \
                     src/allegro_5/firstbyte.c \
                     src/allegro_5/linux-gui.c \
-                    src/allegro_5/linux-keydefine.c
+                    src/allegro_5/linux-keydefine.c \
+                    src/allegro_5/video.c
 else
 elkulator_hal_src = src/allegro_4/2xsai.c \
                     src/allegro_4/adc.c  \
@@ -36,7 +37,8 @@ elkulator_hal_src = src/allegro_4/2xsai.c \
                     src/allegro_4/soundopenal.c \
                     src/allegro_4/firstbyte.c \
                     src/allegro_4/linux-gui.c \
-                    src/allegro_4/linux-keydefine.c
+                    src/allegro_4/linux-keydefine.c \
+                    src/allegro_4/video.c
 endif
 
 elkulator_SOURCES = src/1770.c \
