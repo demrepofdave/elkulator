@@ -1,7 +1,7 @@
 #include <string.h>
 #include <allegro.h>
 #include <allegro/internal/aintern.h>
-#include "video.h"
+#include "video_internal.h"
 
 //#define TRACE rpclog
 #define uint32 unsigned long

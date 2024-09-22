@@ -28,7 +28,8 @@ elkulator_hal_src = src/allegro_5/adc.c  \
                     src/allegro_5/firstbyte.c \
                     src/allegro_5/linux-gui.c \
                     src/allegro_5/linux-keydefine.c \
-                    src/allegro_5/video.c
+                    src/allegro_5/video.c \
+                    src/allegro_4/keyboard.c
 else
 elkulator_hal_src = src/allegro_4/2xsai.c \
                     src/allegro_4/adc.c  \
@@ -38,7 +39,8 @@ elkulator_hal_src = src/allegro_4/2xsai.c \
                     src/allegro_4/firstbyte.c \
                     src/allegro_4/linux-gui.c \
                     src/allegro_4/linux-keydefine.c \
-                    src/allegro_4/video.c
+                    src/allegro_4/video.c \
+                    src/allegro_4/keyboard.c
 endif
 
 elkulator_SOURCES = src/1770.c \

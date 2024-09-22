@@ -39,8 +39,6 @@ void endblit()
 {
 }
 
-int keylookup[128];
-
 int main(int argc, char *argv[])
 {
         int ret = allegro_init();

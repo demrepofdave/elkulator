@@ -303,8 +303,6 @@ void adddatnoise(uint8_t dat);
 void addhightone();
 void mixtapenoise(int16_t *tapebuffer);
 
-void makekeyl();
-
 void loadstate();
 void savestate();
 void doloadstate();

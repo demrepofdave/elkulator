@@ -109,8 +109,13 @@ void video_blit(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, in
                                                         
 void video_clearall()
 {
-        clear(b);
-        clear(b16);
-        clear(b162);
-        clear(screen);
+    clear(b);
+    clear(b16);
+    clear(b162);
+    clear(screen);
+}
+
+void video_shutdown()
+{
+    allegro_exit();
 }

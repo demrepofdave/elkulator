@@ -1,4 +1,3 @@
-#include <allegro.h>
 
 
 typedef enum 
@@ -24,6 +23,8 @@ void video_blit(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, in
 
 void video_clearall();
 
+void video_shutdown();
+
 
 // 2xSaI routines.
 #define uint32 unsigned long
@@ -32,14 +33,9 @@ void video_clearall();
 
 int Init_2xSaI(int depth);
 void Super2xSaI(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int s_x, int s_y, int d_x, int d_y, int w, int h);
-void Super2xSaI_ex(uint8 *src, uint32 src_pitch, uint8 *unused, BITMAP *dest, uint32 width, uint32 height);
-
 void SuperEagle(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int s_x, int s_y, int d_x, int d_y, int w, int h);
-void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, BITMAP *dest, uint32 width, uint32 height);
 
 // Other filer routines.
 void scale2x(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int width, int height);
 void palfilter(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int depth);
 
-// Private functions to be places in hal only header.
-BITMAP * getBitmap(bitmapSelect bitmapIndex);

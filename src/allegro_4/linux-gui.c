@@ -649,6 +649,7 @@ int gui_startdebugging()
 {
     debug=debugon=1;
     startdebug();
+    return D_O_K;
 }
 
 MENU miscmenu[5]=
@@ -708,8 +709,15 @@ void entergui()
         
         //BITMAP *guib;
         
-        while (keypressed()) readkey();
-        while (menu_pressed()) rest(100);
+        while (keypressed())
+        {
+                readkey();
+        }
+
+        while (menu_pressed())
+        {
+                rest(100);
+        } 
 
         updatelinuxgui();
 

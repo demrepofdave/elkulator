@@ -4,6 +4,7 @@
 #ifndef WIN32
 #include <allegro.h>
 #include "elk.h"
+#include "keyboard.h"
 
 int keytemp[128];
 

@@ -11,7 +11,7 @@
 /*Modified by Sarah Walker to work with Allegro*/
 
 #include <allegro.h>
-#include "video.h"
+#include "video_internal.h"
 
 #ifndef MAX
 #define MAX(a,b)    (((a) > (b)) ? (a) : (b))

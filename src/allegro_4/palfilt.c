@@ -1,7 +1,7 @@
 /*Elkulator v1.0 by Sarah Walker
   PAL filter*/
 #include <allegro.h>
-#include "video.h"
+#include "video_internal.h"
 //#include "elk.h"
 
 fixed ACoef[2],ACoef2[3];

@@ -3,10 +3,11 @@ extern int output;
 static int reallyfasttapebreak;
 /*Elkulator v1.0 by Sarah Walker*/
 /*UEF handling*/
-#include <allegro.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <zlib.h>
 #include "elk.h"
+#include "allegro_4/video.h"
 
 #define INT_HIGHTONE 0x40
 
@@ -246,7 +247,7 @@ void polluef()
 //113 : float baud rate
 
         }
-        allegro_exit();
+        video_shutdown();
         printf("Bad chunk ID %04X length %i\n",chunkid,chunklen);
         exit(-1);
 }

@@ -1,10 +1,11 @@
 /*Elkulator v1.0 by Sarah Walker
   Memory handling*/
-#include <allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "elk.h"
+#include "allegro_4/keyboard.h"
 
 static const char * roms = "roms";   // Name of directory containing rom files
 
@@ -16,7 +17,6 @@ int FASTHIGH2=0;
 extern int output;
 int mrbmapped=0;
 int plus1=0;
-uint8_t readkeys(uint16_t addr);
 uint8_t rombanks[16][16384];
 uint8_t rombank_enabled[16];
 
@@ -174,7 +174,7 @@ uint8_t readmem(uint16_t addr)
                 if (!extrom)
                 {
                         if (intrombank&2) return basic[addr&0x3FFF];
-                        return readkeys(addr);
+                        return keyboard_read(addr);
                 }
                 /* Treat cartridges specially for now. */
                 if (rombank==0) return cart0[(banks[0] * 16384) + (addr&0x3FFF)];
@@ -327,96 +327,6 @@ void writemem(uint16_t addr, uint8_t val)
             jim_page = val;
             //fprintf(stdout, "JIM: %02x pc=%04x (&f4)=%02x\n", jim_page, pc, ram[0xf4]);
         }
-}
-
-int keys[2][14][4]=
-{
-        {
-                {KEY_RIGHT,KEY_END,0,KEY_SPACE},
-                {KEY_LEFT,KEY_DOWN,KEY_ENTER,KEY_DEL},
-                {KEY_MINUS,KEY_UP,KEY_QUOTE,0},
-                {KEY_0,KEY_P,KEY_COLON,KEY_SLASH},
-                {KEY_9,KEY_O,KEY_L,KEY_STOP},
-                {KEY_8,KEY_I,KEY_K,KEY_COMMA},
-                {KEY_7,KEY_U,KEY_J,KEY_M},
-                {KEY_6,KEY_Y,KEY_H,KEY_N},
-                {KEY_5,KEY_T,KEY_G,KEY_B},
-                {KEY_4,KEY_R,KEY_F,KEY_V},
-                {KEY_3,KEY_E,KEY_D,KEY_C},
-                {KEY_2,KEY_W,KEY_S,KEY_X},
-                {KEY_1,KEY_Q,KEY_A,KEY_Z},
-                {KEY_ESC,KEY_ALT,KEY_LCONTROL,KEY_LSHIFT}
-        },
-        {
-                {KEY_RIGHT,KEY_END,0,KEY_SPACE},
-                {KEY_LEFT,KEY_DOWN,KEY_ENTER,KEY_BACKSPACE},
-                {KEY_MINUS,KEY_UP,KEY_QUOTE,0},
-                {KEY_0,KEY_P,KEY_SEMICOLON,KEY_SLASH},
-                {KEY_9,KEY_O,KEY_L,KEY_STOP},
-                {KEY_8,KEY_I,KEY_K,KEY_COMMA},
-                {KEY_7,KEY_U,KEY_J,KEY_M},
-                {KEY_6,KEY_Y,KEY_H,KEY_N},
-                {KEY_5,KEY_T,KEY_G,KEY_B},
-                {KEY_4,KEY_R,KEY_F,KEY_V},
-                {KEY_3,KEY_E,KEY_D,KEY_C},
-                {KEY_2,KEY_W,KEY_S,KEY_X},
-                {KEY_1,KEY_Q,KEY_A,KEY_Z},
-                {KEY_ESC,KEY_TAB,KEY_RCONTROL,KEY_RSHIFT}
-        }
-};
-
-int keyl[128];
-
-void makekeyl()
-{
-        int c,d,e;
-        memset(keyl,0,sizeof(keyl));
-
-        /* Establish a mapping from emulated key presses to keyboard matrix values. */
-
-        for (c=0;c<14;c++)
-        {
-                for (d=0;d<4;d++)
-                {
-                        for (e=0;e<2;e++)
-                        {
-                                keyl[keys[e][c][d]]=c|(d<<4)|0x80;
-                        }
-                }
-        }
-
-        /* Record the Break keys separately, along with configurable menu keys. */
-
-        update_break_keys();
-        update_menu_keys();
-}
-
-uint8_t readkeys(uint16_t addr)
-{
-        int d;
-        uint8_t temp=0;
-        for (d=0;d<128;d++)
-        {
-                if (key[d] && keyl[keylookup[d]]&0x80 && !(addr&(1<<(keyl[keylookup[d]]&15)))) temp|=1<<((keyl[keylookup[d]]&0x30)>>4);
-//                if (autoboot && (d==KEY_LSHIFT || d==KEY_RSHIFT) && !(addr&(1<<(keyl[d]&15)))) temp|=1<<((keyl[keylookup[d]]&0x30)>>4);
-        }
-  //      if (autoboot && !(addr&(1<<(keyl[KEY_LSHIFT]&15)))) temp|=1<<((keyl[keylookup[KEY_LSHIFT]]&0x30)>>4);
-//        rpclog("Readkey %i %04X %02X %02X %04X\n",autoboot,addr,temp,keyl[KEY_LSHIFT],1<<(keyl[KEY_LSHIFT]&15));
-/*        for (c=0;c<14;c++)
-        {
-                if (!(addr&(1<<c)))
-                {
-                        if (key[keylookup[keys[0][c][0]]]) temp|=1;
-                        if (key[keylookup[keys[0][c][1]]]) temp|=2;
-                        if (key[keylookup[keys[0][c][2]]]) temp|=4;
-                        if (key[keylookup[keys[0][c][3]]]) temp|=8;
-                        if (key[keylookup[keys[1][c][0]]]) temp|=1;
-                        if (key[keylookup[keys[1][c][1]]]) temp|=2;
-                        if (key[keylookup[keys[1][c][2]]]) temp|=4;
-                        if (key[keylookup[keys[1][c][3]]]) temp|=8;
-                }
-        }*/
-        return temp;
 }
 
 void savememstate(FILE *f)
