@@ -23,21 +23,6 @@ void rpclog(char *format, ...)
    fflush(rlog);
 }
 
-/*int waiting,waiting2;
-
-void waitforthread()
-{
-        return;
-        waiting=1;
-        while (!waiting2)
-              sleep(10);
-}
-
-void stopwaiting()
-{
-        waiting=0;
-}*/
-
 int drawit=0;
 void drawitint()
 {
@@ -48,18 +33,6 @@ void cleardrawit()
 {
         drawit=0;
 }
-
-/*void wait50()
-{
-//        if (!infocus) drawit=1;
-        if (tapeon && tapespeed) drawit=1;
-        while (!drawit || !infocus)
-        {
-                sleep(1);
-//                if (waiting) return;
-        }
-        drawit--;
-}*/
 
 char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
 char tapename[512];
@@ -267,7 +240,4 @@ void closeelk()
 {
         stopmovie();
         saveconfig();
-//        dumpram();
-//        dumpregs();
-//        printf("Closing!\n");
 }

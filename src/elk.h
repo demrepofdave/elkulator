@@ -1,3 +1,6 @@
+#ifndef _ELK_H
+#define _ELK_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -332,3 +335,5 @@ int socket_open(const char *filename);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // _ELK_H

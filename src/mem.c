@@ -199,7 +199,6 @@ uint8_t readmem(uint16_t addr)
                     if (addr==0xFC72) return getplus1stat();
             }
             if (addr>=0xFC60 && addr<=0xFC6F && plus1) return readserial(addr);
-//          if ((addr&~0x1F)==0xFC20) return readsid(addr);
 
             /* Allow the JIM paging register to be read if enabled directly or
                indirectly. */
@@ -282,7 +281,6 @@ void writemem(uint16_t addr, uint8_t val)
             break;
         }
         if ((addr&0xFFF8)==0xFCC0 && plus3) write1770(addr,val);
-//        if ((addr&~0x1F)==0xFC20) writesid(addr,val);
 
         if (addr==0xFC98)
         {
