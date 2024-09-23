@@ -80,12 +80,6 @@ extern int tapewrite;
 extern int dfsena,adfsena;
 extern int sndex;
 
-#define SCANLINES 0
-#define LINEDBL   1
-#define _2XSAI    2
-#define SCALE2X   3
-#define EAGLE     4
-#define PAL       5
 extern int drawmode;
 
 #define HALFSIZE   (drawmode==_2XSAI || drawmode==SCALE2X || drawmode==EAGLE)
@@ -323,8 +317,6 @@ uint8_t getplus1stat();
 
 void initpaltables();
 
-void startblit();
-void endblit();
 void setquit();
 
 void entergui();

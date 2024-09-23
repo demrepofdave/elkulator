@@ -183,12 +183,10 @@ static uint8_t *src_line[4];
 static uint8_t *dst_line[2];
 
 
-void Super2xSaI(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int s_x, int s_y, int d_x, int d_y, int w, int h)
+void Super2xSaI(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
 {
 	int sbpp, dbpp;
 
-    BITMAP * bitmapSource = getBitmap(bitmapSourceIndex);
-    BITMAP * bitmapDest   = getBitmap(bitmapDestIndex);
 	BITMAP * dst2          = NULL;
 
 	if (!bitmapSource || !bitmapDest)
@@ -437,12 +435,10 @@ void Super2xSaI_ex(uint8 *src, uint32 src_pitch, uint8 *unused, BITMAP *dest, ui
 
 
 
-void SuperEagle(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int s_x, int s_y, int d_x, int d_y, int w, int h)
+void SuperEagle(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
 {
 	int sbpp, dbpp;
 
-    BITMAP * bitmapSource = getBitmap(bitmapSourceIndex);
-    BITMAP * bitmapDest   = getBitmap(bitmapDestIndex);
 	BITMAP * dst2         = NULL;
 
 	if (!bitmapSource || !bitmapDest)

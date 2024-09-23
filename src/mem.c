@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "elk.h"
-#include "allegro_4/keyboard.h"
+#include "common/keyboard.h"
 
 static const char * roms = "roms";   // Name of directory containing rom files
 

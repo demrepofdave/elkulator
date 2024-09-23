@@ -7,7 +7,7 @@ static int reallyfasttapebreak;
 #include <stdlib.h>
 #include <zlib.h>
 #include "elk.h"
-#include "allegro_4/video.h"
+#include "common/video.h"
 
 #define INT_HIGHTONE 0x40
 

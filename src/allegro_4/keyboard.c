@@ -1,4 +1,4 @@
-#include "keyboard.h"
+#include "common/keyboard.h"
 #include "elk.h"
 #include <allegro.h>
 

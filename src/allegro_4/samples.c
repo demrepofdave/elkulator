@@ -1,5 +1,5 @@
 #include <allegro.h>
-#include "samples.h"
+#include "common/samples.h"
 
 SAMPLE *seeksmp[4][2];
 SAMPLE *motorsmp[3];

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
-#include "allegro_4/keyboard.h"
+#include "common/keyboard.h"
 #undef printf
 int autoboot;
 FILE *rlog;

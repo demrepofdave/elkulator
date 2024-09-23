@@ -31,12 +31,9 @@ typedef unsigned long Uint32;
   blindly assume you didn't flounder.
 */
 
-void scale2x(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int width, int height)
+void scale2x(BITMAP * bitmapSource, BITMAP * bitmapDest, int width, int height)
 {
 	int looph, loopw;
-
-    BITMAP * bitmapSource = getBitmap(bitmapSourceIndex);
-    BITMAP * bitmapDest   = getBitmap(bitmapDestIndex);
 
 	Uint8* srcpix = (Uint8*)bitmapSource->dat;
 	Uint8* dstpix = (Uint8*)bitmapDest->dat;

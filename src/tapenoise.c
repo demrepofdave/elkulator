@@ -5,7 +5,7 @@
 #include <math.h>
 #include <unistd.h>
 #include "elk.h"
-#include "allegro_4/samples.h"
+#include "common/samples.h"
 
 static const char * ddnoise = "ddnoise"; // Name of directory containing wav files to emulate tape noise
 

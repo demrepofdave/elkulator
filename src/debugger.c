@@ -7,7 +7,6 @@ int indebug=0;
 extern int fcount;
 
 #ifdef WIN32
-#include <allegro.h>
 #include <winalleg.h>
 #include <wingdi.h>
 #include <process.h>

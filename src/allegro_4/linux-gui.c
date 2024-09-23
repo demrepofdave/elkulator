@@ -5,7 +5,7 @@
 #include <allegro.h>
 //#include <alleggl.h>
 #include "elk.h"
-#include "video.h"
+#include "common/video.h"
 
 #undef printf
 

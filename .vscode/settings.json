@@ -5,6 +5,8 @@
         "elk.h": "c",
         "2xsai.h": "c",
         "video.h": "c",
-        "allegro.h": "c"
+        "allegro.h": "c",
+        "keyboard.h": "c",
+        "string.h": "c"
     }
 }

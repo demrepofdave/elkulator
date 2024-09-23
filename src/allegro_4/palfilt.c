@@ -77,13 +77,10 @@ void initpaltables()
         initcoef();
 }
 
-void palfilter(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int depth)
+void palfilter(BITMAP * bitmapSource, BITMAP * bitmapDest, int depth)
 {
         int x,y,c;
         int r,g,b;
-
-        BITMAP * bitmapSource = getBitmap(bitmapSourceIndex);
-        BITMAP * bitmapDest   = getBitmap(bitmapDestIndex);
 
         fixed constr=ftofix(-0.509f),constb=ftofix(0.194);
         fixed paly,palry,palby;

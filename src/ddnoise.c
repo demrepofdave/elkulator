@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "elk.h"
-#include "allegro_4/samples.h"
+#include "common/samples.h"
 
 static const char * ddnoise35 = "ddnoise/35";   // Name of directory containing wav files to emulate noise of 3.5 inch Disk Drive
 static const char * ddnoise525 = "ddnoise/525"; // Name of directory containing wav files to emulate noise of 5.25 inch Disk Drive

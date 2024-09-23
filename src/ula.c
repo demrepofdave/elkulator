@@ -1,8 +1,8 @@
 /*Elkulator v1.0 by Sarah Walker
   ULA and video emulation*/
-#include <allegro.h>
-#include "allegro_4/video.h"
+#include "common/video.h"
 #include <stdio.h>
+#include <string.h>
 #include <zlib.h>
 #include "elk.h"
 
@@ -63,13 +63,13 @@ void initula()
 {
         int c;
 //        allegro_init();
-        coldepth=desktop_color_depth();
+        coldepth=video_get_desktop_color_depth();
         video_set_desktop_color_depth();
         #ifdef WIN32
-        set_gfx_mode(GFX_AUTODETECT_WINDOWED,2048,2048,0,0);
+        video_set_gfx_mode_windowed(2048,2048,0,0);
         vidb=create_video_bitmap(800,300);
         #else
-        set_gfx_mode(GFX_AUTODETECT_WINDOWED,640,512,0,0);
+        video_set_gfx_mode_windowed(640,512,0,0);
         winsizex=640; winsizey=512;
         #endif
         video_init();
@@ -97,7 +97,7 @@ void enterfullscreen()
         destroy_bitmap(vidb);
         #endif
         video_set_desktop_color_depth();
-        set_gfx_mode(GFX_AUTODETECT_FULLSCREEN,800,600,0,0);
+        video_set_gfx_mode_fullscreen(800,600,0,0);
         #ifdef WIN32
         vp1=create_video_bitmap(800,600);
         vp2=create_video_bitmap(800,600);
@@ -120,10 +120,10 @@ void leavefullscreen()
         #endif
         video_set_desktop_color_depth();
         #ifdef WIN32
-        set_gfx_mode(GFX_AUTODETECT_WINDOWED,2048,2048,0,0);
+        video_set_gfx_mode_windowed(048,2048,0,0);
         vidb=create_video_bitmap(800,300);
         #else
-        set_gfx_mode(GFX_AUTODETECT_WINDOWED,640,512,0,0);
+        video_set_gfx_mode_windowed(640,512,0,0);
         winsizex=640; winsizey=512;
         #endif
         video_set_depth_and_elk_palette();
@@ -501,7 +501,7 @@ int numlines=0;
 int wantsavescrshot=0;
 int wantmovieframe=0;
 FILE *moviefile;
-BITMAP *moviebitmap;
+//BITMAP *moviebitmap;
 
 void yield()
 {
@@ -765,60 +765,11 @@ void yield()
                                         
                                         if (ula.draw)
                                         {
-                                                startblit();
-                                                switch (drawmode)
-                                                {
-                                                        case SCANLINES:
-                                                        video_blit(BIT_MAIN,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        //blit(b,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        break;
-                                                        case LINEDBL:
-                                                        #ifdef WIN32
-                                                        blit(b,vidb,0,0,0,0,640,256);
-                                                        if (videoresize) stretch_blit(vidb,screen,0,0,640,256,0,0,winsizex,winsizey);
-                                                        else             stretch_blit(vidb,screen,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        #else
-                                                        for (c=0;c<512;c++)
-                                                        {
-                                                                video_blit(BIT_MAIN,BIT_B16,0,c>>1,0,c,640,1);
-                                                                //blit(b,b16,0,c>>1,0,c,640,1);
-                                                        }
-                                                        video_blit(BIT_B16,BIT_SCREEN, 0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        #endif
-                                                        break;
-                                                        case _2XSAI:
-                                                        video_blit(BIT_MAIN,BIT_B162,0,0,0,0,640,256);
-                                                        //blit(b,b162,0,0,0,0,640,256);
-                                                        Super2xSaI(BIT_B162,BIT_B16,0,0,0,0,320,256);
-                                                        video_blit(BIT_B16,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        break;
-                                                        case SCALE2X:
-                                                        video_blit(BIT_MAIN,BIT_B162,0,0,0,0,640,256);
-                                                        //blit(b,b162,0,0,0,0,640,256);
-                                                        scale2x(BIT_B162,BIT_B16,320,256);
-                                                        //scale2x(b162,b16,320,256);
-                                                        video_blit(BIT_B16,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        break;
-                                                        case EAGLE:
-                                                        video_blit(BIT_MAIN,BIT_B162,0,0,0,0,640,256);
-                                                        //blit(b,b162,0,0,0,0,640,256);
-                                                        SuperEagle(BIT_B162,BIT_B16,0,0,0,0,320,256);
-                                                        video_blit(BIT_B16,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        break;
-                                                        case PAL: // TODO: Not currently working (blank screen)
-                                                        palfilter(BIT_MAIN,BIT_B16,coldepth);
-                                                        //palfilter(b,b16,coldepth);
-                                                        video_blit(BIT_B16,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        //blit(b16,screen,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                                                        break;
-                                                }
+                                                video_blit_to_screen(drawmode, winsizex, winsizey, coldepth);
+                                                //startblit()
                                                 if (wantsavescrshot) dosavescrshot();
                                                 if (wantmovieframe) saveframe();
-                                                endblit();
+                                                //endblit();
                                         }
 //                                        wait50();
                                         ula.addrback=ula.addr;
@@ -972,46 +923,9 @@ void savescrshot()
 // TODO: Disable for now.
 void dosavescrshot()
 {
-//        BITMAP *tb;
-//        video_set_desktop_color_depth();
-//        tb=create_bitmap(640,512);
-//        switch (drawmode)
-//        {
-//                case SCANLINES:
-//                blit(b,tb,0,0,0,0,640,512);
-//                video_blit(BIT_MAIN,BIT_SCREEN,0,0,(winsizex-640)/2,(winsizey-512)/2,640,512);
-//                break;
-//                case LINEDBL:
-//                #ifdef WIN32
-//                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
-//                #else
-//                blit(b16,tb,0,0,0,0,640,512);
-//                #endif
-//                break;
-//                case _2XSAI:
-//                blit(b,b162,0,0,0,0,640,256);
-//                Super2xSaI(b162,b16,0,0,0,0,320,256);
-//                blit(b16,tb,0,0,0,0,640,512);
-//                break;
-//                case SCALE2X:
-//                blit(b,b162,0,0,0,0,640,256);
-//                scale2x(b162,b16,320,256);
-//                blit(b16,tb,0,0,0,0,640,512);
-//                break;
-//                case EAGLE:
-//                blit(b,b162,0,0,0,0,640,256);
-//                SuperEagle(b162,b16,0,0,0,0,320,256);
-//                blit(b16,tb,0,0,0,0,640,512);
-//                break;
-//                case PAL:
-//                palfilter(b,b16,coldepth);
-//                blit(b16,tb,0,0,0,0,640,512);
-//                break;
-//        }
-//        save_bmp(scrshotname,tb,NULL);
-//        destroy_bitmap(tb);
-        set_color_depth(8);
-        
+        video_capture_screenshot(drawmode, coldepth);
+        video_save_bmp(scrshotname);
+        video_destroy_screenshot();
         wantsavescrshot=0;
 }
 
@@ -1024,7 +938,7 @@ void startmovie()
     if (moviefile == NULL)
         return;
 
-    moviebitmap=create_bitmap_ex(8, 640, 256);
+    //moviebitmap=create_bitmap_ex(8, 640, 256);
     sndstreamindex = 0;
     sndstreamcount = 0;
 }
@@ -1034,7 +948,7 @@ void stopmovie()
     wantmovieframe = 0;
     if (moviefile != NULL) {
         fclose(moviefile);
-        destroy_bitmap(moviebitmap);
+        //destroy_bitmap(moviebitmap);
         moviefile = NULL;
     }
 }
@@ -1043,39 +957,39 @@ void stopmovie()
 
 int deflate_bitmap(int level)
 {
-    unsigned int have;
-    z_stream strm;
-    unsigned char in[DEFLATE_CHUNK_SIZE];
-    unsigned char out[DEFLATE_CHUNK_SIZE];
+//    unsigned int have;
+//    z_stream strm;
+//    unsigned char in[DEFLATE_CHUNK_SIZE];
+//    unsigned char out[DEFLATE_CHUNK_SIZE];
 
     /* Allocate the deflate state. */
-    strm.zalloc = Z_NULL;
-    strm.zfree = Z_NULL;
-    strm.opaque = Z_NULL;
-    if (deflateInit(&strm, level) != Z_OK)
-        return Z_ERRNO;
+//    strm.zalloc = Z_NULL;
+//    strm.zfree = Z_NULL;
+//    strm.opaque = Z_NULL;
+//    if (deflateInit(&strm, level) != Z_OK)
+//        return Z_ERRNO;
 
     /* Compress the bitmap buffer. */
-    strm.avail_in = 640*256;
-    strm.next_in = moviebitmap->dat;
+//    strm.avail_in = 640*256;
+//    strm.next_in = moviebitmap->dat;
 
     /* Run deflate() on the bitmap buffer, finishing the compression. */
-    strm.avail_out = DEFLATE_CHUNK_SIZE;
-    strm.next_out = out;
-    if (deflate(&strm, Z_FINISH) == Z_STREAM_ERROR)
-        return Z_ERRNO;
+//    strm.avail_out = DEFLATE_CHUNK_SIZE;
+//    strm.next_out = out;
+//    if (deflate(&strm, Z_FINISH) == Z_STREAM_ERROR)
+//        return Z_ERRNO;
 
     /* Write the length of the data. */
-    have = DEFLATE_CHUNK_SIZE - strm.avail_out;
-    fwrite(&have, sizeof(unsigned int), 1, moviefile);
+//    have = DEFLATE_CHUNK_SIZE - strm.avail_out;
+//    fwrite(&have, sizeof(unsigned int), 1, moviefile);
 
-    if (fwrite(out, 1, have, moviefile) != have || ferror(moviefile)) {
-        deflateEnd(&strm);
-        return Z_ERRNO;
-    }
+//    if (fwrite(out, 1, have, moviefile) != have || ferror(moviefile)) {
+//        deflateEnd(&strm);
+//        return Z_ERRNO;
+//    }
 
     /* clean up and return */
-    deflateEnd(&strm);
+//    deflateEnd(&strm);
     return Z_OK;
 }
 
