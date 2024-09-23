@@ -1,7 +1,8 @@
 /*Elkulator v1.0 by Sarah Walker
   6502 emulation*/
-#include <allegro.h>
+
 #include <stdio.h>
+#include <stdlib.h>
 #include "elk.h"
 
 int timetolive;

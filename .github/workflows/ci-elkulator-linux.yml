@@ -21,7 +21,7 @@ jobs:
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
-        run: make
+        run: make elkulator
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
   build-allegro4-ubuntu2204:
@@ -43,7 +43,7 @@ jobs:
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
-        run: make
+        run: make elkulator
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
   build-allegro4-ubuntu2404:
@@ -65,7 +65,7 @@ jobs:
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
-        run: make
+        run: make elkulator
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
   build-allegro5-ubuntu2004:
@@ -85,7 +85,7 @@ jobs:
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
-        run: make
+        run: make elkulator
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
   build-allegro5-ubuntu2204:
@@ -105,7 +105,7 @@ jobs:
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
-        run: make
+        run: make elkulator
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
   build-allegro5-ubuntu2404:
@@ -125,7 +125,7 @@ jobs:
       - name: Check source (cppcheck)
         run: cppcheck .
       - name: Build source
-        run: make
+        run: make elkulator
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
   build-allegro5-windows-msys2:

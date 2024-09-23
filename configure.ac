@@ -4,12 +4,12 @@
 AC_PREREQ([2.61])
 AC_INIT(Elkulator, 1.0, Sarah Walker <b-em@bbcmicro.com>, elkulator)
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
+#AM_INIT_AUTOMAKE
 AC_CONFIG_MACRO_DIRS([m4])
 AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_CC_C_O
-
 
 
 AC_MSG_CHECKING([whether to enable debugging])
@@ -23,6 +23,16 @@ else
    AC_MSG_RESULT([no])
 fi
 
+AC_MSG_CHECKING([whether to use allegro5])
+AC_ARG_ENABLE(allergo5,
+	      AC_HELP_STRING([--enable-allegro5], [use allegro5 to build]))
+if test "$enable_allegro5" = "yes"; then
+   CFLAGS="$CFLAGS -DHAL_ALLEGRO_5"
+   AC_MSG_RESULT([yes])
+fi
+
+AM_CONDITIONAL(ENABLE_ALLEGRO5, test "$enable_allegro5" = "yes")
+
 #AC_MSG_CHECKING([for libz])
 #AX_CHECK_ZLIB
 
@@ -34,8 +44,13 @@ AM_CONDITIONAL(OS_LINUX, test "$OS" = "linux")
 # NOTE: For the following Autoconf macro to be supported, you need to extract
 #       allegro.m4 from the DOS/Windows Allegro sources (the file is contained
 #       in `misc') and copy it to this directory or MSYS's `/share/aclocal'.
-if test "$OS" != "win"; then
-   AM_PATH_ALLEGRO(, , AC_MSG_ERROR(building Elkulator requires Allegro to be installed))
+if test "$enable_allegro5" = "yes"; then
+   AC_CHECK_HEADER([allegro5/allegro.h],[],
+	    [AC_MSG_FAILURE([The Allegro version 5 library is needed but not installed], 1)],[])
+else 
+   if test "$OS" != "win"; then
+       AM_PATH_ALLEGRO(, , AC_MSG_ERROR(building Elkulator requires Allegro to be installed))
+   fi
 fi
 
 AC_CHECK_LIB([z], [gzopen], [], \
@@ -50,4 +65,4 @@ AC_CHECK_LIB([alut], [alutInit], [], \
 
 AC_CHECK_LIB([m], [sin])
 
-AC_OUTPUT([Makefile src/Makefile])
+AC_OUTPUT([Makefile])

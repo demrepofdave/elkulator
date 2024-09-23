@@ -1,7 +1,7 @@
 #include <string.h>
 #include <allegro.h>
 #include <allegro/internal/aintern.h>
-#include "2xsai.h"
+#include "video_internal.h"
 
 //#define TRACE rpclog
 #define uint32 unsigned long
@@ -183,17 +183,17 @@ static uint8_t *src_line[4];
 static uint8_t *dst_line[2];
 
 
-void Super2xSaI(BITMAP * src, BITMAP * dest, int s_x, int s_y, int d_x, int d_y, int w, int h)
+void Super2xSaI(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
 {
 	int sbpp, dbpp;
 
-	BITMAP *dst2 = NULL;
+	BITMAP * dst2          = NULL;
 
-	if (!src || !dest)
+	if (!bitmapSource || !bitmapDest)
            return;
 
-	sbpp = bitmap_color_depth(src);
-	dbpp = bitmap_color_depth(dest);
+	sbpp = bitmap_color_depth(bitmapSource);
+	dbpp = bitmap_color_depth(bitmapDest);
 
 	if ((sbpp != xsai_depth) || (sbpp != dbpp))	/* Must be same color depth */
 		return;
@@ -201,15 +201,15 @@ void Super2xSaI(BITMAP * src, BITMAP * dest, int s_x, int s_y, int d_x, int d_y,
 //	BLIT_CLIP2(src, dest, s_x, s_y, d_x, d_y, w, h, 2, 2);
 		
 	if (w < 4 || h < 4) {  /* Image is too small to be 2xSaI'ed. */
-		stretch_blit(src, dest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
+		stretch_blit(bitmapSource, bitmapDest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
 		return;
 	}	
 
 	sbpp = BYTES_PER_PIXEL(sbpp);
 	if (d_x || d_y)
-		dst2 = create_sub_bitmap(dest, d_x, d_y, w * 2, h * 2);
+		dst2 = create_sub_bitmap(bitmapDest, d_x, d_y, w * 2, h * 2);
 	
-	Super2xSaI_ex(src->line[s_y] + s_x * sbpp, (unsigned int)(src->line[1] - src->line[0]), NULL, dst2 ? dst2 : dest, w, h);
+	Super2xSaI_ex(bitmapSource->line[s_y] + s_x * sbpp, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, dst2 ? dst2 : bitmapDest, w, h);
 	
 	if (dst2)
 		destroy_bitmap(dst2);
@@ -435,17 +435,17 @@ void Super2xSaI_ex(uint8 *src, uint32 src_pitch, uint8 *unused, BITMAP *dest, ui
 
 
 
-void SuperEagle(BITMAP * src, BITMAP * dest, int s_x, int s_y, int d_x, int d_y, int w, int h)
+void SuperEagle(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
 {
 	int sbpp, dbpp;
 
-	BITMAP *dst2 = NULL;
+	BITMAP * dst2         = NULL;
 
-	if (!src || !dest)
+	if (!bitmapSource || !bitmapDest)
 		return;
 
-	sbpp = bitmap_color_depth(src);
-	dbpp = bitmap_color_depth(dest);
+	sbpp = bitmap_color_depth(bitmapSource);
+	dbpp = bitmap_color_depth(bitmapDest);
 
 	if ((sbpp != xsai_depth) || (sbpp != dbpp))	/* Must be same color depth */
 		return;
@@ -453,15 +453,15 @@ void SuperEagle(BITMAP * src, BITMAP * dest, int s_x, int s_y, int d_x, int d_y,
 //	BLIT_CLIP2(src, dest, s_x, s_y, d_x, d_y, w, h, 2, 2);
 		
 	if (w < 4 || h < 4) {  /* Image is too small to be 2xSaI'ed. */
-		stretch_blit(src, dest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
+		stretch_blit(bitmapSource, bitmapDest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
 		return;
 	}	
 	
 	sbpp = BYTES_PER_PIXEL(sbpp);
 	if (d_x || d_y)
-		dst2 = create_sub_bitmap(dest, d_x, d_y, w * 2, h * 2);
+		dst2 = create_sub_bitmap(bitmapDest, d_x, d_y, w * 2, h * 2);
 	
-	SuperEagle_ex(src->line[s_y] + s_x * sbpp, (unsigned int)(src->line[1] - src->line[0]), NULL, dst2 ? dst2 : dest, w, h);
+	SuperEagle_ex(bitmapSource->line[s_y] + s_x * sbpp, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, dst2 ? dst2 : bitmapDest, w, h);
 	
 	if (dst2)
 		destroy_bitmap(dst2);

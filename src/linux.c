@@ -32,15 +32,6 @@ void native_window_close_button_handler(void)
        quited = 1;
 }
 
-void startblit()
-{
-}
-void endblit()
-{
-}
-
-int keylookup[128];
-
 int main(int argc, char *argv[])
 {
         int ret = allegro_init();

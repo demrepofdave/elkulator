@@ -1,6 +1,7 @@
 /*Elkulator v1.0 by Sarah Walker*/
 /*CSW handling*/
 #include <stdio.h>
+#include <stdlib.h>
 #include <zlib.h>
 #include "elk.h"
 

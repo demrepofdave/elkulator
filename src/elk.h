@@ -1,9 +1,11 @@
+#ifndef _ELK_H
+#define _ELK_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stdint.h>
-#include <allegro.h>
 #include <stdio.h>
 
 #define printf rpclog
@@ -81,12 +83,6 @@ extern int tapewrite;
 extern int dfsena,adfsena;
 extern int sndex;
 
-#define SCANLINES 0
-#define LINEDBL   1
-#define _2XSAI    2
-#define SCALE2X   3
-#define EAGLE     4
-#define PAL       5
 extern int drawmode;
 
 #define HALFSIZE   (drawmode==_2XSAI || drawmode==SCALE2X || drawmode==EAGLE)
@@ -173,14 +169,6 @@ extern int writeprot[2],fwriteprot[2];
 extern int defaultwriteprot;
 
 extern int motoron,fdctime,disctime;
-
-
-void initresid();
-void resetsid();
-void setsidtype(int resamp, int model);
-uint8_t readsid(uint16_t addr);
-void writesid(uint16_t addr, uint8_t val);
-extern int cursid,sidmethod;
 
 extern int wantloadstate,wantsavestate;
 extern char ssname[260];
@@ -271,7 +259,6 @@ void clearintula(uint8_t num);
 void receive(uint8_t val);
 void enterfullscreen();
 void leavefullscreen();
-void clearall();
 void clearscreen();
 void savescrshot();
 void loadulastate(FILE *f);
@@ -305,8 +292,6 @@ void adddatnoise(uint8_t dat);
 void addhightone();
 void mixtapenoise(int16_t *tapebuffer);
 
-void makekeyl();
-
 void loadstate();
 void savestate();
 void doloadstate();
@@ -327,12 +312,7 @@ uint8_t getplus1stat();
 
 void initpaltables();
 
-void startblit();
-void endblit();
 void setquit();
-
-void scale2x(BITMAP *src, BITMAP *dst, int width, int height);
-void palfilter(BITMAP *src, BITMAP *dest, int depth);
 
 void entergui();
 
@@ -347,3 +327,5 @@ int socket_open(const char *filename);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // _ELK_H

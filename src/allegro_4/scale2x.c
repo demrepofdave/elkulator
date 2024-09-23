@@ -11,6 +11,8 @@
 /*Modified by Sarah Walker to work with Allegro*/
 
 #include <allegro.h>
+#include "video_internal.h"
+
 #ifndef MAX
 #define MAX(a,b)    (((a) > (b)) ? (a) : (b))
 #define MIN(a,b)    (((a) < (b)) ? (a) : (b))
@@ -29,19 +31,19 @@ typedef unsigned long Uint32;
   blindly assume you didn't flounder.
 */
 
-void scale2x(BITMAP *src, BITMAP *dst, int width, int height)
+void scale2x(BITMAP * bitmapSource, BITMAP * bitmapDest, int width, int height)
 {
 	int looph, loopw;
 
-	Uint8* srcpix = (Uint8*)src->dat;
-	Uint8* dstpix = (Uint8*)dst->dat;
+	Uint8* srcpix = (Uint8*)bitmapSource->dat;
+	Uint8* dstpix = (Uint8*)bitmapDest->dat;
 
-	const int srcpitch = (src->w*bitmap_color_depth(src))/8;
-	const int dstpitch = (dst->w*bitmap_color_depth(dst))/8;
+	const int srcpitch = (bitmapSource->w*bitmap_color_depth(bitmapSource))/8;
+	const int dstpitch = (bitmapDest->w*bitmap_color_depth(bitmapDest))/8;
 //	const int width = src->w;
 //	const int height = src->h;
 
-	switch(bitmap_color_depth(src))
+	switch(bitmap_color_depth(bitmapSource))
 	{
 	case 8: {
 	    	Uint8 E0, E1, E2, E3, B, D, E, F, H;

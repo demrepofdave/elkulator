@@ -1,10 +1,10 @@
 /*Elkulator v1.0 by Sarah Walker
   Disc support (also some tape)*/
   
-#include <allegro.h>
 #include <stdio.h>
 #include <string.h>
 #include "elk.h"
+#include "common/fileutils.h"
 
 void (*fdccallback)();
 void (*fdcdata)(uint8_t dat);
@@ -51,7 +51,7 @@ void loaddisc(int drive, char *fn)
                 rpclog("!fn\n");
                 return;
         }
-        p=get_extension(fn);
+        p = fileutils_get_extension(fn);
         if (!p)
         {
                 rpclog("!p\n");
@@ -119,7 +119,7 @@ void newdisc(int drive, char *fn)
 {
         int c=0,d;
         FILE *f;
-        char *p=get_extension(fn);
+        char *p = fileutils_get_extension(fn);
         while (loaders[c].ext)
         {
                 if (!strcasecmp(p,loaders[c].ext) && loaders[c].size!=-1)
@@ -251,7 +251,7 @@ void loadtape(char *fn)
         char *p;
         if (!fn) return;
 //        if (fn[0]==0) return;
-        p=get_extension(fn);
+        p = fileutils_get_extension(fn);
         if (!p) return;
         if (p[0]=='u' || p[0]=='U') openuef(fn);
         else                        opencsw(fn);
