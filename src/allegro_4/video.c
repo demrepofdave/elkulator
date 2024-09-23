@@ -29,47 +29,6 @@ PALETTE elkpal =
       {63,63,63},
 };
 
-
-BITMAP * getBitmap(bitmapSelect bitmapIndex)
-{
-    BITMAP * bitmap = NULL;
-
-    switch(bitmapIndex)
-    {
-        case BIT_SCREEN:
-            bitmap = screen;
-            break;
-        
-        case BIT_MAIN:
-            bitmap = b;
-            break;
-
-        case BIT_B16:
-            bitmap = b16;
-            break;
-
-        case BIT_B162:
-            bitmap = b162;
-            break;
-
-        case BIT_VIDB:
-            bitmap = vidb;
-            break;
-
-        case BIT_VP1:
-            bitmap = vp1;
-            break;
-
-        case BIT_VP2:
-            bitmap = vp2;
-            break;
-
-        default:
-            break;
-    }
-    return (bitmap);
-}
-
 void video_init()
 {
     b16=create_bitmap(800*2,600);
@@ -112,17 +71,19 @@ int video_get_desktop_color_depth()
     return(desktop_color_depth());
 }
 
-void video_put_pixel(bitmapSelect bitmapIndex, int y, int x, uint8_t color)
+// TODO: Depricated.
+void video_put_pixel(int y, int x, uint8_t color)
 {
-    BITMAP * bitmap = getBitmap(bitmapIndex);
-    bitmap->line[y][x]=color;
+    b->line[y][x]=color;
 }
 
-void video_blit(bitmapSelect bitmapSourceIndex, bitmapSelect bitmapDestIndex, int source_x, int source_y, int dest_x, int dest_y, int width, int height)
+void video_put_pixel_line(int y, int x, int width, uint8_t color)
 {
-    BITMAP * bitmapSource = getBitmap(bitmapSourceIndex);
-    BITMAP * bitmapDest   = getBitmap(bitmapDestIndex);
-    blit(bitmapSource, bitmapDest, source_x, source_y, dest_x, dest_y, width, height);
+    int count = 0;
+    for(count = 0; count < width; count++)
+    {
+        b->line[y][x + count]=color;
+    }
 }
 
 #ifdef WIN32

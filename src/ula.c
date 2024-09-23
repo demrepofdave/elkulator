@@ -1,10 +1,10 @@
 /*Elkulator v1.0 by Sarah Walker
   ULA and video emulation*/
-#include "common/video.h"
 #include <stdio.h>
 #include <string.h>
 #include <zlib.h>
 #include "elk.h"
+#include "common/video.h"
 
 void dosavescrshot();
 void saveframe();
@@ -501,7 +501,6 @@ int numlines=0;
 int wantsavescrshot=0;
 int wantmovieframe=0;
 FILE *moviefile;
-//BITMAP *moviebitmap;
 
 void yield()
 {
@@ -521,7 +520,7 @@ void yield()
                                 if (LINEDOUBLE) ula.y<<=1;
                                 for (x=0;x<8;x++)
                                 {
-                                    video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), 0);
+                                    video_put_pixel(ula.y, (ula.x+x), 0);
                                     // b->line[ula.y][ula.x+x]=0;
                                 }
 
@@ -529,11 +528,27 @@ void yield()
                         }
                         else if (!(ula.x&8) || !(ula.mode&4))
                         {
-                                if (ula.mode&4) tempaddr=ula.addr+ula.sc+((ula.x>>1)&~7);
-                                else            tempaddr=ula.addr+ula.sc+(ula.x&~7);
-                                if (tempaddr&0x8000) tempaddr-=modelens[ula.mode];
+                                if (ula.mode&4)
+                                {
+                                        tempaddr=ula.addr+ula.sc+((ula.x>>1)&~7);
+                                }
+                                else
+                                {
+                                        tempaddr=ula.addr+ula.sc+(ula.x&~7);
+                                }            
+
+                                if (tempaddr&0x8000)
+                                {
+                                        tempaddr-=modelens[ula.mode];
+                                }
+
                                 temp=ram[tempaddr];
-                                if (LINEDOUBLE) ula.y<<=1;
+
+                                if (LINEDOUBLE)
+                                {
+                                        ula.y<<=1;
+                                }
+
                                 if (HALFSIZE)
                                 {
                                         switch (ula.mode)
@@ -542,7 +557,7 @@ void yield()
                                                 for (x=0;x<8;x++)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
                                                         //b->line[ula.y][(ula.x+x)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
@@ -551,7 +566,7 @@ void yield()
                                                 for (x=0;x<8;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
                                                         //b->line[ula.y][(ula.x+x)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
@@ -560,9 +575,9 @@ void yield()
                                                 for (x=0;x<8;x+=4)
                                                 {
                                                         col=ulalookup[temp];
-                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
                                                         //b->line[ula.y][(ula.x+x)>>1]=pal[col];
-                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x+2)>>1), pal[col]);
+                                                        video_put_pixel(ula.y, ((ula.x+x+2)>>1), pal[col]);
                                                         //b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
@@ -571,7 +586,7 @@ void yield()
                                                 for (x=0;x<16;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
 //                                                        b->line[ula.y][(ula.x+x)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
@@ -580,9 +595,9 @@ void yield()
                                                 for (x=0;x<16;x+=4)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x)>>1), pal[col]);
+                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
                                                         //b->line[ula.y][(ula.x+x)>>1]=pal[col];
-                                                        video_put_pixel(BIT_MAIN, ula.y, ((ula.x+x+2)>>1), pal[col]);
+                                                        video_put_pixel(ula.y, ((ula.x+x+2)>>1), pal[col]);
                                                         //b->line[ula.y][(ula.x+x+2)>>1]=pal[col];
                                                         temp<<=1;
                                                 }
@@ -597,7 +612,7 @@ void yield()
                                                 for (x=0;x<8;x++)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
                                                         //b->line[ula.y][ula.x+x]=pal[col];
                                                         temp<<=1;
                                                 }
@@ -606,8 +621,9 @@ void yield()
                                                 for (x=0;x<8;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+1), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
                                                         //b->line[ula.y][ula.x+x]=pal[col];
                                                         //b->line[ula.y][ula.x+x+1]=pal[col];
                                                         temp<<=1;
@@ -617,10 +633,10 @@ void yield()
                                                 for (x=0;x<8;x+=4)
                                                 {
                                                         col=ulalookup[temp];
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+1), pal[col]);
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+2), pal[col]);
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+3), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x+2), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x+3), pal[col]);
                                                         //b->line[ula.y][ula.x+x]=pal[col];
                                                         //b->line[ula.y][ula.x+x+1]=pal[col];
                                                         //b->line[ula.y][ula.x+x+2]=pal[col];
@@ -634,8 +650,8 @@ void yield()
                                                 for (x=0;x<16;x+=2)
                                                 {
                                                         col=ulalookup[temp&0x80];
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+1), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
                                                         //b->line[ula.y][ula.x+x]=pal[col];
                                                         //b->line[ula.y][ula.x+x+1]=pal[col];
                                                         temp<<=1;
@@ -645,10 +661,10 @@ void yield()
                                                 for (x=0;x<16;x+=4)
                                                 {
                                                         col=ulalookup[temp&0x88];
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+1), pal[col]);
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+2), pal[col]);
-                                                        video_put_pixel(BIT_MAIN, ula.y, (ula.x+x+3), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x+2), pal[col]);
+                                                        video_put_pixel(ula.y, (ula.x+x+3), pal[col]);
                                                         //b->line[ula.y][ula.x+x]=pal[col];
                                                         //b->line[ula.y][ula.x+x+1]=pal[col];
                                                         //b->line[ula.y][ula.x+x+2]=pal[col];
@@ -669,7 +685,7 @@ void yield()
                         if (LINEDOUBLE) ula.y<<=1;
                         for (x=0;x<8;x++)
                         {
-                            video_put_pixel(BIT_MAIN, ula.y, (ula.x+x), 0);
+                            video_put_pixel(ula.y, (ula.x+x), 0);
                             //b->line[ula.y][ula.x+x]=0;
                         }
                         if (LINEDOUBLE) ula.y>>=1;

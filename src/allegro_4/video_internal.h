@@ -5,7 +5,6 @@
 #include "common/video.h"
 
 // Private functions to be places in hal only header.
-BITMAP * getBitmap(bitmapSelect bitmapIndex);
 
 // 2xSaI routines.
 #define uint32 unsigned long
