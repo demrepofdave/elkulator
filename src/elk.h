@@ -170,14 +170,6 @@ extern int defaultwriteprot;
 
 extern int motoron,fdctime,disctime;
 
-
-void initresid();
-void resetsid();
-void setsidtype(int resamp, int model);
-uint8_t readsid(uint16_t addr);
-void writesid(uint16_t addr, uint8_t val);
-extern int cursid,sidmethod;
-
 extern int wantloadstate,wantsavestate;
 extern char ssname[260];
 

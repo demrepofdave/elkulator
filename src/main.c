@@ -187,10 +187,6 @@ void initelk(int argc, char *argv[])
         keyboard_makelayout();
         
         set_display_switch_mode(SWITCH_BACKGROUND);
-        
-//        initresid();
-//        resetsid();
-//        setsidtype(0,0);
 }
 
 int ddnoiseframes=0;
