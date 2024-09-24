@@ -115,7 +115,6 @@ jobs:
       - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}."
       - name: Install required apt files
         run: |
-         sudo add-apt-repository ppa:allegro/5.2
          sudo apt-get update
          sudo apt-get install -y automake liballegro5-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
