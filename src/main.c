@@ -10,7 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "common/video.h"
 #include "common/keyboard.h"
+#include "common/fileutils.h"
 #undef printf
 int autoboot;
 FILE *rlog;
@@ -56,8 +58,8 @@ void initelk(int argc, char *argv[])
         int parallelnext=0;
         int serialnext=0;
         int serialdebugnext=0;
-        get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-        p=get_filename(exedir);
+        fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+        p = fileutils_get_filename(exedir);
         p[0]=0;
         discname[0]=discname2[0]=tapename[0]=0;
         parallelname[0]=0;serialname[0]=0;
@@ -178,12 +180,9 @@ void initelk(int argc, char *argv[])
             if (romnames[i][0] != 0) loadrom_n(i, romnames[i]);
         }
         if (defaultwriteprot) writeprot[0]=writeprot[1]=1;
-#ifndef WIN32
-        install_keyboard();
-#endif
-        install_timer();
-        install_int_ex(drawitint,MSEC_TO_TIMER(20));
-        install_joystick(JOY_TYPE_AUTODETECT);
+
+        video_init_part3a(drawitint);
+
         inital();
         initsound();
         loaddiscsamps();
@@ -191,7 +190,7 @@ void initelk(int argc, char *argv[])
 
         keyboard_makelayout();
         
-        set_display_switch_mode(SWITCH_BACKGROUND);
+        video_set_display_switch_mode_background();
 }
 
 int ddnoiseframes=0;
@@ -224,7 +223,7 @@ void runelk()
                 oldbreak = break_pressed();
                 if (wantloadstate) doloadstate();
                 if (wantsavestate) dosavestate();
-                if (infocus) poll_joystick();
+                if (infocus) video_poll_joystick();
                 if (autoboot) autoboot--;
                 ddnoiseframes++;
                 if (ddnoiseframes>=5)
@@ -234,7 +233,7 @@ void runelk()
                 }
         }
         else
-           rest(1);
+           video_rest(1);
 }
 
 void closeelk()

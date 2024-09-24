@@ -2,7 +2,7 @@
   OpenAL interface*/
   
 #include <stdio.h>
-#include <allegro.h>
+#include <allegro5/allegro.h>
 #include <AL/al.h>
 #include <AL/alut.h>
 #include <stdint.h>

@@ -53,6 +53,17 @@ void video_init_part3()
     set_palette(elkpal);
 }
 
+// Called from main.c (initelk)
+void video_init_part3a(void (*timer_function)(void))
+{
+#ifndef WIN32
+        install_keyboard();
+#endif
+        install_timer();
+        install_int_ex(timer_function,MSEC_TO_TIMER(20));
+        install_joystick(JOY_TYPE_AUTODETECT);
+}
+
 // Called from linux.c (main)
 void video_init_part4(void (*handler_function)(void))
 {
@@ -60,7 +71,20 @@ void video_init_part4(void (*handler_function)(void))
     install_mouse();
 }
 
+int video_set_display_switch_mode_background()
+{
+    return set_display_switch_mode(SWITCH_BACKGROUND);
+}
 
+int video_poll_joystick()
+{
+    return poll_joystick();
+}
+
+void video_rest(unsigned int period)
+{
+    return rest(period);
+}
 
 void video_set_gfx_mode_windowed(int w, int h, int v_w, int v_h)
 {
