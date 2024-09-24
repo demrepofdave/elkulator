@@ -5,17 +5,19 @@
 
 // This is the allegro4 implementation of the abstraction layer.
 
-#include <allegro.h>
+#include <allegro5/allegro.h>
 #include "common/video.h"
 #include "video_internal.h"
 
-BITMAP *b = NULL;    // Main bitmap used before blitting to window screen.
-BITMAP *b16 = NULL;  // Intermediate bitmap 1
-BITMAP *b162 = NULL; // Intermediate bitmap 2
-BITMAP *vidb = NULL; // Windows bitmap
-BITMAP *vp1 = NULL;  // Windows bitmap 1?
-BITMAP *vp2 = NULL;  // Windows bitmap 2?
-BITMAP *bm_screenshot = NULL; // USed for screenshots.
+ALLEGRO_BITMAP *b             = NULL;    // Main bitmap used before blitting to window screen.
+ALLEGRO_BITMAP *b16           = NULL;  // Intermediate bitmap 1
+ALLEGRO_BITMAP *b162          = NULL; // Intermediate bitmap 2
+ALLEGRO_BITMAP *vidb          = NULL; // Windows bitmap
+ALLEGRO_BITMAP *vp1           = NULL;  // Windows bitmap 1?
+ALLEGRO_BITMAP *vp2           = NULL;  // Windows bitmap 2?
+ALLEGRO_BITMAP *bm_screenshot = NULL; // USed for screenshots.
+
+ALLEGRO_LOCKED_REGION *region = NULL; // Region lock on bitmap b (to allow writing of pixels)
 
 PALETTE elkpal =
 {
@@ -29,37 +31,20 @@ PALETTE elkpal =
       {63,63,63},
 };
 
-
-// Called from linux.c (main)
-int video_init_part1()
-{
-    return(allegro_init());
-}
-
-// Called from ula.c (ulainit)
 void video_init_part2()
 {
-    b16=create_bitmap(800*2,600);
-    b162=create_bitmap(640,256);
+    b16 = al_create_bitmap(800*2,600);
+    b162= al_create_bitmap(640,256);
     clear(b16);
     Init_2xSaI(desktop_color_depth());
 }
 
-// Called from ula.c (ulainit)
 void video_init_part3()
 {
     set_color_depth(8);
-    b=create_bitmap(640,616);
+    b = al_create_bitmap(640,616);
     set_palette(elkpal);
 }
-
-// Called from linux.c (main)
-void video_init_part4(void (*handler_function)(void))
-{
-    set_close_button_callback(handler_function);
-    install_mouse();
-}
-
 
 
 void video_set_gfx_mode_windowed(int w, int h, int v_w, int v_h)
@@ -88,18 +73,19 @@ int video_get_desktop_color_depth()
     return(desktop_color_depth());
 }
 
-// TODO: Depricated.
 void video_put_pixel(int y, int x, uint8_t color)
 {
-    b->line[y][x]=color;
+    *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = color;
 }
 
 void video_put_pixel_line(int y, int x, int width, uint8_t color)
 {
-    int count = 0;
-    for(count = 0; count < width; count++)
-    {
-        b->line[y][x + count]=color;
+    int count = width;
+
+    char *ptr = (char *)region->data + region->pitch * y + x * region->pixel_size;
+    while (count--) {
+        *(uint32_t *)ptr = color;
+        ptr += region->pixel_size;
     }
 }
 

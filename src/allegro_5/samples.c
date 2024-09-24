@@ -1,4 +1,4 @@
-#include <allegro.h>
+#include <allegro5/allegro.h>
 #include "common/samples.h"
 
 SAMPLE *seeksmp[4][2];

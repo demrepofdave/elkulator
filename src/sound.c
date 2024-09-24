@@ -1,7 +1,12 @@
 /*Elkulator v1.0 by Sarah Walker
   CSS SN sound chip emulation*/
 
+#ifdef HAL_ALLEGRO_5
+#include <allegro5/allegro.h>
+#else
 #include <allegro.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include "elk.h"

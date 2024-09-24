@@ -2,7 +2,12 @@
   Windows key redefinition*/
 
 #ifdef WIN32
+#ifdef HAL_ALLEGRO_5
+#include <allegro5/allegro.h>
+#else
 #include <allegro.h>
+#endif
+
 #include <winalleg.h>
 #include <stdio.h>
 #include <stdlib.h>

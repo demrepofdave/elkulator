@@ -72,9 +72,9 @@ void initula()
         video_set_gfx_mode_windowed(640,512,0,0);
         winsizex=640; winsizey=512;
         #endif
-        video_init();
+        video_init_part2();
         initpaltables();
-        video_init2();
+        video_init_part3();
         for (c=0;c<256;c++)
         {
                 ulalookup[c]=0;

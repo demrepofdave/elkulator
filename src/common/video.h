@@ -10,8 +10,10 @@
 #define EAGLE     4
 #define PAL       5
 
-void video_init();
-void video_init2();
+int  video_init_part1();                                // Called from main() in linux.c
+void video_init_part2();                                // Called from ulainit() in ula.c
+void video_init_part3();                                // Called from ulainit() in ula.c
+void video_init_part4(void (*handler_function)(void));  // Called from main() in linux.c
 void video_set_gfx_mode_windowed(int w, int h, int v_w, int v_h);
 void video_set_gfx_mode_fullscreen(int w, int h, int v_w, int v_h);
 void video_set_depth_and_elk_palette();

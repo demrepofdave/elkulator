@@ -1,6 +1,11 @@
 /*Elkulator v1.0 by Tom walker
   Initialisation/Closing/Main loop*/
+#ifdef HAL_ALLEGRO_5
+#include <allegro5/allegro.h>
+#else
 #include <allegro.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
