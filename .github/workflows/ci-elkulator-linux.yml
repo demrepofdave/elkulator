@@ -138,7 +138,7 @@ jobs:
         with:
           msystem: UCRT64
           update: true
-          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make
+          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make automake
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: CI-Build
