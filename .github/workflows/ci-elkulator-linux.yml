@@ -127,7 +127,7 @@ jobs:
         run: make elkulator
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
-  build-allegro5-windows-msys2:
+  build-allegro5-win-msys2:
     runs-on: windows-latest
     defaults:
       run:
@@ -138,7 +138,7 @@ jobs:
         with:
           msystem: UCRT64
           update: true
-          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make libtool automake autoconf
+          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make libtool automake autoconf freealut
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: CI-Build
