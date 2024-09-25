@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
                 exit(-1);
         }
         initelk(argc,argv);
-        video_init_part4(native_window_close_button_handler);
+        video_register_close_button_handler(native_window_close_button_handler);
         
         while (!quited)
         {
