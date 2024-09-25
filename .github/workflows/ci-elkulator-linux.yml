@@ -142,8 +142,4 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: CI-Build
-        run: |
-          echo 'Running in MSYS2!'
-          pwd
-          ls -l
-          ./win_make_elkulator.sh
+        run:  ./scripts/autoconfigure.sh --enable-allegro5

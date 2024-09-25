@@ -48,7 +48,7 @@ if test "$enable_allegro5" = "yes"; then
    AC_CHECK_HEADER([allegro5/allegro.h],[],
 	    [AC_MSG_FAILURE([The Allegro version 5 library is needed but not installed], 1)],[])
 else 
-   if test "$OS" != "win"; then
+   if test "$OS" != "Windows_NT"; then
        AM_PATH_ALLEGRO(, , AC_MSG_ERROR(building Elkulator requires Allegro to be installed))
    fi
 fi
