@@ -12,9 +12,10 @@
 
 int  video_init_part1();                                // Called from main() in linux.c
 void video_init_part2();                                // Called from ulainit() in ula.c
-void video_init_part3();                                // Called from ulainit() in ula.
-void video_init_part3a(void (*timer_function)(void));   // Called from initelk() in main.c
-void video_init_part4(void (*handler_function)(void));  // Called from main() in linux.c
+void video_init_part3(void (*timer_function)(void));    // Called from initelk() in main.c
+
+void video_register_close_button_handler(void (*handler_function)(void));
+
 int video_set_display_switch_mode_background();
 int video_poll_joystick();
 void video_rest(unsigned int period);

@@ -37,15 +37,10 @@ void video_init_part2()
     b162= al_create_bitmap(640,256);
     clear(b16);
     Init_2xSaI(desktop_color_depth());
-}
-
-void video_init_part3()
-{
     set_color_depth(8);
     b = al_create_bitmap(640,616);
     set_palette(elkpal);
 }
-
 
 void video_set_gfx_mode_windowed(int w, int h, int v_w, int v_h)
 {

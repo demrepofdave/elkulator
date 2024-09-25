@@ -74,7 +74,6 @@ void initula()
         #endif
         video_init_part2();
         initpaltables();
-        video_init_part3();
         for (c=0;c<256;c++)
         {
                 ulalookup[c]=0;

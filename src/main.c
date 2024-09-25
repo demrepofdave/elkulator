@@ -181,7 +181,7 @@ void initelk(int argc, char *argv[])
         }
         if (defaultwriteprot) writeprot[0]=writeprot[1]=1;
 
-        video_init_part3a(drawitint);
+        video_init_part3(drawitint);
 
         inital();
         initsound();

@@ -43,18 +43,13 @@ void video_init_part2()
     b162=create_bitmap(640,256);
     clear(b16);
     Init_2xSaI(desktop_color_depth());
-}
-
-// Called from ula.c (ulainit)
-void video_init_part3()
-{
     set_color_depth(8);
     b=create_bitmap(640,616);
     set_palette(elkpal);
 }
 
 // Called from main.c (initelk)
-void video_init_part3a(void (*timer_function)(void))
+void video_init_part3(void (*timer_function)(void))
 {
 #ifndef WIN32
         install_keyboard();
@@ -62,13 +57,12 @@ void video_init_part3a(void (*timer_function)(void))
         install_timer();
         install_int_ex(timer_function,MSEC_TO_TIMER(20));
         install_joystick(JOY_TYPE_AUTODETECT);
+        install_mouse();
 }
 
-// Called from linux.c (main)
-void video_init_part4(void (*handler_function)(void))
+void video_register_close_button_handler(void (*handler_function)(void))
 {
     set_close_button_callback(handler_function);
-    install_mouse();
 }
 
 int video_set_display_switch_mode_background()
