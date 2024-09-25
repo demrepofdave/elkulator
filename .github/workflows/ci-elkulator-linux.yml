@@ -12,7 +12,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
@@ -34,7 +34,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
@@ -56,7 +56,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
@@ -79,7 +79,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro5-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure
         run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
@@ -99,7 +99,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro5-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure
         run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
@@ -118,7 +118,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro5-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure
         run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
@@ -133,7 +133,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
