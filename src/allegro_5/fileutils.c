@@ -8,7 +8,7 @@ char * fileutils_get_extension(char * filename)
     if(filename)
     {
         pExtension = filename;
-        while(filename[index] != NULL)
+        while(filename[index] != 0)
         {
             if(filename[index] == '.')
             {
@@ -18,7 +18,7 @@ char * fileutils_get_extension(char * filename)
             index++;
         }
     }
-    if(pExtension && *pExtension == NULL)
+    if(pExtension && *pExtension == 0)
     {
         pExtension = NULL;
     }
