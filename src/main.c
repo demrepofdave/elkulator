@@ -59,8 +59,10 @@ void initelk(int argc, char *argv[])
         int serialnext=0;
         int serialdebugnext=0;
         fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-        p = fileutils_get_filename(exedir);
-        p[0]=0;
+        #ifndef HAL_ALLEGRO_5
+            p = fileutils_get_filename(exedir);
+            p[0] = 0;
+        #endif
         discname[0]=discname2[0]=tapename[0]=0;
         parallelname[0]=0;serialname[0]=0;
         for (int i = 0; i < 16; i++)
