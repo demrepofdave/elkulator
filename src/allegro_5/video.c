@@ -166,7 +166,7 @@ void video_init_part2()
     log_debug("Queue = %p, display = %p\n", queue, display);
     gui_allegro_init(queue, display);
 
-    if (!(timer = al_create_timer(20000)))
+    if (!(timer = al_create_timer(0.002)))
     {
         log_fatal("main: unable to create timer");
         exit(1);
@@ -184,7 +184,6 @@ void video_init_part2()
 // Called from main.c (initelk)
 void video_init_part3(void (*timer_function)(void))
 {
-    al_start_timer(timer);
 }
 
 void video_rest(unsigned int period)
@@ -454,6 +453,11 @@ void video_shutdown()
     //allegro_exit();
 }
 
+void video_start_timer()
+{
+    log_debug("video_start_timer: staring timer %p\n");
+    al_start_timer(timer);
+}
 
 // True if quitting, false if not.
 bool video_await_event()
@@ -461,7 +465,6 @@ bool video_await_event()
     ALLEGRO_EVENT event;
     bool quitting = false;
     bool timer_triggered = false;
-    log_debug("video_await_event: entering\n");
     while (!quitting && !timer_triggered) 
     {
         al_wait_for_event(queue, &event);
@@ -472,13 +475,13 @@ bool video_await_event()
                 quitting = true;
                 break;
             case ALLEGRO_EVENT_TIMER:
-                log_debug("video_await_event: event timer triggered\n");
+                //log_debug("video_await_event: event timer triggered\n");
                 timer_triggered = true;
                 break;
             case ALLEGRO_EVENT_MENU_CLICK:
 //                main_pause("menu active");
                 log_debug("video_await_event: event Menu click\n");
-                gui_allegro_event(&event);
+                quitting = gui_allegro_event(&event);
 //                main_resume();
                 break;
             //case ALLEGRO_EVENT_DISPLAY_RESIZE:
@@ -486,6 +489,5 @@ bool video_await_event()
             //    break;
         }
     }
-    log_debug("video_await_event: end loop\n");
     return quitting;
 }

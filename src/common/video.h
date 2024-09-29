@@ -39,6 +39,7 @@ void video_clearall();
 
 void video_shutdown();
 
+void video_start_timer();
 bool video_await_event();
 
 #endif // _VIDEO_H

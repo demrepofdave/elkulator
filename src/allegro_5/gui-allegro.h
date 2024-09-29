@@ -106,6 +106,6 @@ typedef enum {
 
 extern void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display);
 extern void gui_allegro_destroy(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display);
-extern void gui_allegro_event(ALLEGRO_EVENT *event);
+extern bool gui_allegro_event(ALLEGRO_EVENT *event);
 
 #endif

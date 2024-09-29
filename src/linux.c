@@ -32,6 +32,8 @@ char discname2[260];
 int quited=0;
 int infocus=1;
 
+extern int drawit;
+
 void native_window_close_button_handler(void)
 {
        quited = 1;
@@ -47,12 +49,16 @@ int main(int argc, char *argv[])
         }
         initelk(argc,argv);
         video_register_close_button_handler(native_window_close_button_handler);
-
+        
+        #ifdef HAL_ALLEGRO_5 
+        video_start_timer();
+        #endif // HAL_ALLEGRO_5
 
         while (!quited)
         {
                 #ifdef HAL_ALLEGRO_5        
                         quited = video_await_event();
+                        if(!quited) drawit++;
                 #endif
                 runelk();
                 if (menu_pressed()) entergui();
