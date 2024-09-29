@@ -36,7 +36,7 @@ void fileutils_get_executable_name(char *output, int size)
     }
     else
     {
-        output[0] = (char*) NULL);  // TODO: This should not be used for allegro5
+        output[0] = '\0';  // TODO: This should not be used for allegro5
     }
     al_destroy_path(path);
     return;
