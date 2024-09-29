@@ -144,4 +144,4 @@ jobs:
       - name: Configure
         run:  ./scripts/autoconfigure.sh --enable-allegro5
       - name: Build source
-        run: make elkulator
+        run: make
