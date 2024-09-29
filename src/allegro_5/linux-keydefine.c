@@ -1,7 +1,6 @@
 /*Elkulator v1.0 by Sarah Walker
   Linux keyboard redefinition GUI*/
 
-#ifndef WIN32
 #include <allegro5/allegro.h>
 #include "elk.h"
 #include "common/keyboard.h"
@@ -157,5 +156,3 @@ int menu_pressed()
 {
         return 0;
 }
-
-#endif

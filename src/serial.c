@@ -29,15 +29,16 @@
 
 int serial_irq = 0;
 
+/* Debugging control. */
+
+int serial_debug = 0;
+
+// TODO: Convert following code to be cross platform
+#ifndef WIN32
 /* Socket communication. */
 
 static int socket_fd = -1;
 
-
-
-/* Debugging control. */
-
-int serial_debug = 0;
 
 /* Serial cycle counters. */
 
@@ -1304,3 +1305,5 @@ void pollserial(int cycles)
 
         update_interrupts();
 }
+
+#endif // WIN32 

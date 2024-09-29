@@ -168,8 +168,10 @@ void initelk(int argc, char *argv[])
         initula();
         resetula();
         reset1770();
-        resetparallel();
-        resetserial();
+        #ifndef WIN32
+                resetparallel();
+                resetserial();
+        #endif // WIN32
         
         loadtape(tapename);
         loaddisc(0,discname);
@@ -214,7 +216,9 @@ void runelk()
                 {
                         memset(ram,0,32768);
                         resetula();
-                        resetserial();
+                        #ifndef WIN32
+                                resetserial();
+                        #endif // WIN32
                         reset6502();
                         resetit=0;
                 }

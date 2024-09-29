@@ -1757,7 +1757,9 @@ void exec6502()
                                         plus1stat&=~0x40;
                                 }
                         }
-                        if (plus1) pollserial(oldcycs);
+                        #ifndef WIN32
+                                if (plus1) pollserial(oldcycs);
+                        #endif // WIN32
                 }
                         if (tapespeed==TAPE_REALLY)
                         {

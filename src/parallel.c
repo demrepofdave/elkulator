@@ -4,6 +4,8 @@
   Part of Elkulator by Sarah Walker.
 */
 
+// TODO: Make core cross platform.
+#ifndef WIN32
 #include <string.h>
 #include <unistd.h>
 #include "elk.h"
@@ -37,3 +39,5 @@ void writeparallel(uint8_t val)
         break;
     }
 }
+
+#endif // WIN32

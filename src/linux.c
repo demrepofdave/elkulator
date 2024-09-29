@@ -1,6 +1,5 @@
 /*Elkulator v1.0 by Sarah Walker
   Linux main loop*/
-#ifndef WIN32
 
 #ifdef HAL_ALLEGRO_5
 #include <allegro5/allegro.h>
@@ -62,4 +61,3 @@ int main(int argc, char *argv[])
 END_OF_MAIN();
 #endif // HAL_ALLEGRO_5
 
-#endif // WIN32
