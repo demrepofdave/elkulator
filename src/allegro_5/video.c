@@ -301,10 +301,11 @@ void video_blit_to_screen(int drawMode, int winsizeX, int winsizeY, int colDepth
     switch (drawMode)
     {
         case SCANLINES:
+            al_unlock_bitmap(b);
             al_set_target_backbuffer(al_get_current_display());
 //            al_draw_scaled_bitmap(b, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
             //blit(b,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
-            al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2,0);
+            al_draw_bitmap(b, (winsizeX-640)/2,(winsizeY-512)/2,0);
             break;
 
 /*        case LINEDBL:
@@ -380,6 +381,7 @@ void video_capture_screenshot(int drawMode, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
+            al_unlock_bitmap(b);
             al_set_target_bitmap(bm_screenshot);
             al_draw_bitmap(b16, 0,0,0);
 //            blit(b,bm_screenshot,0,0,0,0,640,512);
@@ -389,6 +391,7 @@ void video_capture_screenshot(int drawMode, int colDepth)
 //            #ifdef WIN32
 //                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
 //            #else
+                al_unlock_bitmap(b);
                 al_set_target_bitmap(bm_screenshot);
                 al_draw_bitmap(b16, 0,0,0);
 //                blit(b16,bm_screenshot,0,0,0,0,640,512);
