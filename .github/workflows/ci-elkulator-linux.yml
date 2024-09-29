@@ -140,6 +140,8 @@ jobs:
           update: true
           install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make libtool automake autoconf mingw-w64-ucrt-x86_64-freealut
       - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: CI-Build
+        uses: actions/checkout@v4
+      - name: Configure
         run:  ./scripts/autoconfigure.sh --enable-allegro5
+      - name: Build source
+        run: make elkulator

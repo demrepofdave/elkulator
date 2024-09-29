@@ -94,10 +94,10 @@ void video_set_gfx_mode_fullscreen(int w, int h, int v_w, int v_h)
     //save_winsizey = al_get_display_height(display);
     if (al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true)) 
     {
-#ifdef WIN32
-        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
-        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
-#endif
+//#ifdef WIN32
+//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
+//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
+//#endif
     }
 }
 
@@ -133,22 +133,22 @@ void video_put_pixel_line(int y, int x, int width, uint8_t color)
     }
 }
 
-#ifdef WIN32
-CRITICAL_SECTION cs;
-#endif
+//#ifdef WIN32
+//CRITICAL_SECTION cs;
+//#endif
 
 void startblit()
 {
-    #ifdef WIN32
-        EnterCriticalSection(&cs);
-    #endif
+//    #ifdef WIN32
+//        EnterCriticalSection(&cs);
+//    #endif
 }
 
 void endblit()
 {
-    #ifdef WIN32
-        LeaveCriticalSection(&cs);
-    #endif
+//    #ifdef WIN32
+//        LeaveCriticalSection(&cs);
+//    #endif
 }
 
 void video_blit_to_screen(int drawMode, int winsizeX, int winsizeY, int colDepth)
@@ -255,13 +255,13 @@ void video_capture_screenshot(int drawMode, int colDepth)
             break;
 
         case LINEDBL:
-            #ifdef WIN32
-                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
-            #else
+//            #ifdef WIN32
+//                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
+//            #else
                 al_set_target_bitmap(bm_screenshot);
                 al_draw_bitmap(b16, 0,0,0);
 //                blit(b16,bm_screenshot,0,0,0,0,640,512);
-            #endif
+//            #endif // WIN32
             break;
 
 /*        case _2XSAI:

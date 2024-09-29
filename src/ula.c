@@ -65,13 +65,13 @@ void initula()
 //        allegro_init();
         coldepth=video_get_desktop_color_depth();
         video_set_desktop_color_depth();
-        #ifdef WIN32
-        video_set_gfx_mode_windowed(2048,2048,0,0);
-        vidb=create_video_bitmap(800,300);
-        #else
+//        #ifdef WIN32
+//        video_set_gfx_mode_windowed(2048,2048,0,0);
+//        vidb=create_video_bitmap(800,300);
+//        #else
         video_set_gfx_mode_windowed(640,512,0,0);
         winsizex=640; winsizey=512;
-        #endif
+//        #endif // WIN32
         video_init_part2();
         initpaltables();
         for (c=0;c<256;c++)
@@ -92,39 +92,39 @@ int fullblit=0;
 
 void enterfullscreen()
 {
-        #ifdef WIN32
-        destroy_bitmap(vidb);
-        #endif
+//        #ifdef WIN32
+//        destroy_bitmap(vidb);
+//        #endif
         video_set_desktop_color_depth();
         video_set_gfx_mode_fullscreen(800,600,0,0);
-        #ifdef WIN32
-        vp1=create_video_bitmap(800,600);
-        vp2=create_video_bitmap(800,600);
-        show_video_bitmap(vp2);
-        vidb=create_video_bitmap(800,300);
-        clear(vidb);
-        install_mouse();
-        #endif
+//        #ifdef WIN32
+//        vp1=create_video_bitmap(800,600);
+//        vp2=create_video_bitmap(800,600);
+//        show_video_bitmap(vp2);
+//        vidb=create_video_bitmap(800,300);
+//        clear(vidb);
+//        install_mouse();
+//        #endif
         video_set_depth_and_elk_palette();
         winsizex=800; winsizey=600;
 }
 
 void leavefullscreen()
 {
-        #ifdef WIN32
-        remove_mouse();
-        destroy_bitmap(vidb);
-        destroy_bitmap(vp2);
-        destroy_bitmap(vp1);
-        #endif
+//        #ifdef WIN32
+//        remove_mouse();
+//        destroy_bitmap(vidb);
+//        destroy_bitmap(vp2);
+//        destroy_bitmap(vp1);
+//        #endif
         video_set_desktop_color_depth();
-        #ifdef WIN32
-        video_set_gfx_mode_windowed(048,2048,0,0);
-        vidb=create_video_bitmap(800,300);
-        #else
+//        #ifdef WIN32
+//        video_set_gfx_mode_windowed(048,2048,0,0);
+//        vidb=create_video_bitmap(800,300);
+//        #else
         video_set_gfx_mode_windowed(640,512,0,0);
         winsizex=640; winsizey=512;
-        #endif
+//        #endif
         video_set_depth_and_elk_palette();
 }
 
