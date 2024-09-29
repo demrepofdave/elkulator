@@ -1,11 +1,18 @@
 /*Elkulator v1.0 by Tom walker
   Initialisation/Closing/Main loop*/
+#ifdef HAL_ALLEGRO_5
+#include <allegro5/allegro.h>
+#else
 #include <allegro.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "common/video.h"
 #include "common/keyboard.h"
+#include "common/fileutils.h"
 #undef printf
 int autoboot;
 FILE *rlog;
@@ -51,9 +58,11 @@ void initelk(int argc, char *argv[])
         int parallelnext=0;
         int serialnext=0;
         int serialdebugnext=0;
-        get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-        p=get_filename(exedir);
-        p[0]=0;
+        fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+        #ifndef HAL_ALLEGRO_5
+            p = fileutils_get_filename(exedir);
+            p[0] = 0;
+        #endif
         discname[0]=discname2[0]=tapename[0]=0;
         parallelname[0]=0;serialname[0]=0;
         for (int i = 0; i < 16; i++)
@@ -159,8 +168,10 @@ void initelk(int argc, char *argv[])
         initula();
         resetula();
         reset1770();
-        resetparallel();
-        resetserial();
+        #ifndef WIN32
+                resetparallel();
+                resetserial();
+        #endif // WIN32
         
         loadtape(tapename);
         loaddisc(0,discname);
@@ -173,12 +184,9 @@ void initelk(int argc, char *argv[])
             if (romnames[i][0] != 0) loadrom_n(i, romnames[i]);
         }
         if (defaultwriteprot) writeprot[0]=writeprot[1]=1;
-#ifndef WIN32
-        install_keyboard();
-#endif
-        install_timer();
-        install_int_ex(drawitint,MSEC_TO_TIMER(20));
-        install_joystick(JOY_TYPE_AUTODETECT);
+
+        video_init_part3(drawitint);
+
         inital();
         initsound();
         loaddiscsamps();
@@ -186,7 +194,7 @@ void initelk(int argc, char *argv[])
 
         keyboard_makelayout();
         
-        set_display_switch_mode(SWITCH_BACKGROUND);
+        video_set_display_switch_mode_background();
 }
 
 int ddnoiseframes=0;
@@ -208,7 +216,9 @@ void runelk()
                 {
                         memset(ram,0,32768);
                         resetula();
-                        resetserial();
+                        #ifndef WIN32
+                                resetserial();
+                        #endif // WIN32
                         reset6502();
                         resetit=0;
                 }
@@ -219,7 +229,7 @@ void runelk()
                 oldbreak = break_pressed();
                 if (wantloadstate) doloadstate();
                 if (wantsavestate) dosavestate();
-                if (infocus) poll_joystick();
+                if (infocus) video_poll_joystick();
                 if (autoboot) autoboot--;
                 ddnoiseframes++;
                 if (ddnoiseframes>=5)
@@ -229,7 +239,7 @@ void runelk()
                 }
         }
         else
-           rest(1);
+           video_rest(1);
 }
 
 void closeelk()

@@ -1,9 +1,14 @@
 /*Elkulator v1.0 by Sarah Walker
   Linux main loop*/
-#ifndef WIN32
 
+#ifdef HAL_ALLEGRO_5
+#include <allegro5/allegro.h>
+#else
 #include <allegro.h>
+#endif
+
 #include "elk.h"
+#include "common/video.h"
 
 char ssname[260];
 char scrshotname[260];
@@ -34,15 +39,15 @@ void native_window_close_button_handler(void)
 
 int main(int argc, char *argv[])
 {
-        int ret = allegro_init();
+        int ret = video_init_part1();
         if (ret != 0)
         {
                 fprintf(stderr, "Error %d initializing Allegro.\n", ret);
                 exit(-1);
         }
         initelk(argc,argv);
-        set_close_button_callback(native_window_close_button_handler);
-        install_mouse();
+        video_register_close_button_handler(native_window_close_button_handler);
+        
         while (!quited)
         {
                 runelk();
@@ -52,6 +57,7 @@ int main(int argc, char *argv[])
         return 0;
 }
 
+#ifndef HAL_ALLEGRO_5
 END_OF_MAIN();
+#endif // HAL_ALLEGRO_5
 
-#endif

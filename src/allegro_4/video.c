@@ -29,21 +29,56 @@ PALETTE elkpal =
       {63,63,63},
 };
 
-void video_init()
+
+// Called from linux.c (main)
+int video_init_part1()
+{
+    return(allegro_init());
+}
+
+// Called from ula.c (ulainit)
+void video_init_part2()
 {
     b16=create_bitmap(800*2,600);
     b162=create_bitmap(640,256);
     clear(b16);
     Init_2xSaI(desktop_color_depth());
-}
-
-void video_init2()
-{
     set_color_depth(8);
     b=create_bitmap(640,616);
     set_palette(elkpal);
 }
 
+// Called from main.c (initelk)
+void video_init_part3(void (*timer_function)(void))
+{
+#ifndef WIN32
+        install_keyboard();
+#endif
+        install_timer();
+        install_int_ex(timer_function,MSEC_TO_TIMER(20));
+        install_joystick(JOY_TYPE_AUTODETECT);
+        install_mouse();
+}
+
+void video_register_close_button_handler(void (*handler_function)(void))
+{
+    set_close_button_callback(handler_function);
+}
+
+int video_set_display_switch_mode_background()
+{
+    return set_display_switch_mode(SWITCH_BACKGROUND);
+}
+
+int video_poll_joystick()
+{
+    return poll_joystick();
+}
+
+void video_rest(unsigned int period)
+{
+    return rest(period);
+}
 
 void video_set_gfx_mode_windowed(int w, int h, int v_w, int v_h)
 {

@@ -6,7 +6,7 @@ int debug;
 int indebug=0;
 extern int fcount;
 
-#ifdef WIN32
+#if 0
 #include <winalleg.h>
 #include <wingdi.h>
 #include <process.h>
@@ -491,12 +491,12 @@ void dodebugger()
                 debugdisaddr=d;
                 sprintf(outs,"  >");
                 debugout(outs);
-#ifdef WIN32
-                c=ReadConsoleA(cinf,ins,255,(LPDWORD)&d,NULL);
-                ins[d]=0;
-#else
+//#ifdef WIN32
+//                c=ReadConsoleA(cinf,ins,255,(LPDWORD)&d,NULL);
+//                ins[d]=0;
+//#else
 		fgets(ins,255,stdin);
-#endif
+//#endif
                 d=0;
                 while (ins[d]!=32 && ins[d]!=0xA && ins[d]!=0xD && ins[d]!=0) d++;
                 while (ins[d]==32) d++;

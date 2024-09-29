@@ -198,7 +198,9 @@ uint8_t readmem(uint16_t addr)
                     if (addr==0xFC70) return readadc();
                     if (addr==0xFC72) return getplus1stat();
             }
-            if (addr>=0xFC60 && addr<=0xFC6F && plus1) return readserial(addr);
+            #ifndef WIN32
+                if (addr>=0xFC60 && addr<=0xFC6F && plus1) return readserial(addr);
+            #endif
 
             /* Allow the JIM paging register to be read if enabled directly or
                indirectly. */
@@ -307,8 +309,10 @@ void writemem(uint16_t addr, uint8_t val)
 //                if (!val) output=1;
         }
         if (addr==0xFC70 && plus1) writeadc(val);
-        if (addr>=0xFC60 && addr<=0xFC6F && plus1) return writeserial(addr, val);
-        if (addr==0xFC71 && plus1) writeparallel(val);
+        #ifndef WIN32
+                if (addr>=0xFC60 && addr<=0xFC6F && plus1) return writeserial(addr, val);
+                if (addr==0xFC71 && plus1) writeparallel(val);
+        #endif // WIN32
         /* The Mega Games Cartridge uses FC00 to select pairs of 16K banks in
            the two sets of ROMs. */
         if (enable_mgc && (addr == 0xfc00)) {

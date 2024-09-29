@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// TODO: Convert code to win32 compatible code.
+#ifndef WIN32
+
 #include <fcntl.h>
 #include <poll.h>
 #include <stdio.h>
@@ -85,3 +88,5 @@ int socket_open(const char *filename)
 
 	return socket_fd;
 }
+
+#endif // WIN32

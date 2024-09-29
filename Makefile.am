@@ -24,14 +24,16 @@ endif
 
 if ENABLE_ALLEGRO5
 elkulator_hal_src = src/allegro_5/adc.c  \
-                    src/allegro_5/soundopenal.c \
                     src/allegro_5/firstbyte.c \
-                    src/allegro_5/linux-gui.c \
-                    src/allegro_5/linux-keydefine.c \
-                    src/allegro_5/video.c \
+                    src/allegro_5/fileutils.c \
+                    src/allegro_5/gui-allegro.c \
                     src/allegro_5/keyboard.c \
-                    src/allegro_5/sample.c \
-                    src/allegro_5/fileutils.c
+                    src/allegro_5/linux-keydefine.c \
+                    src/allegro_5/palfilt.c \
+                    src/allegro_5/samples.c \
+                    src/allegro_5/soundopenal.c \
+                    src/allegro_5/video.c
+
 
 else
 elkulator_hal_src = src/allegro_4/2xsai.c \

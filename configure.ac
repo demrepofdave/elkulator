@@ -47,12 +47,19 @@ AM_CONDITIONAL(OS_LINUX, test "$OS" = "linux")
 if test "$enable_allegro5" = "yes"; then
    AC_CHECK_HEADER([allegro5/allegro.h],[],
 	    [AC_MSG_FAILURE([The Allegro version 5 library is needed but not installed], 1)],[])
+   AC_CHECK_LIB([allegro], [al_install_system])
+   AC_CHECK_LIB([allegro_acodec], [al_init_acodec_addon])
+   AC_CHECK_LIB([allegro_audio], [al_install_audio])
+   AC_CHECK_LIB([allegro_dialog], [al_init_native_dialog_addon])
+   AC_CHECK_LIB([allegro_image], [al_init_image_addon])
+   AC_CHECK_LIB([allegro_primitives], [al_init_primitives_addon])
 else 
-   if test "$OS" != "win"; then
+   if test "$OS" != "Windows_NT"; then
        AM_PATH_ALLEGRO(, , AC_MSG_ERROR(building Elkulator requires Allegro to be installed))
    fi
 fi
 
+# Checks for libraries.
 AC_CHECK_LIB([z], [gzopen], [], \
 	[echo "You need to install the zlib library."
 	 exit -1])

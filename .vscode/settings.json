@@ -7,6 +7,9 @@
         "video.h": "c",
         "allegro.h": "c",
         "keyboard.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "allegro_audio.h": "c",
+        "samples.h": "c",
+        "allegro_acodec.h": "c"
     }
 }

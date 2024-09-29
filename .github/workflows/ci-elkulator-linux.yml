@@ -12,7 +12,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
@@ -34,7 +34,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
@@ -56,7 +56,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro4-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
@@ -79,7 +79,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro5-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure
         run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
@@ -99,7 +99,7 @@ jobs:
          sudo apt-get update
          sudo apt-get install -y automake liballegro5-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure
         run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
@@ -115,11 +115,10 @@ jobs:
       - run: echo "Branch is ${{ github.ref }}, repository is ${{ github.repository }}."
       - name: Install required apt files
         run: |
-         sudo add-apt-repository ppa:allegro/5.2
          sudo apt-get update
          sudo apt-get install -y automake liballegro5-dev zlib1g-dev libalut-dev libopenal-dev cppcheck
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure
         run: ./scripts/autoconfigure.sh --enable-allegro5
       - name: Check source (cppcheck)
@@ -128,23 +127,21 @@ jobs:
         run: make elkulator
       - run: echo "Job Complete.  Status job ${{ job.status }}."
 
-  build-allegro5-windows-msys2:
+  build-allegro5-win-msys2:
     runs-on: windows-latest
     defaults:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
           update: true
-          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make
+          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make libtool automake autoconf mingw-w64-ucrt-x86_64-freealut
       - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: CI-Build
-        run: |
-          echo 'Running in MSYS2!'
-          pwd
-          ls -l
-          ./win_make_elkulator.sh
+        uses: actions/checkout@v4
+      - name: Configure
+        run:  ./scripts/autoconfigure.sh --enable-allegro5
+      - name: Build source
+        run: make
