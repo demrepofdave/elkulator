@@ -471,15 +471,26 @@ static ALLEGRO_MENU *create_debug_menu(void)
 void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display)
 {
     ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "File", 0, 0, NULL, create_file_menu());
-    al_append_menu_item(menu, "Edit", 0, 0, NULL, create_edit_menu());
-    al_append_menu_item(menu, "Disc", 0, 0, NULL, create_disc_menu());
-    al_append_menu_item(menu, "Tape", 0, 0, NULL, create_tape_menu());
-    al_append_menu_item(menu, "ROM", 0, 0, NULL, create_rom_menu());
-    al_append_menu_item(menu, "Model", 0, 0, NULL, create_model_menu());
-    al_append_menu_item(menu, "Settings", 0, 0, NULL, create_settings_menu());
-    al_append_menu_item(menu, "Speed", 0, 0, NULL, create_speed_menu());
-    al_append_menu_item(menu, "Debug", 0, 0, NULL, create_debug_menu());
+    printf("Menu = %p\n");
+
+    int res = al_append_menu_item(menu, "File", 0, 0, NULL, create_file_menu());
+    printf("File=%d\n",res);
+    res = al_append_menu_item(menu, "Edit", 0, 0, NULL, create_edit_menu());
+    printf("File=%d\n",res);
+    res = al_append_menu_item(menu, "Disc", 0, 0, NULL, create_disc_menu());
+    printf("File=%d\n",res);
+    res = al_append_menu_item(menu, "Tape", 0, 0, NULL, create_tape_menu());
+    printf("File=%d\n",res);
+    res = al_append_menu_item(menu, "ROM", 0, 0, NULL, create_rom_menu());
+    printf("File=%d\n",res);
+    res = al_append_menu_item(menu, "Model", 0, 0, NULL, create_model_menu());
+    printf("File=%d\n",res);
+    res = al_append_menu_item(menu, "Settings", 0, 0, NULL, create_settings_menu());
+    printf("File=%d\n",res);
+    res = al_append_menu_item(menu, "Speed", 0, 0, NULL, create_speed_menu());
+    printf("File=%d\n",res);
+    res = al_append_menu_item(menu, "Debug", 0, 0, NULL, create_debug_menu());
+    printf("File=%d\n",res);
     al_set_display_menu(display, menu);
     al_register_event_source(queue, al_get_default_menu_event_source());
 }

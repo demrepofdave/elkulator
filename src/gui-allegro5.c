@@ -444,18 +444,18 @@ void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display)
 {
     ALLEGRO_MENU *menu = al_create_menu();
     printf("Menu = %p\n");
-    int res = al_append_menu_item(menu, "File", 0, 0, NULL, create_file_menu());
+    //int res = al_append_menu_item(menu, "File", 0, 0, NULL, create_file_menu());
+    //printf("Res = %d", res);
+    //res = al_append_menu_item(menu, "Tape", 0, 0, NULL, create_tape_menu());
+    //printf("Res = %d", res);
+    //res = al_append_menu_item(menu, "Disc", 0, 0, NULL, create_disc_menu());
+    //printf("Res = %d", res);
+    //res = al_append_menu_item(menu, "ROM", 0, 0, NULL, create_rom_menu());
+    //printf("Res = %d", res);
+    int res = al_append_menu_item(menu, "Settings", 0, 0, NULL, create_settings_menu());
     printf("Res = %d", res);
-    res = al_append_menu_item(menu, "Tape", 0, 0, NULL, create_tape_menu());
-    printf("Res = %d", res);
-    res = al_append_menu_item(menu, "Disc", 0, 0, NULL, create_disc_menu());
-    printf("Res = %d", res);
-    res = al_append_menu_item(menu, "ROM", 0, 0, NULL, create_rom_menu());
-    printf("Res = %d", res);
-    res = al_append_menu_item(menu, "Settings", 0, 0, NULL, create_settings_menu());
-    printf("Res = %d", res);
-    res = al_append_menu_item(menu, "Misc", 0, 0, NULL, create_misc_menu());
-    printf("Res = %d", res);
+    //res = al_append_menu_item(menu, "Misc", 0, 0, NULL, create_misc_menu());
+    //printf("Res = %d", res);
     if(al_set_display_menu(display, menu))
     {
         printf("al_set_display_menu ok\n");
