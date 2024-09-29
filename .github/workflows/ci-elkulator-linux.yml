@@ -138,7 +138,7 @@ jobs:
         with:
           msystem: UCRT64
           update: true
-          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make libtool automake autoconf freealut
+          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-allegro make libtool automake autoconf mingw-w64-x86_64-freealut
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: CI-Build
