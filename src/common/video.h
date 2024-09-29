@@ -2,6 +2,7 @@
 #define _VIDEO_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define SCANLINES 0
 #define LINEDBL   1
@@ -37,5 +38,7 @@ void video_destroy_screenshot();
 void video_clearall();
 
 void video_shutdown();
+
+bool video_await_event();
 
 #endif // _VIDEO_H

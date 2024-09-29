@@ -47,13 +47,18 @@ int main(int argc, char *argv[])
         }
         initelk(argc,argv);
         video_register_close_button_handler(native_window_close_button_handler);
-        
+
+
         while (!quited)
         {
+                #ifdef HAL_ALLEGRO_5        
+                        quited = video_await_event();
+                #endif
                 runelk();
                 if (menu_pressed()) entergui();
         }
         closeelk();
+
         return 0;
 }
 

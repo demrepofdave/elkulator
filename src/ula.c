@@ -62,7 +62,6 @@ uint8_t ulalookup[256];
 void initula()
 {
         int c;
-//        allegro_init();
         coldepth=video_get_desktop_color_depth();
         video_set_desktop_color_depth();
 //        #ifdef WIN32
