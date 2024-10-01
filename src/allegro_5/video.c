@@ -128,7 +128,7 @@ int video_init_part1()
     //        table4bpp[0][temp][c] = table4bpp[3][temp][c >> 3];
     //    }
     //}
-    b = al_create_bitmap(1280, 800);
+    b = al_create_bitmap(640, 616);
     al_set_target_bitmap(b);
     al_clear_to_color(al_map_rgb(0, 0,0));
     region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
@@ -160,8 +160,8 @@ int video_init_part1()
 
 void video_init_part2()
 {
-    ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
-    b = al_create_bitmap(640,616);
+    //ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
+    //b = al_create_bitmap(640,616);
 
     log_debug("Queue = %p, display = %p\n", queue, display);
     gui_allegro_init(queue, display);
@@ -250,7 +250,7 @@ int video_get_desktop_color_depth()
 
 void video_put_pixel(int y, int x, uint8_t color)
 {
-    *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = color;
+        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = color;
 }
 
 void video_put_pixel_line(int y, int x, int width, uint8_t color)
@@ -303,9 +303,10 @@ void video_blit_to_screen(int drawMode, int winsizeX, int winsizeY, int colDepth
         case SCANLINES:
             al_unlock_bitmap(b);
             al_set_target_backbuffer(al_get_current_display());
-//            al_draw_scaled_bitmap(b, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
+            al_draw_scaled_bitmap(b, 0,0,640,512, 0,0,640,512, 0);
             //blit(b,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
-            al_draw_bitmap(b, (winsizeX-640)/2,(winsizeY-512)/2,0);
+            //al_draw_bitmap(b, (winsizeX-640)/2,(winsizeY-512)/2,0);
+            //al_draw_bitmap(b, 0,0,0);
             break;
 
 /*        case LINEDBL:
@@ -359,6 +360,7 @@ void video_blit_to_screen(int drawMode, int winsizeX, int winsizeY, int colDepth
             al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
             break;*/
     }
+    region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
     endblit();
 }
 
