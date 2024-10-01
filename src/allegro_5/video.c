@@ -250,7 +250,22 @@ int video_get_desktop_color_depth()
 
 void video_put_pixel(int y, int x, uint8_t color)
 {
+    ALLEGRO_COLOR black = al_map_rgb(0,0,0);
+    ALLEGRO_COLOR white = al_map_rgb(63,63,63);
+
+    // Test code.
+    //al_set_target_bitmap(b);
+    if(color == 0)
+    {
+        //al_put_pixel(x, y, black);
         *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = color;
+    }
+    else
+    {
+        //al_put_pixel(x, y, white);
+        //al_put_pixel(int x, int y, ALLEGRO_COLOR color)
+        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = color;
+    }
 }
 
 void video_put_pixel_line(int y, int x, int width, uint8_t color)
@@ -361,6 +376,7 @@ void video_blit_to_screen(int drawMode, int winsizeX, int winsizeY, int colDepth
             break;*/
     }
     region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+    al_flip_display();
     endblit();
 }
 
