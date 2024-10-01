@@ -258,13 +258,13 @@ void video_put_pixel(int y, int x, uint8_t color)
     if(color == 0)
     {
         //al_put_pixel(x, y, black);
-        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = color;
+        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = 0xff000000;
     }
     else
     {
         //al_put_pixel(x, y, white);
         //al_put_pixel(int x, int y, ALLEGRO_COLOR color)
-        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = color;
+        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = 0xffffffff;
     }
 }
 
