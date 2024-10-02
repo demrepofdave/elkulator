@@ -92,9 +92,9 @@ void video_set_gfx_mode_windowed()
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, main_window.winsizex, main_window.winsizey, 0,0);
 }
 
-void video_set_gfx_mode_fullscreen(int w, int h, int v_w, int v_h)
+void video_set_gfx_mode_fullscreen()
 {
-    set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, w, h, v_w, v_h);
+    set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, main_window.winsizex, main_window.winsizey, 0, 0);
 }
 
 void video_set_depth_and_elk_palette()

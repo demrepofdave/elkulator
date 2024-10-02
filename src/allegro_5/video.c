@@ -72,8 +72,6 @@ int video_init_part1()
         exit(1);
     }
 
-    winsizex = 800; // TODO: Temp till initial window is created.
-    winsizey = 600; // TODO: Temp till initial window is created.
 #ifdef ALLEGRO_GTK_TOPLEVEL
     al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_GTK_TOPLEVEL | ALLEGRO_RESIZABLE);
 #else
@@ -170,7 +168,7 @@ void video_init_part2()
     log_debug("Queue = %p, display = %p\n", queue, display);
     gui_allegro_init(queue, display);
 
-    if (!(timer = al_create_timer(0.002)))
+    if (!(timer = al_create_timer(0.005)))
     {
         log_fatal("main: unable to create timer");
         exit(1);
@@ -195,11 +193,18 @@ void video_rest(unsigned int period)
     return;
 }
 
-void video_set_gfx_mode_windowed(int w, int h, int v_w, int v_h)
+void video_set_window_size(int w, int h, int v_w, int v_h)
+{
+    main_window.winsizex = w;
+    main_window.winsizey = h;
+}
+
+
+void video_set_gfx_mode_windowed()
 {
     ALLEGRO_DISPLAY *display;
     display = al_get_current_display();
-    al_resize_display(display, 800, 600);
+    al_resize_display(display, main_window.winsizex,  main_window.winsizey);
     al_set_display_flag(display, ALLEGRO_MAXIMIZED, false);
     al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
@@ -222,7 +227,7 @@ int video_poll_joystick()
     return 0;
 }
 
-void video_set_gfx_mode_fullscreen(int w, int h, int v_w, int v_h)
+void video_set_gfx_mode_fullscreen()
 {
     ALLEGRO_DISPLAY *display = al_get_current_display();
     //save_winsizex = al_get_display_width(display);
@@ -300,7 +305,7 @@ void endblit()
 //    #endif
 }
 
-void video_blit_to_screen(int drawMode, int winsizeX, int winsizeY, int colDepth)
+void video_blit_to_screen(int drawMode, int colDepth)
 {
     int c;
     //int firstx = 0;

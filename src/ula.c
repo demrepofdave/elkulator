@@ -86,19 +86,9 @@ int fullblit=0;
 
 void enterfullscreen()
 {
-//        #ifdef WIN32
-//        destroy_bitmap(vidb);
-//        #endif
         video_set_desktop_color_depth();
-        video_set_gfx_mode_fullscreen(800,600,0,0);
-//        #ifdef WIN32
-//        vp1=create_video_bitmap(800,600);
-//        vp2=create_video_bitmap(800,600);
-//        show_video_bitmap(vp2);
-//        vidb=create_video_bitmap(800,300);
-//        clear(vidb);
-//        install_mouse();
-//        #endif
+        video_set_window_size(800,600, 0, 0);
+        video_set_gfx_mode_fullscreen();
         video_set_depth_and_elk_palette();
         video_set_window_size(800,600, 0, 0);
 }

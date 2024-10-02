@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
                         {
                                 drawit++;
                         }
+                        if(elkEvent & ELK_EVENT_RESET)
+                        {
+                                resetit = 1;
+                        }
                         runelk();
                 }
         #else

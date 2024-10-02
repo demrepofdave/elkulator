@@ -35,7 +35,7 @@ void video_rest(unsigned int period);  // Only used in allegro4.
 
 void video_set_window_size(int w, int h, int v_w, int v_h);
 void video_set_gfx_mode_windowed();
-void video_set_gfx_mode_fullscreen(int w, int h, int v_w, int v_h);
+void video_set_gfx_mode_fullscreen();
 void video_set_depth_and_elk_palette();
 void video_set_desktop_color_depth();
 int  video_get_desktop_color_depth();
