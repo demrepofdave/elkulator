@@ -168,7 +168,7 @@ void video_init_part2()
     log_debug("Queue = %p, display = %p\n", queue, display);
     gui_allegro_init(queue, display);
 
-    if (!(timer = al_create_timer(0.005)))
+    if (!(timer = al_create_timer(0.02)))
     {
         log_fatal("main: unable to create timer");
         exit(1);

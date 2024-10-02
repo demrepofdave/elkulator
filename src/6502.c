@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "elk.h"
 #include "logger.h"
+#include "config_vars.h"
 
 int timetolive;
 int ins=0;
@@ -1765,7 +1766,7 @@ void exec6502()
                                 if (plus1) pollserial(oldcycs);
                         #endif // WIN32
                 }
-                        if (tapespeed==TAPE_REALLY)
+                        if (tapespeed==TAPE_REALLY_FAST)
                         {
                                 if (pc==0xF699 || pc==0xF7E5 || (pc==0xfa51 && p.z))
                                 {

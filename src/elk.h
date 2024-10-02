@@ -87,12 +87,6 @@ extern int drawmode;
 #define HALFSIZE   (drawmode==_2XSAI || drawmode==SCALE2X || drawmode==EAGLE)
 #define LINEDOUBLE (drawmode==SCANLINES || drawmode==PAL)
 
-#define TAPE_SLOW 0
-#define TAPE_FAST 1
-#define TAPE_REALLY 2
-extern int tapespeed;
-
-
 struct drives
 {
         void (*seek)(int drive, int track);

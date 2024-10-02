@@ -4,6 +4,7 @@
 #include <string.h>
 #include <zlib.h>
 #include "elk.h"
+#include "config_vars.h"
 #include "common/video.h"
 
 void dosavescrshot();

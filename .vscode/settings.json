@@ -11,6 +11,7 @@
         "allegro_audio.h": "c",
         "samples.h": "c",
         "allegro_acodec.h": "c",
-        "gui-allegro.h": "c"
+        "gui-allegro.h": "c",
+        "config_vars.h": "c"
     }
 }

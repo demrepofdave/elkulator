@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "config_vars.h"
 #include "common/video.h"
 #include "common/keyboard.h"
 #include "common/fileutils.h"
