@@ -33,9 +33,6 @@ static ALLEGRO_TIMER *timer;
 ALLEGRO_EVENT_QUEUE *queue;
 static ALLEGRO_EVENT_SOURCE evsrc;
 
-extern int winsizex, winsizey;
-
-
 uint32_t elkpal[8] =
 {
     0xff000000,
@@ -47,13 +44,6 @@ uint32_t elkpal[8] =
     0xffffff00,
     0xffffffff
 };
-
-typedef struct
-{
-    int winsizex; // Current window size in ???
-    int winsizey; // Current window size in ???
-    bool maintain_aspect; // If true maintain 4:3 aspect ration (used recalce winsizey based on winsizex)
-} WindowCoords;
 
 WindowCoords main_window;
 
@@ -98,7 +88,7 @@ int video_init_part1()
     }
     //video_set_window_size(true);
 
-    if ((display = al_create_display(winsizex, winsizey)) == NULL) {
+    if ((display = al_create_display(main_window.winsizex, main_window.winsizey)) == NULL) {
         log_fatal("video: unable to create display");
         exit(1);
     }

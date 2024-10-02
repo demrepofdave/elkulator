@@ -64,13 +64,8 @@ void initula()
         int c;
         coldepth=video_get_desktop_color_depth();
         video_set_desktop_color_depth();
-//        #ifdef WIN32
-//        video_set_gfx_mode_windowed(2048,2048,0,0);
-//        vidb=create_video_bitmap(800,300);
-//        #else
-        video_set_gfx_mode_windowed(640,512,0,0);
-        winsizex=640; winsizey=512;
-//        #endif // WIN32
+        video_set_window_size(640,512,0,0);
+        video_set_gfx_mode_windowed();
         video_init_part2();
         initpaltables();
         for (c=0;c<256;c++)
@@ -105,7 +100,7 @@ void enterfullscreen()
 //        install_mouse();
 //        #endif
         video_set_depth_and_elk_palette();
-        winsizex=800; winsizey=600;
+        video_set_window_size(800,600, 0, 0);
 }
 
 void leavefullscreen()
@@ -121,8 +116,8 @@ void leavefullscreen()
 //        video_set_gfx_mode_windowed(048,2048,0,0);
 //        vidb=create_video_bitmap(800,300);
 //        #else
-        video_set_gfx_mode_windowed(640,512,0,0);
-        winsizex=640; winsizey=512;
+        video_set_window_size(640,512,0,0);
+        video_set_gfx_mode_windowed();
 //        #endif
         video_set_depth_and_elk_palette();
 }
@@ -779,7 +774,7 @@ void yield()
                                         
                                         if (ula.draw)
                                         {
-                                                video_blit_to_screen(drawmode, winsizex, winsizey, coldepth);
+                                                video_blit_to_screen(drawmode, coldepth);
                                                 //startblit()
                                                 if (wantsavescrshot) dosavescrshot();
                                                 if (wantmovieframe) saveframe();
