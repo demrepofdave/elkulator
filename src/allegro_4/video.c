@@ -29,6 +29,7 @@ PALETTE elkpal =
       {63,63,63},
 };
 
+WindowCoords main_window;
 
 // Called from linux.c (main)
 int video_init_part1()
@@ -80,14 +81,20 @@ void video_rest(unsigned int period)
     return rest(period);
 }
 
-void video_set_gfx_mode_windowed(int w, int h, int v_w, int v_h)
+void video_set_window_size(int w, int h, int v_w, int v_h)
 {
-    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
+    main_window.winsizex = w;
+    main_window.winsizey = h;
 }
 
-void video_set_gfx_mode_fullscreen(int w, int h, int v_w, int v_h)
+void video_set_gfx_mode_windowed()
 {
-    set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, w, h, v_w, v_h);
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED, main_window.winsizex, main_window.winsizey, 0,0);
+}
+
+void video_set_gfx_mode_fullscreen()
+{
+    set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, main_window.winsizex, main_window.winsizey, 0, 0);
 }
 
 void video_set_depth_and_elk_palette()
@@ -139,14 +146,14 @@ void endblit()
     #endif
 }
 
-void video_blit_to_screen(int drawMode, int winsizeX, int winsizeY, int colDepth)
+void video_blit_to_screen(int drawMode, int colDepth)
 {
     int c;
     startblit();
     switch (drawMode)
     {
         case SCANLINES:
-            blit(b,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
+            blit(b,screen,0,0,(main_window.winsizex-640)/2,(main_window.winsizey-512)/2,640,512);
             break;
 
         case LINEDBL:
@@ -159,31 +166,31 @@ void video_blit_to_screen(int drawMode, int winsizeX, int winsizeY, int colDepth
                 {
                     blit(b,b16,0,c>>1,0,c,640,1);
                 }
-                blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
+                blit(b16,screen,0,0,(main_window.winsizex-640)/2,(main_window.winsizey-512)/2,640,512);
             #endif
             break;
 
         case _2XSAI:
             blit(b,b162,0,0,0,0,640,256);
             Super2xSaI(b162,b16,0,0,0,0,320,256);
-            blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
+            blit(b16,screen,0,0,(main_window.winsizex-640)/2,(main_window.winsizey-512)/2,640,512);
             break;
 
         case SCALE2X:
             blit(b,b162,0,0,0,0,640,256);
             scale2x(b162,b16,320,256);
-            blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
+            blit(b16,screen,0,0,(main_window.winsizex-640)/2,(main_window.winsizey-512)/2,640,512);
             break;
 
         case EAGLE:
             blit(b,b162,0,0,0,0,640,256);
             SuperEagle(b162,b16,0,0,0,0,320,256);
-            blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
+            blit(b16,screen,0,0,(main_window.winsizex-640)/2,(main_window.winsizey-512)/2,640,512);
             break;
 
         case PAL: // TODO: Not currently working (blank screen)
             palfilter(b,b16,colDepth);
-            blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
+            blit(b16,screen,0,0,(main_window.winsizex-640)/2,(main_window.winsizey-512)/2,640,512);
             break;
     }
     endblit();

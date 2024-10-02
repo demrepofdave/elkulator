@@ -1,5 +1,7 @@
 #include <allegro5/allegro_native_dialog.h>
+#include "common/video.h"
 #include "gui-allegro.h"
+#include "logger.h"
 
 /* pclose() and popen() on Windows are _pclose() and _popen() */
 #ifdef _WIN32
@@ -11,7 +13,6 @@ typedef struct {
     const char *label;
     int itemno;
 } menu_map_t;
-
 
 // Private functions.
 
@@ -93,9 +94,22 @@ static int radio_event_with_deselect(ALLEGRO_EVENT *event, int current)
     return num;
 }
 
+/*MENU filemenu[6]=
+{
+        {"&Return",gui_return,NULL,0,NULL},
+        {"&Hard reset",gui_reset,NULL,0,NULL},
+        {"&Load state",gui_loads,NULL,0,NULL},
+        {"&Save state",gui_saves,NULL,0,NULL},
+        {"&Exit",gui_exit,NULL,0,NULL},
+        {NULL,NULL,NULL,0,NULL}
+};*/
 static ALLEGRO_MENU *create_file_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
+
+    al_append_menu_item(menu, "Hard Reset", IDM_FILE_HARD_RESET, 0, NULL, NULL);
+//    al_append_menu_item(menu, "Load state...", IDM_FILE_LOAD_STATE, 0, NULL, NULL);
+//    al_append_menu_item(menu, "Save State...", IDM_FILE_SAVE_STATE, 0, NULL, NULL);
     al_append_menu_item(menu, "Exit", IDM_FILE_EXIT, 0, NULL, NULL);
     return menu;
 }
@@ -104,6 +118,7 @@ static ALLEGRO_MENU *create_file_menu(void)
 
 void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display)
 {
+    log_debug("gui_allegro_init\n");
     ALLEGRO_MENU *menu = al_create_menu();
     al_append_menu_item(menu, "File", 0, 0, NULL, create_file_menu());
     al_set_display_menu(display, menu);
@@ -119,16 +134,22 @@ void gui_allegro_destroy(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display)
 static const char all_dext[] = "*.ssd;*.dsd;*.img;*.adf;*.ads;*.adm;*.adl;*.sdd;*.ddd;*.fdi;*.imd;*.hfe;"
                                "*.SSD;*.DSD;*.IMG;*.ADF;*.ADS;*.ADM;*.ADL;*.SDD;*.DDD;*.FDI;*.IMD;*.HFE";
 
-void gui_allegro_event(ALLEGRO_EVENT *event)
+uint32_t gui_allegro_event(ALLEGRO_EVENT *event)
 {
+    uint32_t elkEvent = 0;
     switch(menu_get_id(event)) 
     {
         case IDM_ZERO:
             break;
         case IDM_FILE_EXIT:
-//            quitting = true;
+            elkEvent = ELK_EVENT_EXIT;
+            break;
+        case IDM_FILE_HARD_RESET:
+            elkEvent = ELK_EVENT_RESET;
             break;
     }
+    log_debug("gui_allegro_event elkEvent = 0x%02x\n", elkEvent);
+    return(elkEvent);
 }
 
 void entergui()

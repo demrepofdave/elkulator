@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "elk.h"
+#include "logger.h"
 
 int timetolive;
 int ins=0;
@@ -1687,11 +1688,14 @@ void exec6502()
                 }
 //                if (output) rpclog("%04X : %02X %02X %02X %02X\n",pc,a,x,y,s);
 //                if (pc==0x1000) rpclog("Loop!\n");
-/*                if (pc==0xFFEE)
-                {
-                        printf("Printing %02X %c\n",a,a);
+//                if (pc==0xFFEE)
+//                {
+//                        if ((a > 31 && a < 127) || a == 0x0a || a == 0x0d)
+//                        {
+//                                log_debug("%c",a);
 //                        output=1;
-                }*/
+//                        }
+//                }
                 yield();
                 if (realnmi)
                 {

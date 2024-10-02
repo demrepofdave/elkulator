@@ -3,15 +3,9 @@
 
 typedef enum {
     IDM_ZERO,
-    IDM_FILE_RESET,
+    IDM_FILE_HARD_RESET,
     IDM_FILE_LOAD_STATE,
     IDM_FILE_SAVE_STATE,
-    IDM_FILE_SCREEN_SHOT,
-    IDM_FILE_PRINT,
-    IDM_FILE_PCMD,
-    IDM_FILE_SERIAL,
-    IDM_FILE_PAULAREC,
-    IDM_FILE_SOUNDREC,
     IDM_FILE_EXIT,
     IDM_EDIT_PASTE,
     IDM_EDIT_COPY,
@@ -106,6 +100,6 @@ typedef enum {
 
 extern void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display);
 extern void gui_allegro_destroy(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display);
-extern void gui_allegro_event(ALLEGRO_EVENT *event);
+extern uint32_t gui_allegro_event(ALLEGRO_EVENT *event);
 
 #endif

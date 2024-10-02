@@ -13,7 +13,6 @@ extern "C" {
 void rpclog(char *format, ...);
 
 extern int videoresize;
-extern int winsizex, winsizey;
 
 extern uint8_t a,x,y,s;
 extern uint16_t pc;
