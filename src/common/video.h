@@ -11,6 +11,11 @@
 #define EAGLE     4
 #define PAL       5
 
+// Following allegro5 only.
+#define ELK_EVENT_EXIT  0x01
+#define ELK_EVENT_RESET 0x02
+#define ELK_EVENT_TIMER_TRIGGERED 0x04
+
 int  video_init_part1();                                // Called from main() in linux.c
 void video_init_part2();                                // Called from ulainit() in ula.c
 void video_init_part3(void (*timer_function)(void));    // Called from initelk() in main.c
@@ -40,6 +45,6 @@ void video_clearall();
 void video_shutdown();
 
 void video_start_timer();
-bool video_await_event();
+uint32_t video_await_event();
 
 #endif // _VIDEO_H

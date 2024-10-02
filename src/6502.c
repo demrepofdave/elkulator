@@ -1692,7 +1692,7 @@ void exec6502()
                 {
                         if ((a > 31 && a < 127) || a == 0x0a || a == 0x0d)
                         {
-                                log_debug("%c",a,a);
+                                log_debug("%c",a);
 //                        output=1;
                         }
                 }

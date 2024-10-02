@@ -50,19 +50,25 @@ int main(int argc, char *argv[])
         initelk(argc,argv);
         video_register_close_button_handler(native_window_close_button_handler);
         
-        #ifdef HAL_ALLEGRO_5 
-        video_start_timer();
+        #ifdef HAL_ALLEGRO_5        
+                video_start_timer();
+                uint32_t elkEvent = 0;
+                while (!(elkEvent & ELK_EVENT_EXIT))
+                {
+                        elkEvent = video_await_event();
+                        if(!(elkEvent & ELK_EVENT_EXIT)) 
+                        {
+                                drawit++;
+                        }
+                        runelk();
+                }
+        #else
+                while (!quited)
+                {
+                        runelk();
+                        if (menu_pressed()) entergui();
+                }
         #endif // HAL_ALLEGRO_5
-
-        while (!quited)
-        {
-                #ifdef HAL_ALLEGRO_5        
-                        quited = video_await_event();
-                        if(!quited) drawit++;
-                #endif
-                runelk();
-                if (menu_pressed()) entergui();
-        }
         closeelk();
 
         return 0;

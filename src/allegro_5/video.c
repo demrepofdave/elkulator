@@ -34,18 +34,28 @@ ALLEGRO_EVENT_QUEUE *queue;
 static ALLEGRO_EVENT_SOURCE evsrc;
 
 extern int winsizex, winsizey;
-//PALETTE elkpal =
-//{
-//      {0,0,0},
-//      {63,0,0},
-//      {0,63,0},
-//      {63,63,0},
-//      {0,0,63},
-//      {63,0,63},
-//      {0,63,63},
-//      {63,63,63},
-//};
 
+
+uint32_t elkpal[8] =
+{
+    0xff000000,
+    0xffff0000,
+    0xff00ff00,
+    0xffffff00,
+    0xff0000ff,
+    0xffff00ff,
+    0xffffff00,
+    0xffffffff
+};
+
+typedef struct
+{
+    int winsizex; // Current window size in ???
+    int winsizey; // Current window size in ???
+    bool maintain_aspect; // If true maintain 4:3 aspect ration (used recalce winsizey based on winsizex)
+} WindowCoords;
+
+WindowCoords main_window;
 
 #define VERSION_STR "Elkulator v2.09a"
 
@@ -57,6 +67,10 @@ int video_init_part1()
         fprintf(stderr, "Error initializing Allegro.\n");
         exit(-1);
     }
+
+    main_window.winsizex = 800; // Will be configured in future
+    main_window.winsizey = 600; // Will be configured in future
+    main_window.maintain_aspect = true;
 
     al_init_native_dialog_addon();
     al_set_new_window_title(VERSION_STR);
@@ -255,10 +269,9 @@ void video_put_pixel(int y, int x, uint8_t color)
 
     // Test code.
     //al_set_target_bitmap(b);
-    if(color == 0)
+    if(color < 8)
     {
-        //al_put_pixel(x, y, black);
-        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = 0xff000000;
+        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = elkpal[color];
     }
     else
     {
@@ -274,7 +287,7 @@ void video_put_pixel_line(int y, int x, int width, uint8_t color)
 
     char *ptr = (char *)region->data + region->pitch * y + x * region->pixel_size;
     while (count--) {
-        *(uint32_t *)ptr = color;
+        *(uint32_t *)ptr = elkpal[color];
         ptr += region->pixel_size;
     }
 }
@@ -481,34 +494,51 @@ void video_start_timer()
 }
 
 // True if quitting, false if not.
-bool video_await_event()
+uint32_t video_await_event()
 {
     ALLEGRO_EVENT event;
     bool quitting = false;
     bool timer_triggered = false;
-    while (!quitting && !timer_triggered) 
+    uint32_t elkEvent = 0;
+    while (!elkEvent) 
     {
         al_wait_for_event(queue, &event);
         switch(event.type)
         {
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 log_debug("video_await_event: event display close - quitting\n");
-                quitting = true;
+                elkEvent = ELK_EVENT_EXIT;
                 break;
             case ALLEGRO_EVENT_TIMER:
                 //log_debug("video_await_event: event timer triggered\n");
-                timer_triggered = true;
+                elkEvent = ELK_EVENT_TIMER_TRIGGERED;
                 break;
             case ALLEGRO_EVENT_MENU_CLICK:
 //                main_pause("menu active");
                 log_debug("video_await_event: event Menu click\n");
-                quitting = gui_allegro_event(&event);
+                elkEvent = gui_allegro_event(&event);
 //                main_resume();
+                break;
+
+            default:
+                log_debug("video_await_event: event %d detected\n", event.type);
                 break;
             //case ALLEGRO_EVENT_DISPLAY_RESIZE:
             //    video_update_window_size(&event);
             //    break;
         }
     }
-    return quitting;
+    if(elkEvent & ELK_EVENT_TIMER_TRIGGERED)
+    {
+        //log_debug("timer_triggered\n");
+    }
+    if(elkEvent & ELK_EVENT_RESET)
+    {
+        log_debug("Elk Reset trigger\n");
+    }
+    if(elkEvent & ELK_EVENT_EXIT)
+    {
+        log_debug("quitting\n");
+    }
+    return elkEvent;
 }
