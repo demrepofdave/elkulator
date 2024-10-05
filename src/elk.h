@@ -173,7 +173,6 @@ extern int enable_mgc;
 extern int enable_db_flash_cartridge;
 extern int enable_jim;
 
-extern int keylookup[128];
 extern int plus1;
 extern uint8_t plus1stat;
 extern int adctime;

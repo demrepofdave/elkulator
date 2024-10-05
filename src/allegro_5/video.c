@@ -17,6 +17,10 @@
 #include "logger.h"
 #include "video_internal.h"
 
+extern void key_down_event(const ALLEGRO_EVENT *event);
+extern void key_up_event(const ALLEGRO_EVENT *event);
+extern void key_char_event(const ALLEGRO_EVENT *event);
+
 ALLEGRO_BITMAP *b             = NULL;    // Main bitmap used before blitting to window screen.
 ALLEGRO_BITMAP *b16           = NULL;  // Intermediate bitmap 1
 ALLEGRO_BITMAP *b162          = NULL; // Intermediate bitmap 2
@@ -502,20 +506,20 @@ uint32_t video_await_event()
                 break;
 
             // Keyboard handling.
-//            case ALLEGRO_EVENT_KEY_DOWN:
+            case ALLEGRO_EVENT_KEY_DOWN:
 //                if (!keydefining)
-//                    key_down_event(&event);
-//                break;
-//            case ALLEGRO_EVENT_KEY_CHAR:
+                    key_down_event(&event);
+                break;
+            case ALLEGRO_EVENT_KEY_CHAR:
 //                if (!keydefining)
-//                    key_char_event(&event);
-//                break;
-//            case ALLEGRO_EVENT_KEY_UP:
+                    key_char_event(&event);
+                break;
+            case ALLEGRO_EVENT_KEY_UP:
 //               if (!keydefining)
-//                    key_up_event(&event);
-//                break;
+                    key_up_event(&event);
+                break;
 
-
+            // Mouse handling
             case ALLEGRO_EVENT_MOUSE_AXES:
                 break;
 
