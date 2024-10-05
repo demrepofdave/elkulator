@@ -1,9 +1,9 @@
 #include <allegro5/allegro.h>
 
-char * fileutils_get_extension(char * filename)
+const char * fileutils_get_extension(const char * filename)
 {
     // Quick and dirty implementation (allegro 5 does not seem to have the equivalent function).
-    char * pExtension = NULL;
+    const char * pExtension = NULL;
     int index = 0;
     if(filename)
     {

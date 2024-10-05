@@ -5,8 +5,11 @@
 #include <ctype.h>
 #include "elk.h"
 #include "config_vars.h"
+#include "config.h"
 
 static const char * elk_cfg_filename = "/elk.cfg"; // Filename for elkulator config file.
+
+Config elkConfig;
 
 FILE *cfgfile;
 uint8_t cfgbuffer[1024];
@@ -90,16 +93,16 @@ void loadconfig()
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"rt");
-        tapespeed=getintcfg("tapespeed",0);
+        elkConfig.tape.speed = getintcfg("tapespeed",0);
         plus1=getintcfg("plus1",0);
         plus3=getintcfg("plus3",0);
         dfsena=getintcfg("dfsena",0);
         adfsena=getintcfg("adfsena",0);
         defaultwriteprot=getintcfg("defaultwriteprotect",1);
         
-        turbo=getintcfg("turbo",0);
-        mrb=getintcfg("mrb",0);
-        mrbmode=getintcfg("mrbmode",0);
+        elkConfig.expansion.turbo=getintcfg("turbo",0);
+        elkConfig.expansion.mrb     = getintcfg("mrb",0);
+        elkConfig.expansion.mrbmode = getintcfg("mrbmode",0);
         ulamode=getintcfg("ulamode",0);
         enable_jim = getintcfg("enable_jim",0);
 
@@ -153,7 +156,7 @@ void saveconfig()
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"wt");
-        writeintcfg("tapespeed",tapespeed);
+        writeintcfg("tapespeed",elkConfig.tape.speed);
         writeintcfg("plus1",plus1);
         writeintcfg("plus3",plus3);
         writeintcfg("dfsena",dfsena);
@@ -163,9 +166,9 @@ void saveconfig()
         writestringcfg("discname_0",discname);
         writestringcfg("discname_1",discname2);
 
-        writeintcfg("turbo",turbo);
-        writeintcfg("mrb",mrb);
-        writeintcfg("mrbmode",mrbmode);
+        writeintcfg("turbo",  elkConfig.expansion.turbo);
+        writeintcfg("mrb",    elkConfig.expansion.mrb);
+        writeintcfg("mrbmode",elkConfig.expansion.mrbmode);
         writeintcfg("ulamode",ulamode);
         writeintcfg("enable_jim", enable_jim);
         

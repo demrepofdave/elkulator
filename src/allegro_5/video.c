@@ -259,21 +259,7 @@ int video_get_desktop_color_depth()
 
 void video_put_pixel(int y, int x, uint8_t color)
 {
-    ALLEGRO_COLOR black = al_map_rgb(0,0,0);
-    ALLEGRO_COLOR white = al_map_rgb(63,63,63);
-
-    // Test code.
-    //al_set_target_bitmap(b);
-    if(color < 8)
-    {
-        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = elkpal[color];
-    }
-    else
-    {
-        //al_put_pixel(x, y, white);
-        //al_put_pixel(int x, int y, ALLEGRO_COLOR color)
-        *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = 0xffffffff;
-    }
+    *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = elkpal[color];
 }
 
 void video_put_pixel_line(int y, int x, int width, uint8_t color)
@@ -484,7 +470,7 @@ void video_shutdown()
 
 void video_start_timer()
 {
-    log_debug("video_start_timer: staring timer %p\n");
+    log_debug("video_start_timer: staring timer %p\n", timer);
     al_start_timer(timer);
 }
 
@@ -513,6 +499,30 @@ uint32_t video_await_event()
                 log_debug("video_await_event: event Menu click\n");
                 elkEvent = gui_allegro_event(&event);
 //                main_resume();
+                break;
+
+            // Keyboard handling.
+//            case ALLEGRO_EVENT_KEY_DOWN:
+//                if (!keydefining)
+//                    key_down_event(&event);
+//                break;
+//            case ALLEGRO_EVENT_KEY_CHAR:
+//                if (!keydefining)
+//                    key_char_event(&event);
+//                break;
+//            case ALLEGRO_EVENT_KEY_UP:
+//               if (!keydefining)
+//                    key_up_event(&event);
+//                break;
+
+
+            case ALLEGRO_EVENT_MOUSE_AXES:
+                break;
+
+            case ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY:
+                break;
+
+            case ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY:
                 break;
 
             default:

@@ -11,6 +11,8 @@
 #include <string.h>
 #include "elk.h"
 #include "config_vars.h"
+#include "callback_handlers.h"
+#include "logger.h"
 #include "common/video.h"
 #include "common/keyboard.h"
 #include "common/fileutils.h"
@@ -48,6 +50,16 @@ char parallelname[512];
 char serialname[512];
 extern int serial_debug;
 char romnames[16][1024];
+
+CallbackHandlers callback_handlers;
+
+void initHandlers()
+{
+        log_debug("initHandlers\n");
+        //callback_handlers.handler_save_state = savestate;
+        //callback_handlers.handler_load_state = loadstate;
+        callback_handlers.handler_load_tape  = loadtape;
+}
 
 void initelk(int argc, char *argv[])
 {
@@ -206,7 +218,7 @@ int runelkframe=0;
 void runelk()
 {
         int c;
-        if (drawit || (tapeon && tapespeed))
+        if (drawit || (tapeon && elkConfig.tape.speed))
         {
                 if (drawit) drawit--;
                 if (drawit>8 || drawit<0) drawit=0;

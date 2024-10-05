@@ -21,7 +21,7 @@ int inchunk=0,chunkid=0,chunklen=0;
 int chunkpos=0,chunkdatabits=8;
 float chunkf;
 
-void openuef(char *fn)
+void openuef(const char *fn)
 {
       int c;
       if (uef)
@@ -130,7 +130,7 @@ void polluef()
 /*                        intone=templ>>2;
                         if (!intone) intone=1;
                         printf("High tone %04X\n",templ);
-			if (tapespeed)
+			if (elkConfig.tape.speed)
 			{*/
 	                        if (templ>20)
 	                        {
@@ -192,7 +192,7 @@ void polluef()
                         templ=gzgetc(uef); templ|=(gzgetc(uef)<<8);
                         intone=templ>>2;
                         if (!intone) intone=1;
-                        if (tapespeed) intone=3;
+                        if (elkConfig.tape.speed) intone=3;
                 }
                 else
                 {

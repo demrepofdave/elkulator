@@ -8,6 +8,8 @@
 #endif
 
 #include "elk.h"
+#include "callback_handlers.h"
+#include "logger.h"
 #include "common/video.h"
 
 char ssname[260];
@@ -21,8 +23,8 @@ int wantloadstate=0,wantsavestate=0;
 
 int plus3=0;
 int dfsena=0,adfsena=0;
-int turbo=0;
-int mrb=0,mrbmode=0;
+//int turbo=0;
+//int mrb=0,mrbmode=0;
 int ulamode=0;
 int drawmode=0;
 
@@ -46,6 +48,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Error %d initializing Allegro.\n", ret);
                 exit(-1);
         }
+        initHandlers();
         initelk(argc,argv);
         video_register_close_button_handler(native_window_close_button_handler);
         

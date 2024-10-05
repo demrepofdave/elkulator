@@ -2,6 +2,7 @@
 #include "common/video.h"
 #include "gui-allegro.h"
 #include "logger.h"
+#include "callback_handlers.h"
 #include "config_vars.h"
 
 /* pclose() and popen() on Windows are _pclose() and _popen() */
@@ -101,17 +102,17 @@ static void tape_speed_set(ALLEGRO_EVENT *event)
 {
     ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
     // TODO: Working code but clean up a bit later.
-    if(tapespeed == TAPE_NORMAL && menu_get_id(event) != IDM_TAPE_SPEED_NORMAL)
+    if(elkConfig.tape.speed == TAPE_NORMAL && menu_get_id(event) != IDM_TAPE_SPEED_NORMAL)
     {
         al_set_menu_item_flags(menu, IDM_TAPE_SPEED_NORMAL, ALLEGRO_MENU_ITEM_CHECKBOX);
     }
 
-    if(tapespeed == TAPE_FAST && menu_get_id(event) != IDM_TAPE_SPEED_FAST)
+    if(elkConfig.tape.speed == TAPE_FAST && menu_get_id(event) != IDM_TAPE_SPEED_FAST)
     {
         al_set_menu_item_flags(menu, IDM_TAPE_SPEED_FAST, ALLEGRO_MENU_ITEM_CHECKBOX);
     }
 
-    if(tapespeed == TAPE_REALLY_FAST && menu_get_id(event) != IDM_TAPE_SPEED_REALLY_FAST)
+    if(elkConfig.tape.speed == TAPE_REALLY_FAST && menu_get_id(event) != IDM_TAPE_SPEED_REALLY_FAST)
     {
         al_set_menu_item_flags(menu, IDM_TAPE_SPEED_REALLY_FAST, ALLEGRO_MENU_ITEM_CHECKBOX);
     }
@@ -119,13 +120,13 @@ static void tape_speed_set(ALLEGRO_EVENT *event)
     switch(menu_get_id(event))
     {
         case IDM_TAPE_SPEED_NORMAL:
-            tapespeed = TAPE_NORMAL;
+            elkConfig.tape.speed = TAPE_NORMAL;
             break;
         case IDM_TAPE_SPEED_FAST:
-            tapespeed = TAPE_FAST;
+            elkConfig.tape.speed = TAPE_FAST;
             break;
         case IDM_TAPE_SPEED_REALLY_FAST:
-            tapespeed = TAPE_REALLY_FAST;
+            elkConfig.tape.speed = TAPE_REALLY_FAST;
             break;
 
     }
@@ -180,17 +181,27 @@ static void tape_load_ui(ALLEGRO_EVENT *event)
 
     if (!tape_fn || !(fpath = al_path_cstr(tape_fn, ALLEGRO_NATIVE_PATH_SEP)))
         fpath = ".";
-    if ((chooser = al_create_native_file_dialog(fpath, "Choose a tape to load", "*.uef;*.csw", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST))) {
+    if ((chooser = al_create_native_file_dialog(fpath, "Choose a tape to load", "*.uef;*.csw", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST))) 
+    {
         display = (ALLEGRO_DISPLAY *)(event->user.data2);
         if (al_show_native_file_dialog(display, chooser)) 
         {
-//            if (al_get_native_file_dialog_count(chooser) > 0) {
-//                tape_close();
-//                ALLEGRO_PATH *path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
-//                tape_load(path);
-//                tape_fn = path;
-//                tape_loaded = 1;
-//            }
+            if (al_get_native_file_dialog_count(chooser) > 0) 
+            {
+                //tape_close();
+                ALLEGRO_PATH *path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
+                const char * path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+                if(path_str)
+                {
+                    log_debug("tape_load_ui: path_str='%s'\n", path_str);
+                    callback_handlers.handler_load_tape(path_str);
+                } 
+                else
+                {
+                    log_debug("tape_load_ui: path_str is NULL\n");
+                }
+                tape_fn = path;
+            }
         }
     }
 }
@@ -205,9 +216,9 @@ static void tape_load_ui(ALLEGRO_EVENT *event)
 static ALLEGRO_MENU *create_tape_speed_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
-    add_checkbox_item(menu, "Normal",      IDM_TAPE_SPEED_NORMAL,      (tapespeed == TAPE_NORMAL));
-    add_checkbox_item(menu, "Fast",        IDM_TAPE_SPEED_FAST,        (tapespeed == TAPE_FAST));
-    add_checkbox_item(menu, "Really Fast", IDM_TAPE_SPEED_REALLY_FAST, (tapespeed == TAPE_REALLY_FAST));
+    add_checkbox_item(menu, "Normal",      IDM_TAPE_SPEED_NORMAL,      (elkConfig.tape.speed == TAPE_NORMAL));
+    add_checkbox_item(menu, "Fast",        IDM_TAPE_SPEED_FAST,        (elkConfig.tape.speed == TAPE_FAST));
+    add_checkbox_item(menu, "Really Fast", IDM_TAPE_SPEED_REALLY_FAST, (elkConfig.tape.speed == TAPE_REALLY_FAST));
     return menu;
 }
 

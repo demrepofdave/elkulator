@@ -48,9 +48,9 @@ void polltape();
 void polluef();
 void pollcsw();
 
-void openuef(char *fn);
+void openuef(const char *fn);
 void closeuef();
-void opencsw(char *fn);
+void opencsw(const char *fn);
 void closecsw();
 
 extern int resetit;
@@ -65,8 +65,7 @@ extern int plus3;
 
 void dumpregs();
 
-extern int turbo;
-extern int mrb,mrbmode,mrbmapped;
+extern int mrbmapped;
 extern int ulamode;
 
 
@@ -204,6 +203,7 @@ extern int motorspin;
 
 extern char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
 
+void initHandlers();
 void initelk();
 void closeelk();
 void cleardrawit();
@@ -268,7 +268,7 @@ uint8_t readserial(uint16_t addr);
 void writeserial(uint16_t addr, uint8_t val);
 void pollserial(int cycles);
 
-void loadtape(char *fn);
+void loadtape(const char *fn);
 void reallyfasttapepoll();
 
 void initsound();

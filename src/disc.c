@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "elk.h"
+#include "logger.h"
 #include "common/fileutils.h"
 
 void (*fdccallback)();
@@ -43,7 +44,7 @@ int driveloaders[2];
 void loaddisc(int drive, char *fn)
 {
         int c=0;
-        char *p;
+        const char *p;
         FILE *f;
         setejecttext(drive,"");
         if (!fn)
@@ -119,7 +120,7 @@ void newdisc(int drive, char *fn)
 {
         int c=0,d;
         FILE *f;
-        char *p = fileutils_get_extension(fn);
+        const char *p = fileutils_get_extension(fn);
         while (loaders[c].ext)
         {
                 if (!strcasecmp(p,loaders[c].ext) && loaders[c].size!=-1)
@@ -165,17 +166,6 @@ void newdisc(int drive, char *fn)
                 c++;
         }
 }
-
-/*void loadtape(char *fn)
-{
-        char *p;
-        if (!fn) return;
-//        if (fn[0]==0) return;
-        p=get_extension(fn);
-        if (!p) return;
-        if (p[0]=='u' || p[0]=='U') openuef(fn);
-        else                        opencsw(fn);
-}*/
 
 void closedisc(int drive)
 {
@@ -246,13 +236,23 @@ void disc_format(int drive, int track, int side, int density)
 }
 
 
-void loadtape(char *fn)
+void loadtape(const char *fn)
 {
-        char *p;
-        if (!fn) return;
-//        if (fn[0]==0) return;
-        p = fileutils_get_extension(fn);
-        if (!p) return;
-        if (p[0]=='u' || p[0]=='U') openuef(fn);
-        else                        opencsw(fn);
+        const char *p;
+        if (fn)
+        {
+                log_debug("loadtape(%s)\n", fn);
+                p = fileutils_get_extension(fn);
+                if (p)
+                {
+                        if (p[0]=='u' || p[0]=='U')
+                        {
+                                openuef(fn);
+                        }
+                        else
+                        {
+                                opencsw(fn);
+                        }
+                }
+        }
 }
