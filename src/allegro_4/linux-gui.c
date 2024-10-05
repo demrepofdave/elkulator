@@ -6,6 +6,7 @@
 //#include <alleggl.h>
 #include "elk.h"
 #include "common/video.h"
+#include "config_vars.h"
 
 #undef printf
 
