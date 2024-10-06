@@ -38,6 +38,9 @@ extern int cycles,ulacycles;
 extern int extrom;
 extern uint8_t ram[32768];
 extern uint16_t pc;
+#ifdef HAL_ALLEGRO_4
+extern int keylookup[128];
+#endif
 
 uint8_t readmem(uint16_t addr);
 void writemem(uint16_t addr, uint8_t val);
@@ -48,9 +51,9 @@ void polltape();
 void polluef();
 void pollcsw();
 
-void openuef(char *fn);
+void openuef(const char *fn);
 void closeuef();
-void opencsw(char *fn);
+void opencsw(const char *fn);
 void closecsw();
 
 extern int resetit;
@@ -65,8 +68,7 @@ extern int plus3;
 
 void dumpregs();
 
-extern int turbo;
-extern int mrb,mrbmode,mrbmapped;
+extern int mrbmapped;
 extern int ulamode;
 
 
@@ -86,12 +88,6 @@ extern int drawmode;
 
 #define HALFSIZE   (drawmode==_2XSAI || drawmode==SCALE2X || drawmode==EAGLE)
 #define LINEDOUBLE (drawmode==SCANLINES || drawmode==PAL)
-
-#define TAPE_SLOW 0
-#define TAPE_FAST 1
-#define TAPE_REALLY 2
-extern int tapespeed;
-
 
 struct drives
 {
@@ -180,7 +176,6 @@ extern int enable_mgc;
 extern int enable_db_flash_cartridge;
 extern int enable_jim;
 
-extern int keylookup[128];
 extern int plus1;
 extern uint8_t plus1stat;
 extern int adctime;
@@ -210,6 +205,7 @@ extern int motorspin;
 
 extern char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
 
+void initHandlers();
 void initelk();
 void closeelk();
 void cleardrawit();
@@ -274,7 +270,7 @@ uint8_t readserial(uint16_t addr);
 void writeserial(uint16_t addr, uint8_t val);
 void pollserial(int cycles);
 
-void loadtape(char *fn);
+void loadtape(const char *fn);
 void reallyfasttapepoll();
 
 void initsound();
@@ -293,8 +289,8 @@ void mixtapenoise(int16_t *tapebuffer);
 
 void loadstate();
 void savestate();
-void doloadstate();
-void dosavestate();
+void doloadstate(const char *filename);
+void dosavestate(const char *filename);
 
 void dodebugger();
 void debugread(uint16_t addr);

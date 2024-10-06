@@ -1,15 +1,18 @@
-/*Elkulator v1.0 by Tom walker
+/*Elkulator v1.0 by Sarah Walker
   Initialisation/Closing/Main loop*/
-#ifdef HAL_ALLEGRO_5
-#include <allegro5/allegro.h>
-#else
+#ifdef HAL_ALLEGRO_4
 #include <allegro.h>
+#else
+#include <allegro5/allegro.h>
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "config_vars.h"
+#include "callback_handlers.h"
+#include "logger.h"
 #include "common/video.h"
 #include "common/keyboard.h"
 #include "common/fileutils.h"
@@ -48,6 +51,16 @@ char serialname[512];
 extern int serial_debug;
 char romnames[16][1024];
 
+CallbackHandlers callback_handlers;
+
+void initHandlers()
+{
+        log_debug("initHandlers\n");
+        callback_handlers.handler_save_state = dosavestate;
+        callback_handlers.handler_load_state = doloadstate;
+        callback_handlers.handler_load_tape  = loadtape;
+}
+
 void initelk(int argc, char *argv[])
 {
         int c;
@@ -59,7 +72,7 @@ void initelk(int argc, char *argv[])
         int serialnext=0;
         int serialdebugnext=0;
         fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-        #ifndef HAL_ALLEGRO_5
+        #ifdef HAL_ALLEGRO_4
             p = fileutils_get_filename(exedir);
             p[0] = 0;
         #endif
@@ -205,7 +218,7 @@ int runelkframe=0;
 void runelk()
 {
         int c;
-        if (drawit || (tapeon && tapespeed))
+        if (drawit || (tapeon && elkConfig.tape.speed))
         {
                 if (drawit) drawit--;
                 if (drawit>8 || drawit<0) drawit=0;
@@ -227,8 +240,8 @@ void runelk()
                         reset6502();
                 }
                 oldbreak = break_pressed();
-                if (wantloadstate) doloadstate();
-                if (wantsavestate) dosavestate();
+                if (wantloadstate) doloadstate(ssname);
+                if (wantsavestate) dosavestate(ssname);
                 if (infocus) video_poll_joystick();
                 if (autoboot) autoboot--;
                 ddnoiseframes++;

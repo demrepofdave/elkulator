@@ -1,13 +1,16 @@
 /*Elkulator v1.0 by Sarah Walker
   Linux main loop*/
 
-#ifdef HAL_ALLEGRO_5
-#include <allegro5/allegro.h>
-#else
+#ifdef HAL_ALLEGRO_4
 #include <allegro.h>
+#else
+#include "common/event_handler.h"
 #endif
 
+#include <stdlib.h>
 #include "elk.h"
+#include "logger.h"
+#include "callback_handlers.h"
 #include "common/video.h"
 
 char ssname[260];
@@ -21,8 +24,8 @@ int wantloadstate=0,wantsavestate=0;
 
 int plus3=0;
 int dfsena=0,adfsena=0;
-int turbo=0;
-int mrb=0,mrbmode=0;
+//int turbo=0;
+//int mrb=0,mrbmode=0;
 int ulamode=0;
 int drawmode=0;
 
@@ -46,15 +49,22 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Error %d initializing Allegro.\n", ret);
                 exit(-1);
         }
+        initHandlers();
         initelk(argc,argv);
         video_register_close_button_handler(native_window_close_button_handler);
         
-        #ifdef HAL_ALLEGRO_5        
+        #ifdef HAL_ALLEGRO_4 
+                        while (!quited)
+                {
+                        runelk();
+                        if (menu_pressed()) entergui();
+                }
+        #else       
                 video_start_timer();
                 uint32_t elkEvent = 0;
                 while (!(elkEvent & ELK_EVENT_EXIT))
                 {
-                        elkEvent = video_await_event();
+                        elkEvent = event_await();
                         if(!(elkEvent & ELK_EVENT_EXIT)) 
                         {
                                 drawit++;
@@ -65,19 +75,13 @@ int main(int argc, char *argv[])
                         }
                         runelk();
                 }
-        #else
-                while (!quited)
-                {
-                        runelk();
-                        if (menu_pressed()) entergui();
-                }
-        #endif // HAL_ALLEGRO_5
+        #endif // HAL_ALLEGRO_4
         closeelk();
 
         return 0;
 }
 
-#ifndef HAL_ALLEGRO_5
+#ifdef HAL_ALLEGRO_4
 END_OF_MAIN();
-#endif // HAL_ALLEGRO_5
+#endif // HAL_ALLEGRO_4
 

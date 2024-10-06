@@ -19,7 +19,7 @@ int cswena;
 int cswskip=0;
 int tapespeed=0;
 
-void opencsw(char *fn)
+void opencsw(const char *fn)
 {
         int end,c;
         uint32_t destlen=16*1024*1024;

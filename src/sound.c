@@ -1,10 +1,10 @@
 /*Elkulator v1.0 by Sarah Walker
   CSS SN sound chip emulation*/
 
-#ifdef HAL_ALLEGRO_5
-#include <allegro5/allegro.h>
-#else
+#ifdef HAL_ALLEGRO_4
 #include <allegro.h>
+#else
+#include <allegro5/allegro.h>
 #endif
 
 #include <stdio.h>
@@ -14,7 +14,7 @@
 int sndinternal=1;
 uint16_t snshift;
 
-#ifndef HAL_ALLEGRO_5
+#ifdef HAL_ALLEGRO_4
 #define al_fixed fixed
 #endif
 

@@ -6,6 +6,7 @@
 //#include <alleggl.h>
 #include "elk.h"
 #include "common/video.h"
+#include "config_vars.h"
 
 #undef printf
 
@@ -50,9 +51,9 @@ void updatelinuxgui()
         discmenu[4].flags=(writeprot[0])?D_SELECTED:0;
         discmenu[5].flags=(writeprot[1])?D_SELECTED:0;
         discmenu[6].flags=(defaultwriteprot)?D_SELECTED:0;
-        tapespdmenu[0].flags=(!tapespeed)?D_SELECTED:0;
-        tapespdmenu[1].flags=(tapespeed==1)?D_SELECTED:0;
-        tapespdmenu[2].flags=(tapespeed==2)?D_SELECTED:0;
+        tapespdmenu[0].flags = (!elkConfig.tape.speed)?D_SELECTED:0;
+        tapespdmenu[1].flags = (elkConfig.tape.speed == 1)?D_SELECTED:0;
+        tapespdmenu[2].flags = (elkConfig.tape.speed == 2)?D_SELECTED:0;
         for (x=0;x<6;x++)  displaymenu[x].flags=(drawmode==(intptr_t)displaymenu[x].dp)?D_SELECTED:0;
         videomenu[1].flags=(fullscreen)?D_SELECTED:0;
         soundmenu[0].flags=(sndint)?D_SELECTED:0;
@@ -62,9 +63,9 @@ void updatelinuxgui()
         dischmenu[0].flags=(plus3)?D_SELECTED:0;
         dischmenu[1].flags=(adfsena)?D_SELECTED:0;
         dischmenu[2].flags=(dfsena)?D_SELECTED:0;
-        memmenu[0].flags=(turbo)?D_SELECTED:0;
-        memmenu[1].flags=(mrb)?D_SELECTED:0;
-        for (x=0;x<3;x++)  mrbmenu[x].flags=(mrbmode==(intptr_t)mrbmenu[x].dp)?D_SELECTED:0;
+        memmenu[0].flags=(elkConfig.expansion.turbo)?D_SELECTED:0;
+        memmenu[1].flags=(elkConfig.expansion.mrb)?D_SELECTED:0;
+        for (x=0;x<3;x++)  mrbmenu[x].flags=(elkConfig.expansion.mrbmode==(intptr_t)mrbmenu[x].dp)?D_SELECTED:0;
         for (x=0;x<3;x++)  ulamenu[x].flags=(ulamode==(intptr_t)ulamenu[x].dp)?D_SELECTED:0;
         memmenu[4].flags=(enable_jim)?D_SELECTED:0;
         joymenu[0].flags=(plus1)?D_SELECTED:0;
@@ -270,19 +271,19 @@ MENU rommenu[5]=
 
 int gui_normal()
 {
-        tapespeed=0;
+        elkConfig.tape.speed=0;
         updatelinuxgui();
         return D_O_K;
 }
 int gui_fast()
 {
-        tapespeed=1;
+        elkConfig.tape.speed=1;
         updatelinuxgui();
         return D_O_K;
 }
 int gui_rfast()
 {
-        tapespeed=2;
+        elkConfig.tape.speed=2;
         updatelinuxgui();
         return D_O_K;
 }
@@ -508,7 +509,7 @@ MENU dischmenu[4]=
 
 int gui_mrbmode()
 {
-        mrbmode=(intptr_t)active_menu->dp;
+        elkConfig.expansion.mrbmode=(intptr_t)active_menu->dp;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
@@ -540,8 +541,8 @@ MENU ulamenu[4]=
 
 int gui_turbo()
 {
-        turbo=!turbo;
-        if (turbo) mrb=0;
+        elkConfig.expansion.turbo= ! elkConfig.expansion.turbo;
+        if (elkConfig.expansion.turbo) elkConfig.expansion.mrb=0;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
@@ -549,8 +550,8 @@ int gui_turbo()
 
 int gui_mrb()
 {
-        mrb=!mrb;
-        if (mrb) turbo=0;
+        elkConfig.expansion.mrb=!elkConfig.expansion.mrb;
+        if (elkConfig.expansion.mrb) elkConfig.expansion.turbo=0;
         resetit=1;
         updatelinuxgui();
         return D_O_K;

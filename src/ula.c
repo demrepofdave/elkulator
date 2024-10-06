@@ -4,6 +4,7 @@
 #include <string.h>
 #include <zlib.h>
 #include "elk.h"
+#include "config_vars.h"
 #include "common/video.h"
 
 void dosavescrshot();
@@ -687,7 +688,7 @@ void yield()
                         if (ula.x==1024)
                         {
                                 /*Sound handling*/
-                                if (!tapeon || !tapespeed)
+                                if (!tapeon || !elkConfig.tape.speed)
                                 {
                                         for (c=0;c<2;c++)
                                         {
@@ -774,7 +775,7 @@ void yield()
                                         ula.addrback=ula.addr;
                                         ula.framecount++;
                                         if (ula.framecount==25) ula.framecount=0;
-                                        ula.draw=((!tapeon || !tapespeed) || !ula.framecount);
+                                        ula.draw=((!tapeon || !elkConfig.tape.speed) || !ula.framecount);
                                 }
                         }
                         ulacycles++;

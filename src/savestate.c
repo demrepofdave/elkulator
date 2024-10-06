@@ -2,6 +2,7 @@
   Savestate handling*/
 #include <stdio.h>
 #include "elk.h"
+#include "config_vars.h"
 
 void savestate()
 {
@@ -13,15 +14,15 @@ void loadstate()
         wantloadstate=1;
 }
 
-void dosavestate()
+void dosavestate(const char * filename)
 {
-        FILE *f=fopen(ssname,"wb");
+        FILE *f=fopen(filename,"wb");
         putc('E',f); putc('L',f); putc('K',f); putc('S',f);
         putc('N',f); putc('A',f); putc('P',f); putc('1',f);
 
-        putc(turbo,f);
-        putc(mrb,f);
-        putc(mrbmode,f);
+        putc(elkConfig.expansion.turbo,f);
+        putc(elkConfig.expansion.mrb,f);
+        putc(elkConfig.expansion.mrbmode,f);
         putc(usedrom6,f);
         
         putc(plus3,f);
@@ -42,15 +43,15 @@ void dosavestate()
         wantsavestate=0;
 }
         
-void doloadstate()
+void doloadstate(const char * filename)
 {
         int c;
-        FILE *f=fopen(ssname,"rb");
+        FILE *f=fopen(filename,"rb");
         for (c=0;c<8;c++) getc(f);
         
-        turbo=getc(f);
-        mrb=getc(f);
-        mrbmode=getc(f);
+        elkConfig.expansion.turbo   = getc(f);
+        elkConfig.expansion.mrb     = getc(f);
+        elkConfig.expansion.mrbmode = getc(f);
         usedrom6=getc(f);
         
         plus3=getc(f);

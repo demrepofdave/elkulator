@@ -5,13 +5,14 @@
 #include <string.h>
 #include <unistd.h>
 #include "elk.h"
+#include "config_vars.h"
 #include "common/keyboard.h"
 
 static const char * roms = "roms";   // Name of directory containing rom files
 
 int FASTLOW=0;
 int FASTHIGH2=0;
-//#define FASTLOW (turbo || (mrb && mrbmode && mrbmapped))
+//#define FASTLOW (elkConfig.expansion.turbo || (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode && mrbmapped))
 #define FASTHIGH (FASTHIGH2 && ((pc&0xE000)!=0xC000))
 
 extern int output;
@@ -140,8 +141,8 @@ void resetmem()
 {
         update_rom_config();
 
-        FASTLOW=turbo || (mrb && mrbmode);
-        FASTHIGH2=(mrb && mrbmode==2);
+        FASTLOW = elkConfig.expansion.turbo || (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode);
+        FASTHIGH2 = (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode==2);
         banks[0] = 0;
         banks[1] = 0;
         if (enable_mgc) {
@@ -222,7 +223,7 @@ uint8_t readmem(uint16_t addr)
         default:
             break;
         }
-        if (mrb) return mrbos[addr&0x3FFF];
+        if (elkConfig.expansion.mrb) return mrbos[addr&0x3FFF];
         return os[addr&0x3FFF];
 }
 
@@ -299,11 +300,11 @@ void writemem(uint16_t addr, uint8_t val)
                 }
                 snden=val&1;
         }
-        if (addr==0xFC7F && mrb)
+        if (addr==0xFC7F && elkConfig.expansion.mrb)
         {
                 mrbmapped=!(val&0x80);
-                FASTLOW=(turbo || (mrb && mrbmode && mrbmapped));
-                FASTHIGH2=(mrb && mrbmode==2 && mrbmapped);
+                FASTLOW=(elkConfig.expansion.turbo || (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode && mrbmapped));
+                FASTHIGH2=(elkConfig.expansion.mrb && elkConfig.expansion.mrbmode==2 && mrbmapped);
                 
 //                rpclog("Write MRB %02X %i %i %04X\n",val,FASTLOW,FASTHIGH2,pc);
 //                if (!val) output=1;
@@ -334,7 +335,7 @@ void writemem(uint16_t addr, uint8_t val)
 void savememstate(FILE *f)
 {
         fwrite(ram,32768,1,f);
-        if (mrb) fwrite(ram2,32768,1,f);
+        if (elkConfig.expansion.mrb) fwrite(ram2,32768,1,f);
         if (plus3 && dfsena) fwrite(dfs,16384,1,f);
         if (sndex)  fwrite(sndrom,16384,1,f);
         if (usedrom6) fwrite(ram6,16384,1,f);
@@ -343,7 +344,7 @@ void savememstate(FILE *f)
 void loadmemstate(FILE *f)
 {
         fread(ram,32768,1,f);
-        if (mrb) fread(ram2,32768,1,f);
+        if (elkConfig.expansion.mrb) fread(ram2,32768,1,f);
         if (plus3 && dfsena) fread(dfs,16384,1,f);
         if (sndex)  fread(sndrom,16384,1,f);
         if (usedrom6) fread(ram6,16384,1,f);
