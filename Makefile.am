@@ -44,6 +44,12 @@ elkulator_hal_src = src/allegro_5/adc.c  \
                     src/allegro_5/keyboard.c \
                     src/allegro_5/linux-keydefine.c \
                     src/allegro_5/menus.c \
+                    src/allegro_5/menu_file.c \
+                    src/allegro_5/menu_tape.c \
+                    src/allegro_5/menu_disc.c \
+                    src/allegro_5/menu_roms.c \                    
+                    src/allegro_5/menu_settings.c \
+                    src/allegro_5/menu_misc.c \                    
                     src/allegro_5/palfilt.c \
                     src/allegro_5/samples.c \
                     src/allegro_5/soundopenal.c \

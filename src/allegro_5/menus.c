@@ -1,3 +1,16 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *              by Sarah Walker
+ *
+ * menus.c
+ * 
+ * This file both creates the native fui menus via allegro5 and
+ * processes the menu events.
+ */
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
 #include <allegro5/allegro_native_dialog.h>
 #include "common/video.h"
 #include "menu_internal.h"
@@ -7,18 +20,38 @@
 #include "common/event_handler.h"
 #include "event_handler_internal.h"
 
+
+/******************************************************************************
+* Preprocessor Macros
+*******************************************************************************/
+
 /* pclose() and popen() on Windows are _pclose() and _popen() */
 #ifdef _WIN32
 #  define pclose _pclose
 #  define popen _popen
 #endif
 
+
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
+
 typedef struct {
     const char *label;
     int itemno;
 } menu_map_t;
 
-// Private functions.
+/******************************************************************************
+* Private Variable Definitions
+*******************************************************************************/
+
+/******************************************************************************
+* Function Prototypes
+*******************************************************************************/
+
+/******************************************************************************
+* Private Function Definitions
+*******************************************************************************/
 
 static inline int menu_id_num(menu_id_t id, int num)
 {
@@ -36,7 +69,9 @@ static inline int menu_get_num(ALLEGRO_EVENT *event)
     return event->user.data1 >> 8;
 }
 
-static void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, bool checked)
+// Public internal function;
+
+void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, bool checked)
 {
     int flags = ALLEGRO_MENU_ITEM_CHECKBOX;
     if (checked)
@@ -133,7 +168,6 @@ static void tape_speed_set(ALLEGRO_EVENT *event)
             break;
 
     }
-
 }
 // File Menu - All functions helpers
 
@@ -163,286 +197,6 @@ static void file_load_state(ALLEGRO_EVENT *event)
         }
         al_destroy_native_file_dialog(chooser);
     }
-}
-
-
-/*MENU miscmenu[5]=
-{
-        {"Save screenshot",gui_scrshot,NULL,0,NULL},
-        {"Start movie",gui_startmovie,NULL,0,NULL},
-        {"Stop movie",gui_stopmovie,NULL,0,NULL},
-        {"Start debugging",gui_startdebugging,NULL,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-static ALLEGRO_MENU *create_misc_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Save screenshot", IDM_SETTINGS_MISC_SCREENSHOT,      ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Start movie",     IDM_SETTINGS_MISC_START_MOVIE,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Stop movie",      IDM_SETTINGS_MISC_STOP_MOVIE,      ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Start debugging", IDM_SETTINGS_MISC_START_DEBUGGING, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-/*
-MENU displaymenu[7]=
-{
-        {"Scanlines",gui_disp,NULL,0,(void *)0},
-        {"Line doubling",gui_disp,NULL,0,(void *)1},
-        {"2xSaI",gui_disp,NULL,0,(void *)2},
-        {"Scale2X",gui_disp,NULL,0,(void *)3},
-        {"Super Eagle",gui_disp,NULL,0,(void *)4},
-        {"PAL Filter",gui_disp,NULL,0,(void *)5},
-        {NULL,NULL,NULL,0,NULL}
-};
-*/
-static ALLEGRO_MENU *create_settings_video_displaytype_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Scanlines",     IDM_SETTINGS_VIDEO_DISPLAY_SCANLINES,        0, NULL, NULL);
-    al_append_menu_item(menu, "Line doubling", IDM_SETTINGS_VIDEO_DISPLAY_LINEDOUBLING, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "2xSaI",         IDM_SETTINGS_VIDEO_DISPLAY_2XSAI,        ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Scale2X",       IDM_SETTINGS_VIDEO_DISPLAY_SCALE2X,      ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Super Eagle",   IDM_SETTINGS_VIDEO_DISPLAY_SUPEREAGLE,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "PAL Filter",    IDM_SETTINGS_VIDEO_DISPLAY_PALFILTER,    ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-/*
-MENU videomenu[3]=
-{
-        {"Display type",NULL,displaymenu,0,NULL},
-        {"Fullscreen",gui_fullscreen,NULL,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};
-*/
-static ALLEGRO_MENU *create_settings_video_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Display type",    0, 0, NULL, create_settings_video_displaytype_menu());
-    al_append_menu_item(menu, "Fullscreen",            IDM_SETTINGS_VIDEO_FULLSCREEN, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*MENU soundmenu[7]=
-{
-        {"Internal speaker",gui_internalsnd,NULL,0,NULL},
-        {"CSS Sound Expansion",gui_sndex,NULL,0,NULL},
-        {"Disc drive noise",gui_ddnoise,NULL,0,NULL},
-        {"Tape noise",gui_tnoise,NULL,0,NULL},
-        {"Disc drive type",NULL,ddtypemenu,0,NULL},
-        {"Disc drive volume",NULL,ddvolmenu,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};
-*/
-static ALLEGRO_MENU *create_settings_sound_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Internal speaker",    IDM_SETTINGS_SOUND_INTERNAL_SPEAKER,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "CSS Sound Expansion", IDM_SETTINGS_SOUND_CSS_EXPANSION,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Disc drive noise",    IDM_SETTINGS_SOUND_DISC_DRIVE_NOISE,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Tape noise",          IDM_SETTINGS_SOUND_TAPE_NOISE,        ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Disc drive type",     IDM_SETTINGS_SOUND_DISC_DRIVE_TYPE,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Disc drive volume",   IDM_SETTINGS_SOUND_DISC_DRIVE_VOLUME, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*MENU ulamenu[4]=
-{
-        {"&Standard",gui_ulamode,NULL,0,(void *)0},
-        {"&Enhanced (8-bit, dual access)",gui_ulamode,NULL,0,(void *)ULA_RAM_8BIT_DUAL_ACCESS},
-        {"&Enhanced (8-bit, single access)",gui_ulamode,NULL,0,(void *)ULA_RAM_8BIT_SINGLE_ACCESS},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-static ALLEGRO_MENU *create_settings_memory_enhancedula_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Standard",                        IDM_SETTINGS_MEMORY_ENHANCED_ULA_STANDARD,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Enhanced (8-bit, dual access)",   IDM_SETTINGS_MEMORY_ENHANCED_ULA_8BITDUEL,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Enhanced (8-bit, single access)", IDM_SETTINGS_MEMORY_ENHANCED_ULA_9BITSINGLE, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*MENU mrbmenu[4]=
-{
-        {"&Off",gui_mrbmode,NULL,0,(void *)0},
-        {"&Turbo",gui_mrbmode,NULL,0,(void *)1},
-        {"&Shadow",gui_mrbmode,NULL,0,(void *)2},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-static ALLEGRO_MENU *create_settings_memory_masterramboard_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Off",    IDM_SETTINGS_MEMORY_MRB_OFF,    ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Turbo",  IDM_SETTINGS_MEMORY_MRB_TURBO,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Shadow", IDM_SETTINGS_MEMORY_MRB_SHADOW, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*MENU memmenu[6]=
-{
-        {"&Elektuur/Slogger turbo board",gui_turbo,NULL,0,NULL},
-        {"&Slogger/Jafa Master RAM board",gui_mrb,NULL,0,NULL},
-        {"&Master RAM board mode",NULL,mrbmenu,0,NULL},
-        {"Enhanced &ULA mode",NULL,ulamenu,0,NULL},
-        {"&Paged RAM in FD (JIM)",gui_jim,NULL,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-
-static ALLEGRO_MENU *create_settings_memory_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Elektuur/Slogger turbo board",  IDM_SETTINGS_MEMORY_TURBO,            ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Slogger/Jafa Master RAM board", IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Master RAM board mode",    0, 0, NULL, create_settings_memory_masterramboard_menu());
-    al_append_menu_item(menu, "Enhanced ULA mode",        0, 0, NULL, create_settings_memory_enhancedula_menu());
-    al_append_menu_item(menu, "Paged RAM in FD (JIM)",         IDM_SETTINGS_MEMORY_JIM_PAGED_RAM,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*MENU dischmenu[4]=
-{
-        {"&Plus 3 enable",gui_plus3,NULL,0,NULL},
-        {"&ADFS enable",gui_adfs,NULL,0,NULL},
-        {"&DFS enable",gui_dfs,NULL,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-static ALLEGRO_MENU *create_settings_disc_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Plus 3 enable", IDM_SETTINGS_DISC_PLUS3_ENABLE, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "ADFS enable",   IDM_SETTINGS_DISC_ADFS_ENABLE,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "DFS enable",    IDM_SETTINGS_DISC_DFS_ENABLE,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*
-MENU joymenu[3]=
-{
-        {"&Plus 1 joystick interface",gui_plus1,NULL,0,NULL},
-        {"&First Byte joystick interface",gui_first,NULL,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-static ALLEGRO_MENU *create_settings_joystick_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Plus 1 joystick interface",     IDM_SETTINGS_JOYSTICK_PLUS1, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "First Byte joystick interface", IDM_SETTINGS_JOYSTICK_FIRSTBYTE,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*MENU keymenu[2]={
-        {"Redefine keyboard",gui_keydefine,NULL,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-
-static ALLEGRO_MENU *create_settings_keyboard_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Redefine keyboard", IDM_SETTINGS_KEYBOARD_REDEFINE,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*
-MENU settingsmenu[7]=
-{
-        {"&Video",NULL,videomenu,0,NULL},
-        {"&Sound",NULL,soundmenu,0,NULL},
-        {"&Memory",NULL,memmenu,0,NULL},
-        {"&Disc",NULL,dischmenu,0,NULL},
-        {"&Joystick",NULL,joymenu,0,NULL},
-        {"&Keyboard",NULL,keymenu,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};
-*/
-static ALLEGRO_MENU *create_settings_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Video",    0, 0, NULL, create_settings_video_menu());
-    al_append_menu_item(menu, "Sound",    0, 0, NULL, create_settings_sound_menu());
-    al_append_menu_item(menu, "Memory",   0, 0, NULL, create_settings_memory_menu());
-    al_append_menu_item(menu, "Disc",     0, 0, NULL, create_settings_disc_menu());
-    al_append_menu_item(menu, "Joystick", 0, 0, NULL, create_settings_joystick_menu());
-    al_append_menu_item(menu, "Keyboard", 0, 0, NULL, create_settings_keyboard_menu());
-    return menu;
-}
-/*
-MENU romcartsmenu[3]=
-{
-        {"Mega Games Cartridge",gui_mgc,0,0,NULL},
-        {"David's Flash ROM Cartridge",gui_db_flash_cartridge,0,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};
-*/
-static ALLEGRO_MENU *create_romscarts_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Mega Games Cartridge",        IDM_ROMCARTS_MEGAGAMES,        ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "David's Flash ROM Cartridge", IDM_ROMCARTS_DAVIDS_FLASH_ROM, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-/*
-MENU rommenu[5]=
-{
-        {"Load ROM cartridge &1...",gui_romload0,NULL,0,NULL},
-        {"Load ROM cartridge &2...",gui_romload1,NULL,0,NULL},
-        {"&Unload ROM cartridges...",gui_romeject0,NULL,0,NULL},
-        {"Multi-ROM expansions",NULL,romcartsmenu,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};
-*/
-static ALLEGRO_MENU *create_roms_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Load ROM cartridge &1...", IDM_ROMS_LOAD_CARTRIDGE1, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Load ROM cartridge &2...", IDM_ROMS_LOAD_CARTRIDGE2, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Unload ROM cartridges...", IDM_ROMS_UNLOAD,          ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Multi-ROM expansions",  0, 0, NULL, create_romscarts_menu());
-    return menu;
-}
-
-
-/*MENU discmenu[8]=
-{
-        {"Load disc :&0/2...",gui_load0,NULL,0,NULL},
-        {"Load disc :&1/3...",gui_load1,NULL,0,NULL},
-        {"Eject disc :0/2",gui_eject0,NULL,0,NULL},
-        {"Eject disc :1/3",gui_eject1,NULL,0,NULL},
-        {"Write protect disc :0/2",gui_wprot0,NULL,0,NULL},
-        {"Write protect disc :1/3",gui_wprot1,NULL,0,NULL},
-        {"Default write protect",gui_wprotd,NULL,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-static ALLEGRO_MENU *create_disc_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-
-    al_append_menu_item(menu, "Load disc :0/2...",       IDM_DISC_LOAD_0_2,              ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Load disc :1/3...",       IDM_DISC_LOAD_1_3,              ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Eject disc :0/2",         IDM_DISC_EJECT_0_2,             ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Eject disc :1/3",         IDM_DISC_EJECT_1_3,             ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Write protect disc :0/2", IDM_DISC_WRITE_PROTECT_0_2,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Write protect disc :1/3", IDM_DISC_WRITE_PROTECT_1_3,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Default write protect",   IDM_DISC_WRITE_PROTECT_DEFAULT, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-/*MENU filemenu[6]=
-{
-        {"&Return",gui_return,NULL,0,NULL},
-        {"&Hard reset",gui_reset,NULL,0,NULL},
-        {"&Load state",gui_loads,NULL,0,NULL},
-        {"&Save state",gui_saves,NULL,0,NULL},
-        {"&Exit",gui_exit,NULL,0,NULL},
-        {NULL,NULL,NULL,0,NULL}
-};*/
-static ALLEGRO_MENU *create_file_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-
-    al_append_menu_item(menu, "Hard Reset", IDM_FILE_HARD_RESET, 0, NULL, NULL);
-    al_append_menu_item(menu, "Load state...", IDM_FILE_LOAD_STATE, 0, NULL, NULL);
-    al_append_menu_item(menu, "Save State...", IDM_FILE_SAVE_STATE, 0, NULL, NULL);
-    al_append_menu_item(menu, "Exit", IDM_FILE_EXIT, 0, NULL, NULL);
-    return menu;
 }
 
 // Tape menu.
@@ -511,41 +265,9 @@ static void file_save_state(ALLEGRO_EVENT *event, const char * title, const char
     }
 }
 
-//MENU tapespdmenu[4]=
-//{
-//        {"Normal",gui_normal,NULL,0,NULL},
-//        {"Fast",gui_fast,NULL,0,NULL},
-//        {"Really Fast",gui_rfast,NULL,0,NULL},
-//        {NULL,NULL,NULL,0,NULL}
-//};
-static ALLEGRO_MENU *create_tape_speed_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    add_checkbox_item(menu, "Normal",      IDM_TAPE_SPEED_NORMAL,      (elkConfig.tape.speed == TAPE_NORMAL));
-    add_checkbox_item(menu, "Fast",        IDM_TAPE_SPEED_FAST,        (elkConfig.tape.speed == TAPE_FAST));
-    add_checkbox_item(menu, "Really Fast", IDM_TAPE_SPEED_REALLY_FAST, (elkConfig.tape.speed == TAPE_REALLY_FAST));
-    return menu;
-}
-
-//MENU tapemenu[]=
-//{
-//        {"Load tape...",gui_loadt,NULL,0,NULL},
-//        {"Rewind tape",gui_rewind,NULL,0,NULL},
-//        {"Eject tape",gui_ejectt,NULL,0,NULL},
-//        {"Tape speed",NULL,tapespdmenu,0,NULL},
-//        {NULL,NULL,NULL,0,NULL}
-//};
-static ALLEGRO_MENU *create_tape_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Load tape...", IDM_TAPE_LOAD,   0,                          NULL, NULL);
-    al_append_menu_item(menu, "Rewind tape",  IDM_TAPE_REWIND, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Eject tape",   IDM_TAPE_EJECT,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Tape speed",   0,               0,                          NULL, create_tape_speed_menu());
-    return menu;
-}
-
-// Public functions.
+/******************************************************************************
+* Public Function Definitions
+*******************************************************************************/
 
 void menu_init(ALLEGRO_DISPLAY *display)
 {
@@ -613,6 +335,7 @@ void entergui()
 void setejecttext(int d, char *s)
 {
 }
+
 void setquit()
 {
 }

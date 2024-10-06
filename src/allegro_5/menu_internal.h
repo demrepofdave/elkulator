@@ -1,6 +1,9 @@
 #ifndef __INC_GUI_ALLEGRO_H
 #define __INC_GUI_ALLEGRO_H
 
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_native_dialog.h>
+
 typedef enum {
     IDM_ZERO,
     IDM_FILE_HARD_RESET,
@@ -143,6 +146,21 @@ typedef enum {
     IDM_DEBUGGER,
     IDM_DEBUG_BREAK
 } menu_id_t;
+
+
+
+// Helper functions
+void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, bool checked);
+
+// Menu creation functions
+ALLEGRO_MENU *create_file_menu(void);
+ALLEGRO_MENU *create_tape_menu(void);
+ALLEGRO_MENU *create_disc_menu(void);
+ALLEGRO_MENU *create_roms_menu(void);
+ALLEGRO_MENU *create_settings_menu(void);
+ALLEGRO_MENU *create_misc_menu(void);
+
+// General main menu handling functions.
 
 extern void menu_init(ALLEGRO_DISPLAY *display);
 extern void menu_destroy(ALLEGRO_DISPLAY *display);
