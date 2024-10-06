@@ -13,6 +13,9 @@
         "allegro_acodec.h": "c",
         "gui-allegro.h": "c",
         "config_vars.h": "c",
-        "callback_handlers.h": "c"
+        "callback_handlers.h": "c",
+        "event_handler.h": "c",
+        "allegro_native_dialog.h": "c",
+        "video_internal.h": "c"
     }
 }

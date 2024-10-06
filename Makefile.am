@@ -38,6 +38,7 @@ elkulator_hal_src = src/allegro_4/2xsai.c \
                     src/allegro_4/allegro_icon.c
 else
 elkulator_hal_src = src/allegro_5/adc.c  \
+                    src/allegro_5/event_handler.c \
                     src/allegro_5/firstbyte.c \
                     src/allegro_5/fileutils.c \
                     src/allegro_5/gui-allegro.c \

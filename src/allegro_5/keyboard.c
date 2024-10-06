@@ -85,8 +85,8 @@ uint8_t keyboard_read(uint16_t addr)
         {
                 if (key[d]) // If host key is pressed.
                 {
-                    log_debug("keyboard_read - key detected %d\n", d);
-                    log_debug("keylookup[%d] is %d\n,", d, keylookup[d]);
+                    //log_debug("keyboard_read - key detected %d\n", d);
+                    //log_debug("keylookup[%d] is %d\n,", d, keylookup[d]);
                     if(keyl[keylookup[d]]&0x80 && !(addr&(1<<(keyl[keylookup[d]]&15))))
                     {
                         temp|=1<<((keyl[keylookup[d]]&0x30)>>4);
@@ -104,7 +104,7 @@ void key_down(uint8_t allegro_keycode)
     key[allegro_keycode] = true;
 }
 
-void key_down_event(const ALLEGRO_EVENT *event)
+void key_down_event(ALLEGRO_EVENT *event)
 {
     int keycode = event->keyboard.keycode;
     log_debug("keyboard: key down event, keycode=%d:%s, modifiers=%04X\n", keycode, al_keycode_to_name(keycode), event->keyboard.modifiers);
@@ -137,7 +137,7 @@ void key_up(uint8_t allegro_keycode)
     key[allegro_keycode] = false;
 }
 
-void key_up_event(const ALLEGRO_EVENT *event)
+void key_up_event(ALLEGRO_EVENT *event)
 {
     int keycode = event->keyboard.keycode;
     log_debug("keyboard: key up event, keycode=%d:%s, modifiers=%04X\n", keycode, al_keycode_to_name(keycode), event->keyboard.modifiers);
@@ -181,7 +181,7 @@ void key_up_event(const ALLEGRO_EVENT *event)
     }
 }
 
-void key_char_event(const ALLEGRO_EVENT *event)
+void key_char_event(ALLEGRO_EVENT *event)
 {
     int keycode = event->keyboard.keycode;
     int unichar = event->keyboard.unichar;
@@ -205,4 +205,30 @@ void key_char_event(const ALLEGRO_EVENT *event)
 //        else
 //            key_down(keylookup[keycode]);
 //    }
+}
+
+
+// Main event handling Code
+uint32_t keyboard_handle_event(ALLEGRO_EVENT *event)
+{
+    uint32_t elkEvent = 0;
+    switch(event->type) 
+    {
+        // Keyboard handling.
+        case ALLEGRO_EVENT_KEY_DOWN:
+//            if (!keydefining)
+                key_down_event(event);
+            break;
+
+        case ALLEGRO_EVENT_KEY_CHAR:
+//            if (!keydefining)
+                key_char_event(event);
+            break;
+
+        case ALLEGRO_EVENT_KEY_UP:
+//           if (!keydefining)
+                key_up_event(event);
+            break;
+    }
+    return elkEvent;
 }

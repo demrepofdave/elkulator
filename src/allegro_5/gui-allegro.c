@@ -1,9 +1,11 @@
 #include <allegro5/allegro_native_dialog.h>
 #include "common/video.h"
-#include "gui-allegro.h"
+#include "menu_internal.h"
 #include "logger.h"
 #include "callback_handlers.h"
 #include "config_vars.h"
+#include "common/event_handler.h"
+#include "event_handler_internal.h"
 
 /* pclose() and popen() on Windows are _pclose() and _popen() */
 #ifdef _WIN32
@@ -23,6 +25,7 @@ static inline int menu_id_num(menu_id_t id, int num)
     return (num << 8) | id;
 }
 
+// Now public.
 static inline menu_id_t menu_get_id(ALLEGRO_EVENT *event)
 {
     return event->user.data1 & 0xff;
@@ -544,9 +547,9 @@ static ALLEGRO_MENU *create_tape_menu(void)
 
 // Public functions.
 
-void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display)
+void menu_init(ALLEGRO_DISPLAY *display)
 {
-    log_debug("gui_allegro_init\n");
+    log_debug("menu_init\n");
     ALLEGRO_MENU *menu = al_create_menu();
     al_append_menu_item(menu, "File",     0, 0, NULL, create_file_menu());
     al_append_menu_item(menu, "Tape",     0, 0, NULL, create_tape_menu());
@@ -555,19 +558,19 @@ void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display)
     al_append_menu_item(menu, "Settings", 0, 0, NULL, create_settings_menu());
     al_append_menu_item(menu, "Misc",     0, 0, NULL, create_misc_menu());
     al_set_display_menu(display, menu);
-    al_register_event_source(queue, al_get_default_menu_event_source());
+    al_register_event_source(event_get_event_queue(), al_get_default_menu_event_source());
 }
 
-void gui_allegro_destroy(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display)
+void menu_destroy(ALLEGRO_DISPLAY *display)
 {
-    al_unregister_event_source(queue, al_get_default_menu_event_source());
+    al_unregister_event_source(event_get_event_queue(), al_get_default_menu_event_source());
     al_set_display_menu(display, NULL);
 }
 
 static const char all_dext[] = "*.ssd;*.dsd;*.img;*.adf;*.ads;*.adm;*.adl;*.sdd;*.ddd;*.fdi;*.imd;*.hfe;"
                                "*.SSD;*.DSD;*.IMG;*.ADF;*.ADS;*.ADM;*.ADL;*.SDD;*.DDD;*.FDI;*.IMD;*.HFE";
 
-uint32_t gui_allegro_event(ALLEGRO_EVENT *event)
+uint32_t menu_handle_event(ALLEGRO_EVENT *event)
 {
     uint32_t elkEvent = 0;
     switch(menu_get_id(event)) 
@@ -599,7 +602,7 @@ uint32_t gui_allegro_event(ALLEGRO_EVENT *event)
             tape_speed_set(event);
             break;
     }
-    log_debug("gui_allegro_event elkEvent = 0x%02x\n", elkEvent);
+    log_debug("menu_handle_event elkEvent = 0x%02x\n", elkEvent);
     return(elkEvent);
 }
 

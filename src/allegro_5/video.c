@@ -13,13 +13,10 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_primitives.h>
 #include "common/video.h"
-#include "allegro_5/gui-allegro.h"
+#include "allegro_5/menu_internal.h"
 #include "logger.h"
 #include "video_internal.h"
-
-extern void key_down_event(const ALLEGRO_EVENT *event);
-extern void key_up_event(const ALLEGRO_EVENT *event);
-extern void key_char_event(const ALLEGRO_EVENT *event);
+#include "event_handler_internal.h"
 
 ALLEGRO_BITMAP *b             = NULL;    // Main bitmap used before blitting to window screen.
 ALLEGRO_BITMAP *b16           = NULL;  // Intermediate bitmap 1
@@ -34,7 +31,6 @@ static ALLEGRO_DISPLAY *display;
 ALLEGRO_LOCKED_REGION *region = NULL; // Region lock on bitmap b (to allow writing of pixels)
 
 static ALLEGRO_TIMER *timer;
-ALLEGRO_EVENT_QUEUE *queue;
 static ALLEGRO_EVENT_SOURCE evsrc;
 
 uint32_t elkpal[8] =
@@ -141,11 +137,13 @@ int video_init_part1()
 
     al_init_image_addon();
 
-        if (!(queue = al_create_event_queue())) {
+    if (!event_init_queue())
+    {
         log_fatal("main: unable to create event queue");
         exit(1);
     }
-    al_register_event_source(queue, al_get_display_event_source(display));
+
+    event_register_event_source(al_get_display_event_source(display));
 
     if (!al_install_audio()) {
         log_fatal("main: unable to initialise audio");
@@ -169,22 +167,22 @@ void video_init_part2()
     //ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
     //b = al_create_bitmap(640,616);
 
-    log_debug("Queue = %p, display = %p\n", queue, display);
-    gui_allegro_init(queue, display);
+    log_debug("display = %p\n", display);
+    menu_init(display);
 
     if (!(timer = al_create_timer(0.02)))
     {
         log_fatal("main: unable to create timer");
         exit(1);
     }
-    al_register_event_source(queue, al_get_timer_event_source(timer));
+    event_register_event_source(al_get_timer_event_source(timer));
     al_init_user_event_source(&evsrc);
-    al_register_event_source(queue, &evsrc);
+    event_register_event_source(&evsrc);
 
-    al_register_event_source(queue, al_get_keyboard_event_source());
+    event_register_event_source(al_get_keyboard_event_source());
 
     al_install_mouse();
-    al_register_event_source(queue, al_get_mouse_event_source());
+    event_register_event_source(al_get_mouse_event_source());
 }
 
 // Called from main.c (initelk)
@@ -484,78 +482,4 @@ void video_stop_timer()
     al_stop_timer(timer);   
 }
 
-// True if quitting, false if not.
-uint32_t video_await_event()
-{
-    ALLEGRO_EVENT event;
-    bool quitting = false;
-    bool timer_triggered = false;
-    uint32_t elkEvent = 0;
-    while (!elkEvent) 
-    {
-        al_wait_for_event(queue, &event);
-        switch(event.type)
-        {
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                log_debug("video_await_event: event display close - quitting\n");
-                elkEvent = ELK_EVENT_EXIT;
-                break;
 
-            case ALLEGRO_EVENT_TIMER:
-                //log_debug("video_await_event: event timer triggered\n");
-                elkEvent = ELK_EVENT_TIMER_TRIGGERED;
-                break;
-
-            case ALLEGRO_EVENT_MENU_CLICK:
-                video_stop_timer();
-                log_debug("video_await_event: event Menu click\n");
-                elkEvent = gui_allegro_event(&event);
-                video_start_timer();
-                break;
-
-            // Keyboard handling.
-            case ALLEGRO_EVENT_KEY_DOWN:
-//                if (!keydefining)
-                    key_down_event(&event);
-                break;
-            case ALLEGRO_EVENT_KEY_CHAR:
-//                if (!keydefining)
-                    key_char_event(&event);
-                break;
-            case ALLEGRO_EVENT_KEY_UP:
-//               if (!keydefining)
-                    key_up_event(&event);
-                break;
-
-            // Mouse handling
-            case ALLEGRO_EVENT_MOUSE_AXES:
-                break;
-
-            case ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY:
-                break;
-
-            case ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY:
-                break;
-
-            default:
-                log_debug("video_await_event: event %d detected\n", event.type);
-                break;
-            //case ALLEGRO_EVENT_DISPLAY_RESIZE:
-            //    video_update_window_size(&event);
-            //    break;
-        }
-    }
-    if(elkEvent & ELK_EVENT_TIMER_TRIGGERED)
-    {
-        //log_debug("timer_triggered\n");
-    }
-    if(elkEvent & ELK_EVENT_RESET)
-    {
-        log_debug("Elk Reset trigger\n");
-    }
-    if(elkEvent & ELK_EVENT_EXIT)
-    {
-        log_debug("quitting\n");
-    }
-    return elkEvent;
-}

@@ -4,13 +4,14 @@
 #ifdef HAL_ALLEGRO_4
 #include <allegro.h>
 #else
-#include <allegro5/allegro.h>
+#include "common/event_handler.h"
+#include "common/video.h"
 #endif
 
+#include <stdlib.h>
 #include "elk.h"
-#include "callback_handlers.h"
 #include "logger.h"
-#include "common/video.h"
+#include "callback_handlers.h"
 
 char ssname[260];
 char scrshotname[260];
@@ -63,7 +64,7 @@ int main(int argc, char *argv[])
                 uint32_t elkEvent = 0;
                 while (!(elkEvent & ELK_EVENT_EXIT))
                 {
-                        elkEvent = video_await_event();
+                        elkEvent = event_await();
                         if(!(elkEvent & ELK_EVENT_EXIT)) 
                         {
                                 drawit++;

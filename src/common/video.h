@@ -11,11 +11,6 @@
 #define EAGLE     4
 #define PAL       5
 
-// Following allegro5 only.
-#define ELK_EVENT_EXIT  0x01
-#define ELK_EVENT_RESET 0x02
-#define ELK_EVENT_TIMER_TRIGGERED 0x04
-
 typedef struct
 {
     int winsizex; // Current window size in ???
@@ -53,6 +48,6 @@ void video_clearall();
 void video_shutdown();
 
 void video_start_timer();
-uint32_t video_await_event();
+void video_stop_timer();
 
 #endif // _VIDEO_H

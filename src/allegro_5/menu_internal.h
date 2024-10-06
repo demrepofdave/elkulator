@@ -144,8 +144,8 @@ typedef enum {
     IDM_DEBUG_BREAK
 } menu_id_t;
 
-extern void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display);
-extern void gui_allegro_destroy(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display);
-extern uint32_t gui_allegro_event(ALLEGRO_EVENT *event);
+extern void menu_init(ALLEGRO_DISPLAY *display);
+extern void menu_destroy(ALLEGRO_DISPLAY *display);
+extern uint32_t menu_handle_event(ALLEGRO_EVENT *event);
 
 #endif
