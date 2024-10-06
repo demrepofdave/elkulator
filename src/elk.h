@@ -38,6 +38,9 @@ extern int cycles,ulacycles;
 extern int extrom;
 extern uint8_t ram[32768];
 extern uint16_t pc;
+#ifdef HAL_ALLEGRO_4
+extern int keylookup[128];
+#endif
 
 uint8_t readmem(uint16_t addr);
 void writemem(uint16_t addr, uint8_t val);
