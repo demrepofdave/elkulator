@@ -1,4 +1,4 @@
-/*Elkulator v1.0 by Tom walker
+/*Elkulator v1.0 by Sarah Walker
   Initialisation/Closing/Main loop*/
 #ifdef HAL_ALLEGRO_4
 #include <allegro.h>
