@@ -1,10 +1,10 @@
 /*Elkulator v1.0 by Sarah Walker
   Linux main loop*/
 
-#ifdef HAL_ALLEGRO_5
-#include <allegro5/allegro.h>
-#else
+#ifdef HAL_ALLEGRO_4
 #include <allegro.h>
+#else
+#include <allegro5/allegro.h>
 #endif
 
 #include "elk.h"
@@ -52,7 +52,13 @@ int main(int argc, char *argv[])
         initelk(argc,argv);
         video_register_close_button_handler(native_window_close_button_handler);
         
-        #ifdef HAL_ALLEGRO_5        
+        #ifdef HAL_ALLEGRO_4 
+                        while (!quited)
+                {
+                        runelk();
+                        if (menu_pressed()) entergui();
+                }
+        #else       
                 video_start_timer();
                 uint32_t elkEvent = 0;
                 while (!(elkEvent & ELK_EVENT_EXIT))
@@ -68,19 +74,13 @@ int main(int argc, char *argv[])
                         }
                         runelk();
                 }
-        #else
-                while (!quited)
-                {
-                        runelk();
-                        if (menu_pressed()) entergui();
-                }
-        #endif // HAL_ALLEGRO_5
+        #endif // HAL_ALLEGRO_4
         closeelk();
 
         return 0;
 }
 
-#ifndef HAL_ALLEGRO_5
+#ifdef HAL_ALLEGRO_4
 END_OF_MAIN();
-#endif // HAL_ALLEGRO_5
+#endif // HAL_ALLEGRO_4
 

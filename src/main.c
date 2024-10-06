@@ -1,9 +1,9 @@
 /*Elkulator v1.0 by Tom walker
   Initialisation/Closing/Main loop*/
-#ifdef HAL_ALLEGRO_5
-#include <allegro5/allegro.h>
-#else
+#ifdef HAL_ALLEGRO_4
 #include <allegro.h>
+#else
+#include <allegro5/allegro.h>
 #endif
 
 #include <stdio.h>
@@ -72,7 +72,7 @@ void initelk(int argc, char *argv[])
         int serialnext=0;
         int serialdebugnext=0;
         fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-        #ifndef HAL_ALLEGRO_5
+        #ifdef HAL_ALLEGRO_4
             p = fileutils_get_filename(exedir);
             p[0] = 0;
         #endif

@@ -2,10 +2,10 @@
   Windows main loop*/
 #ifdef WIN32
 
-#ifdef HAL_ALLEGRO_5
-#include <allegro5/allegro.h>
-#else
+#ifdef HAL_ALLEGRO_4
 #include <allegro.h>
+#else
+#include <allegro5/allegro.h>
 #endif
 
 #include <winalleg.h>
