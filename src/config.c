@@ -136,12 +136,14 @@ void loadconfig()
         
         joffset=getintcfg("joy_offset",0);
 
-        // Just use default keyboard for now.
-        // for (c=0;c<128;c++)
-        //{
-        //        sprintf(s2,"key_define_%03i",c);
-        //        keylookup[c]=getintcfg(s2,c);
-        //}
+        // Just use default keyboard for now for allegro5.
+        #ifdef HAL_ALLEGRO_4
+        for (c=0;c<128;c++)
+        {
+                sprintf(s2,"key_define_%03i",c);
+                keylookup[c]=getintcfg(s2,c);
+        }
+        #endif
 
         /* Cartridge expansions */
         enable_mgc = getintcfg("enable_mgc", 0);
@@ -191,11 +193,13 @@ void saveconfig()
         writeintcfg("joy_offset",joffset);
         
         // Use default keyboard for now.
-        //for (c=0;c<128;c++)
-        //{
-        //        sprintf(s,"key_define_%03i",c);
-        //        writeintcfg(s,keylookup[c]);
-        //}
+        #ifdef HAL_ALLEGRO_4
+        for (c=0;c<128;c++)
+        {
+                sprintf(s,"key_define_%03i",c);
+                writeintcfg(s,keylookup[c]);
+        }
+        #endif
 
         /* Cartridge expansions */
         writeintcfg("enable_mgc", enable_mgc);

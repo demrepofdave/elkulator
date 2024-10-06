@@ -5,13 +5,13 @@
 #include <allegro.h>
 #else
 #include "common/event_handler.h"
-#include "common/video.h"
 #endif
 
 #include <stdlib.h>
 #include "elk.h"
 #include "logger.h"
 #include "callback_handlers.h"
+#include "common/video.h"
 
 char ssname[260];
 char scrshotname[260];
