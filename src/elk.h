@@ -286,8 +286,8 @@ void mixtapenoise(int16_t *tapebuffer);
 
 void loadstate();
 void savestate();
-void doloadstate();
-void dosavestate();
+void doloadstate(const char *filename);
+void dosavestate(const char *filename);
 
 void dodebugger();
 void debugread(uint16_t addr);

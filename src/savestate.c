@@ -14,9 +14,9 @@ void loadstate()
         wantloadstate=1;
 }
 
-void dosavestate()
+void dosavestate(const char * filename)
 {
-        FILE *f=fopen(ssname,"wb");
+        FILE *f=fopen(filename,"wb");
         putc('E',f); putc('L',f); putc('K',f); putc('S',f);
         putc('N',f); putc('A',f); putc('P',f); putc('1',f);
 
@@ -43,10 +43,10 @@ void dosavestate()
         wantsavestate=0;
 }
         
-void doloadstate()
+void doloadstate(const char * filename)
 {
         int c;
-        FILE *f=fopen(ssname,"rb");
+        FILE *f=fopen(filename,"rb");
         for (c=0;c<8;c++) getc(f);
         
         elkConfig.expansion.turbo   = getc(f);

@@ -56,8 +56,8 @@ CallbackHandlers callback_handlers;
 void initHandlers()
 {
         log_debug("initHandlers\n");
-        //callback_handlers.handler_save_state = savestate;
-        //callback_handlers.handler_load_state = loadstate;
+        callback_handlers.handler_save_state = dosavestate;
+        callback_handlers.handler_load_state = doloadstate;
         callback_handlers.handler_load_tape  = loadtape;
 }
 
@@ -240,8 +240,8 @@ void runelk()
                         reset6502();
                 }
                 oldbreak = break_pressed();
-                if (wantloadstate) doloadstate();
-                if (wantsavestate) dosavestate();
+                if (wantloadstate) doloadstate(ssname);
+                if (wantsavestate) dosavestate(ssname);
                 if (infocus) video_poll_joystick();
                 if (autoboot) autoboot--;
                 ddnoiseframes++;

@@ -478,6 +478,12 @@ void video_start_timer()
     al_start_timer(timer);
 }
 
+void video_stop_timer()
+{
+    log_debug("video_start_timer: staring timer %p\n", timer);
+    al_stop_timer(timer);   
+}
+
 // True if quitting, false if not.
 uint32_t video_await_event()
 {
@@ -494,15 +500,17 @@ uint32_t video_await_event()
                 log_debug("video_await_event: event display close - quitting\n");
                 elkEvent = ELK_EVENT_EXIT;
                 break;
+
             case ALLEGRO_EVENT_TIMER:
                 //log_debug("video_await_event: event timer triggered\n");
                 elkEvent = ELK_EVENT_TIMER_TRIGGERED;
                 break;
+
             case ALLEGRO_EVENT_MENU_CLICK:
-//                main_pause("menu active");
+                video_stop_timer();
                 log_debug("video_await_event: event Menu click\n");
                 elkEvent = gui_allegro_event(&event);
-//                main_resume();
+                video_start_timer();
                 break;
 
             // Keyboard handling.
