@@ -29,6 +29,12 @@
 
 typedef struct 
 {
+    uint8_t plus1;
+    uint8_t plus3;
+    uint8_t dfsena;
+    uint8_t adfsena;
+    uint8_t defaultwriteprot;
+    // Turbo and Shadow board configuration
     uint8_t mrb;
     uint8_t mrbmode;
     uint8_t turbo; 

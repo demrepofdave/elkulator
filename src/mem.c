@@ -17,7 +17,6 @@ int FASTHIGH2=0;
 
 extern int output;
 int mrbmapped=0;
-int plus1=0;
 uint8_t rombanks[16][16384];
 uint8_t rombank_enabled[16];
 
@@ -67,10 +66,10 @@ void loadrom_n(int bank, char *name)
 
 void update_rom_config(void)
 {
-    rombank_enabled[PLUS1_BANK] = plus1;
+    rombank_enabled[PLUS1_BANK] = elkConfig.expansion.plus1;
     rombank_enabled[SOUND_BANK] = sndex;
-    rombank_enabled[ADFS_BANK] = (plus3 && adfsena);
-    rombank_enabled[DFS_BANK] = (plus3 && dfsena);
+    rombank_enabled[ADFS_BANK]  = (elkConfig.expansion.plus3 && elkConfig.expansion.adfsena);
+    rombank_enabled[DFS_BANK]   = (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena);
 }
 
 void loadroms()
@@ -192,15 +191,15 @@ uint8_t readmem(uint16_t addr)
         switch (addr&0xFF00) {
         case 0xFC00:
         {
-            if ((addr&0xFFF8)==0xFCC0 && plus3) return read1770(addr);
+            if ((addr&0xFFF8)==0xFCC0 && elkConfig.expansion.plus3) return read1770(addr);
             if (addr==0xFCC0 && firstbyte) return readfirstbyte();
-            if (plus1)
+            if (elkConfig.expansion.plus1)
             {
                     if (addr==0xFC70) return readadc();
                     if (addr==0xFC72) return getplus1stat();
             }
             #ifndef WIN32
-                if (addr>=0xFC60 && addr<=0xFC6F && plus1) return readserial(addr);
+                if (addr>=0xFC60 && addr<=0xFC6F && elkConfig.expansion.plus1) return readserial(addr);
             #endif
 
             /* Allow the JIM paging register to be read if enabled directly or
@@ -268,7 +267,7 @@ void writemem(uint16_t addr, uint8_t val)
         if (addr<0xC000)
         {
                 if (extrom && rombank==SOUND_BANK && (addr&0x2000)) sndrom[addr&0x3FFF]=val;
-                if (extrom && rombank==DFS_BANK && plus3 && dfsena) dfs[addr&0x3FFF]=val;
+                if (extrom && rombank==DFS_BANK && elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) dfs[addr&0x3FFF]=val;
                 if (extrom && rombank==0x6) { ram6[addr&0x3FFF]=val; usedrom6=1; }
         }
         switch (addr & 0xFF00) {
@@ -283,7 +282,7 @@ void writemem(uint16_t addr, uint8_t val)
         default:
             break;
         }
-        if ((addr&0xFFF8)==0xFCC0 && plus3) write1770(addr,val);
+        if ((addr&0xFFF8)==0xFCC0 && elkConfig.expansion.plus3) write1770(addr,val);
 
         if (addr==0xFC98)
         {
@@ -309,10 +308,10 @@ void writemem(uint16_t addr, uint8_t val)
 //                rpclog("Write MRB %02X %i %i %04X\n",val,FASTLOW,FASTHIGH2,pc);
 //                if (!val) output=1;
         }
-        if (addr==0xFC70 && plus1) writeadc(val);
+        if (addr==0xFC70 && elkConfig.expansion.plus1) writeadc(val);
         #ifndef WIN32
-                if (addr>=0xFC60 && addr<=0xFC6F && plus1) return writeserial(addr, val);
-                if (addr==0xFC71 && plus1) writeparallel(val);
+                if (addr>=0xFC60 && addr<=0xFC6F && elkConfig.expansion.plus1) return writeserial(addr, val);
+                if (addr==0xFC71 && elkConfig.expansion.plus1) writeparallel(val);
         #endif // WIN32
         /* The Mega Games Cartridge uses FC00 to select pairs of 16K banks in
            the two sets of ROMs. */
@@ -336,7 +335,7 @@ void savememstate(FILE *f)
 {
         fwrite(ram,32768,1,f);
         if (elkConfig.expansion.mrb) fwrite(ram2,32768,1,f);
-        if (plus3 && dfsena) fwrite(dfs,16384,1,f);
+        if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fwrite(dfs,16384,1,f);
         if (sndex)  fwrite(sndrom,16384,1,f);
         if (usedrom6) fwrite(ram6,16384,1,f);
 }
@@ -345,7 +344,7 @@ void loadmemstate(FILE *f)
 {
         fread(ram,32768,1,f);
         if (elkConfig.expansion.mrb) fread(ram2,32768,1,f);
-        if (plus3 && dfsena) fread(dfs,16384,1,f);
+        if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fread(dfs,16384,1,f);
         if (sndex)  fread(sndrom,16384,1,f);
         if (usedrom6) fread(ram6,16384,1,f);
 }

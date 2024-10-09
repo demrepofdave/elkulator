@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-
+void init_config();
 
 #endif // _CONFIG_H

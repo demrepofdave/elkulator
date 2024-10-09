@@ -197,7 +197,7 @@ void initelk(int argc, char *argv[])
         for (int i = 0; i < 16; i++) {
             if (romnames[i][0] != 0) loadrom_n(i, romnames[i]);
         }
-        if (defaultwriteprot) writeprot[0]=writeprot[1]=1;
+        if (elkConfig.expansion.defaultwriteprot) writeprot[0]=writeprot[1]=1;
 
         video_init_part3(drawitint);
 

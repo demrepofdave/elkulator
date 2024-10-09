@@ -138,7 +138,7 @@ void updateulaints()
                 irq=1;
 //                printf("Interrupt %02X %02X\n",ula.isr,ula.ier);
         }
-        else if (plus1 && serial_irq)
+        else if (elkConfig.expansion.plus1 && serial_irq)
                 irq = 1;
         else
         {

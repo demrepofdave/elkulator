@@ -16,11 +16,21 @@ uint8_t cfgbuffer[1024];
 int sndex;
 int sndint;
 int firstbyte;
-int defaultwriteprot;
 int joffset;
 int enable_mgc;
 int enable_db_flash_cartridge;
 int enable_jim;
+
+// TODO: Probably do not need this as loadconfig specifies defaults;
+
+void init_config()
+{
+        elkConfig.expansion.plus1 = 0;
+        elkConfig.expansion.plus3 = 0;
+        elkConfig.expansion.mrb = 0;
+        elkConfig.expansion.mrbmode = 0;
+        elkConfig.expansion.turbo = 0;
+}
 
 char *getstringcfg(char *name)
 {
@@ -93,14 +103,14 @@ void loadconfig()
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"rt");
-        elkConfig.tape.speed = getintcfg("tapespeed",0);
-        plus1=getintcfg("plus1",0);
-        plus3=getintcfg("plus3",0);
-        dfsena=getintcfg("dfsena",0);
-        adfsena=getintcfg("adfsena",0);
-        defaultwriteprot=getintcfg("defaultwriteprotect",1);
+        elkConfig.tape.speed                 = getintcfg("tapespeed",0);
+        elkConfig.expansion.plus1            = getintcfg("plus1",0);
+        elkConfig.expansion.plus3            = getintcfg("plus3",0);
+        elkConfig.expansion.dfsena           = getintcfg("dfsena",0);
+        elkConfig.expansion.adfsena          = getintcfg("adfsena",0);
+        elkConfig.expansion.defaultwriteprot = getintcfg("defaultwriteprotect",1);
         
-        elkConfig.expansion.turbo=getintcfg("turbo",0);
+        elkConfig.expansion.turbo   = getintcfg("turbo",0);
         elkConfig.expansion.mrb     = getintcfg("mrb",0);
         elkConfig.expansion.mrbmode = getintcfg("mrbmode",0);
         ulamode=getintcfg("ulamode",0);
@@ -160,11 +170,11 @@ void saveconfig()
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"wt");
         writeintcfg("tapespeed",elkConfig.tape.speed);
-        writeintcfg("plus1",plus1);
-        writeintcfg("plus3",plus3);
-        writeintcfg("dfsena",dfsena);
-        writeintcfg("adfsena",adfsena);
-        writeintcfg("defaultwriteprotect",defaultwriteprot);
+        writeintcfg("plus1",elkConfig.expansion.plus1);
+        writeintcfg("plus3",elkConfig.expansion.plus3);
+        writeintcfg("dfsena", elkConfig.expansion.dfsena);
+        writeintcfg("adfsena",elkConfig.expansion.adfsena);
+        writeintcfg("defaultwriteprotect",elkConfig.expansion.defaultwriteprot);
         
         writestringcfg("discname_0",discname);
         writestringcfg("discname_1",discname2);

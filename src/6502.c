@@ -1753,7 +1753,7 @@ void exec6502()
                                 if (!motorspin) fdcspindown();
                         }
 
-                        if (plus1 && adctime)
+                        if (elkConfig.expansion.plus1 && adctime)
                         {
                                 adctime-=128;
                                 if (adctime<=0)
@@ -1763,7 +1763,7 @@ void exec6502()
                                 }
                         }
                         #ifndef WIN32
-                                if (plus1) pollserial(oldcycs);
+                                if (elkConfig.expansion.plus1) pollserial(oldcycs);
                         #endif // WIN32
                 }
                         if (elkConfig.tape.speed == TAPE_REALLY_FAST)

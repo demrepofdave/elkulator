@@ -64,8 +64,6 @@ extern int infocus;
 
 void resetsound();
 
-extern int plus3;
-
 void dumpregs();
 
 extern int mrbmapped;
@@ -81,7 +79,6 @@ extern int discchanged[2];
 
 extern int tapewrite;
 
-extern int dfsena,adfsena;
 extern int sndex;
 
 extern int drawmode;
@@ -161,7 +158,6 @@ extern void (*fdcwriteprotect)();
 extern int  (*fdcgetdata)(int last);
 
 extern int writeprot[2],fwriteprot[2];
-extern int defaultwriteprot;
 
 extern int motoron,fdctime,disctime;
 
@@ -176,7 +172,6 @@ extern int enable_mgc;
 extern int enable_db_flash_cartridge;
 extern int enable_jim;
 
-extern int plus1;
 extern uint8_t plus1stat;
 extern int adctime;
 
