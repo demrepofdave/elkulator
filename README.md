@@ -43,9 +43,6 @@ If this is successful then you should be able to run the emulator:
  
 ## Linux
 
-Elkulator can still be compiled against allegro4 for reference, allthough this will
-be deprecated soon.
-
 You will need the following libraries:
 
 - Allegro 5.x
@@ -104,7 +101,7 @@ To configure and build Elkulator, open a terminal window, navigate to the
 Elkulator directory then enter
 
 ```
-  ./scripts/autoconfigure.sk --enable-allegro4
+  ./scripts/autoconfigure.sh --enable-allegro4
 ```
 
 To build enter: 
@@ -144,8 +141,8 @@ Video performance is noticeably slower than on Windows. This is largely due to
 the lack of hardware acceleration support in Elkulator.
 
 
-Features
-========
+# Features
+
 
 - Emulates basic 32k Electron
 - Emulation of all modes + line-by-line effects
@@ -158,8 +155,7 @@ Features
 - Super 2xSaI, Super Eagle, Scale2x and PAL filters
 
 
-Status
-======
+# Status
 
 - 6502   - Enough to run all games AFAIK. Cycle accurate.
 - ULA    - Cycle accurate graphics emulation.
@@ -170,8 +166,8 @@ Status
 - CSS    - Using SN emulator from B-em.
 
 
-Menu
-====
+# Menu
+
 
 The menu options are:
 
@@ -235,8 +231,7 @@ The menu options are:
     - Break - Breaks into debugger (when debugger enabled)
 
 
-Turbo boards
-============
+# Turbo boards
 
 Elkulator can emulate an Elektuur/Slogger turbo board. This board replaces the lower
 8k of RAM in the system with the faster RAM on the board. This has the effect of speeding
@@ -255,8 +250,44 @@ afair, attempting to replace all the Electron memory. It has three modes :
          noticeably faster as well. This mode is incompatible with almost all games though.
 
 
+# FAQ
+
+Q : How do I run a game?
+A : Load the UEF file through the tape menu. Then, at the > prompt, type
+    CHAIN"" (for most games. A few will need *RUN).
+
+Q : Why is the 2xSaI filter so slow?
+A : The code itself isn't terribly fast to start with, but due to my lazyness,
+    the screen rendering code is still in 8-bit, so Elkulator has to perform
+    an 8-bit to 16-bit conversion every frame.
+
+Q : Why is the PAL filter even slower?
+A : The PAL filter is actually doing a lot of work - processing 3 16mhz data streams.
+    It's made worse by my inability to optimise it properly.
 
 # Credits
 
-Sarah Walker (b-em@bbcmicro.com)
-+ Many others (TODO: Add)
+Dave Moore for the website and for testing
+
+Peter Edwards for testing and for feature suggestions
+
+Gary Forrest for hosting
+
+Bob Austin,Astec,Harry Barman,Paul Bond,Allen Boothroyd,Ben Bridgewater,Cambridge,
+John Cox,Chris Curry,6502 designers,Jeremy Dion,Tim Dobson,Joe Dunn,Ferranti,
+Steve Furber,David Gale,Andrew Gordon,Martyn Gilbert,Lawrence Hardwick,Hermann Hauser,
+John Herbert,Hitachi,Andy Hopper,Paul Jephcot,Brian Jones,Chris Jordan,
+Computer Laboratory,Tony Mann,Peter Miller,Trevor Morris,Steve Parsons,Robin Pain,
+Glyn Phillips,Brian Robertson,Peter Robinson,David Seal,Kim Spence-Jones,Graham Tebby,
+Jon Thackray,Topexpress,Chris Turner,Hugo Tyson,John Umney,Alex van Someren,
+Geoff Vincent,Adrian Warner,Robin Williamson and Roger Wilson for contributing to the 
+development of the Acorn Electron (among others too numerous to mention)
+
+Sarah Walker
+
+b-em@bbcmicro.com
+
+Also check out B-em (b-em@bbcmicro.com), my BBC/Master emulator, Arculator 
+(b-em.bbcmicro.com/arculator), my Archimedes emulator, and RPCemu
+(www.riscos.info/RPCEmu), my RiscPC/A7000 emulator (that I'm not really involved
+with anymore).
