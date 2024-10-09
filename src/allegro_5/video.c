@@ -1,9 +1,25 @@
-// Video abstration layer.
-// Allows actual graphics libraries and sound used for the emulation to be abstracted from the actual electron code
-// This allows easier porting to different graphics and sound libraries in futurer in order to allow maximum
-// cross platform support and long term durability.
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * video.c
+ * 
+ * Video abstration layer.
+ * 
+ * Allows actual graphics libraries used for the emulation to be abstracted 
+ * from the actual electron code.
+ * 
+ * This allows easier porting to different graphics and sound libraries in 
+ * future in order to allow maximum cross platform support and long term
+ * durability.
+ *
+ * This is the allegro 5 implementation of the abstraction layer.
+ *
+ */
 
-// This is the allegro4 implementation of the abstraction layer.
+/******************************************************************************
+* Include files
+*******************************************************************************/
 
 #include <stdio.h>
 #include <allegro5/allegro.h>
@@ -17,6 +33,22 @@
 #include "logger.h"
 #include "video_internal.h"
 #include "event_handler_internal.h"
+
+/******************************************************************************
+* Preprocessor Macros
+*******************************************************************************/
+
+#define VERSION_STR "Elkulator v2.09a"
+
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
+
+typedef uint32_t elk_pallete_t;
+
+/******************************************************************************
+* Private Variable Definitions
+*******************************************************************************/
 
 ALLEGRO_BITMAP *b             = NULL;    // Main bitmap used before blitting to window screen.
 ALLEGRO_BITMAP *b16           = NULL;  // Intermediate bitmap 1
@@ -33,7 +65,7 @@ ALLEGRO_LOCKED_REGION *region = NULL; // Region lock on bitmap b (to allow writi
 static ALLEGRO_TIMER *timer;
 static ALLEGRO_EVENT_SOURCE evsrc;
 
-uint32_t elkpal[8] =
+elk_pallete_t elkpal[8] =
 {
     0xff000000,
     0xffff0000,
@@ -45,9 +77,21 @@ uint32_t elkpal[8] =
     0xffffffff
 };
 
-WindowCoords main_window;
+windowCoords_t main_window;
 
-#define VERSION_STR "Elkulator v2.09a"
+/******************************************************************************
+* Function Prototypes
+*******************************************************************************/
+
+
+/******************************************************************************
+* Private Function Definitions
+*******************************************************************************/
+
+
+/******************************************************************************
+* Public Function Definitions
+*******************************************************************************/
 
 // Called from linux.c (main)
 int video_init_part1()
@@ -58,8 +102,8 @@ int video_init_part1()
         exit(-1);
     }
 
-    main_window.winsizex = 800; // Will be configured in future
-    main_window.winsizey = 600; // Will be configured in future
+    main_window.winsizex = 800; // TODO: Will be configured in future
+    main_window.winsizey = 600; // TODO: Will be configured in future
     main_window.maintain_aspect = true;
 
     al_init_native_dialog_addon();
@@ -104,32 +148,6 @@ int video_init_part1()
     //colwhite = 0xffffffff;
     // border_col = al_map_rgb(0, 0, 0);
 
-    //nula_default_palette();
-
-    //for (int c = 0; c < 8; c++)
-    //    nula_flash[c] = 1;
-    //for (int temp = 0; temp < 256; temp++) {
-    //    int temp2 = temp;
-    //    for (int c = 0; c < 16; c++) {
-    //        int left = 0;
-    //        if (temp2 & 2)
-    //            left |= 1;
-    //        if (temp2 & 8)
-    //            left |= 2;
-    //        if (temp2 & 32)
-    //            left |= 4;
-    //        if (temp2 & 128)
-    //            left |= 8;
-    //        table4bpp[3][temp][c] = left;
-    //        temp2 <<= 1;
-    //        temp2 |= 1;
-    //    }
-    //    for (int c = 0; c < 16; c++) {
-    //        table4bpp[2][temp][c] = table4bpp[3][temp][c >> 1];
-    //        table4bpp[1][temp][c] = table4bpp[3][temp][c >> 2];
-    //        table4bpp[0][temp][c] = table4bpp[3][temp][c >> 3];
-    //    }
-    //}
     b = al_create_bitmap(640, 616);
     al_set_target_bitmap(b);
     al_clear_to_color(al_map_rgb(0, 0,0));
@@ -188,6 +206,7 @@ void video_init_part2()
 // Called from main.c (initelk)
 void video_init_part3(void (*timer_function)(void))
 {
+    // Nothing to do.
 }
 
 void video_rest(unsigned int period)

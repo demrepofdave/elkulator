@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "elk.h"
 #include "common/samples.h"
+#include "common/sound.h"
 
 static const char * ddnoise35 = "ddnoise/35";   // Name of directory containing wav files to emulate noise of 3.5 inch Disk Drive
 static const char * ddnoise525 = "ddnoise/525"; // Name of directory containing wav files to emulate noise of 5.25 inch Disk Drive
@@ -162,7 +163,7 @@ printf("Mixing ddnoise...\n");
         mixtapenoise(ddbuffer);
 //        fwrite(ddbuffer,4410*2,1,f2);
 //rpclog("Give buffer... %i %i\n",ddnoise_mstat,ddnoise_sstat);
-        givealbufferdd(ddbuffer);
+        sound_givealbufferdd(ddbuffer);
         
         oldmotoron=motoron;
 }

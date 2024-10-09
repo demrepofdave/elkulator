@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "elk.h"
+#include "common/sound.h"
 
 int sndinternal=1;
 uint16_t snshift;

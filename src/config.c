@@ -9,7 +9,7 @@
 
 static const char * elk_cfg_filename = "/elk.cfg"; // Filename for elkulator config file.
 
-Config elkConfig;
+elk_config_t elkConfig;
 
 FILE *cfgfile;
 uint8_t cfgbuffer[1024];

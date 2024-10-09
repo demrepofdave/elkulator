@@ -5,6 +5,7 @@
 #include <zlib.h>
 #include "elk.h"
 #include "config_vars.h"
+#include "common/sound.h"
 #include "common/video.h"
 
 void dosavescrshot();

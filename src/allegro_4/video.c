@@ -29,7 +29,7 @@ PALETTE elkpal =
       {63,63,63},
 };
 
-WindowCoords main_window;
+windowCoords_t main_window;
 
 // Called from linux.c (main)
 int video_init_part1()

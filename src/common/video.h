@@ -1,9 +1,37 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * video.h
+ * 
+ * Video abstration layer include file..
+ * 
+ * Allows actual graphics libraries used for the emulation to be abstracted 
+ * from the actual electron code.
+ * 
+ * This allows easier porting to different graphics and sound libraries in 
+ * future in order to allow maximum cross platform support and long term
+ * durability.
+ *
+ * This is the allegro 5 implementation of the abstraction layer.
+ *
+ */
+
 #ifndef _VIDEO_H
 #define _VIDEO_H
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
 
 #include <stdint.h>
 #include <stdbool.h>
 
+/******************************************************************************
+* Preprocessor Macros
+*******************************************************************************/
+
+// Various defines for various type of display and display filters
 #define SCANLINES 0
 #define LINEDBL   1
 #define _2XSAI    2
@@ -11,12 +39,23 @@
 #define EAGLE     4
 #define PAL       5
 
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
+
+// This structure will all information related to the native window state
+// and coordinates.
 typedef struct
 {
     int winsizex; // Current window size in ???
     int winsizey; // Current window size in ???
     bool maintain_aspect; // If true maintain 4:3 aspect ration (used recalce winsizey based on winsizex)
-} WindowCoords;
+} windowCoords_t;
+
+
+/******************************************************************************
+* Public Function Definitions
+*******************************************************************************/
 
 int  video_init_part1();                                // Called from main() in linux.c
 void video_init_part2();                                // Called from ulainit() in ula.c

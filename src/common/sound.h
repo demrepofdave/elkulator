@@ -2,56 +2,46 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * config_var.h
+ * soundopenal.c
  * 
- * Contains configuration structure which is used to
- * run the electron and emulator.  Most of this information
- * is loaded and stored in elk.cfg file.
+ * Sound abstration layer (OpenAL)
+ *
+ * Allows actual sound libraries and sound used for the emulation
+ * to be abstracted from the actual electron code
+ * 
+ * This allows easier porting to different sound libraries in 
+ * future in order to allow maximum cross platform support and 
+ * long term durability.
+ *
+ * This is the openAL implementation of the abstraction layer.
+ * 
+ * TODO: The above description is not completely true as
+ *       some sound code still exist in the electron emulation
+ *       main code.  This should change in future.
  */
 
-#ifndef _CONFIG_VARS_H
-#define _CONFIG_VARS_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
+#include <stdint.h>
 
 /******************************************************************************
 * Preprocessor Macros
 *******************************************************************************/
-#define TAPE_NORMAL       0
-#define TAPE_FAST         1
-#define TAPE_REALLY_FAST  2
+
 
 /******************************************************************************
 * Typedefs
 *******************************************************************************/
 
-typedef struct 
-{
-    uint8_t mrb;
-    uint8_t mrbmode;
-    uint8_t turbo; 
-} expansion_config_t;
-
-
-typedef struct
-{
-    uint8_t speed;
-} tape_config_t;
-
-
-typedef struct 
-{
-    tape_config_t      tape;
-    expansion_config_t expansion;
-
-} elk_config_t;
-
-extern elk_config_t elkConfig;
 
 /******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
 
-#endif // CONFIG_VARS_H
+void sound_init_part1(int argc, char *argv[]);
+void sound_init_part2();
+void addsnd(uint8_t dat);
+void mixbuffer(int16_t *d);
+void sound_givealbufferdd(int16_t *buf);

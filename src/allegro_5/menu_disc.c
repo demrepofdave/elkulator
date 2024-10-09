@@ -1,6 +1,6 @@
 /*
  * Elkulator - An electron emulator originally written 
- *              by Sarah Walker
+ *             by Sarah Walker
  *
  * menu_disc.c
  * 

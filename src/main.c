@@ -16,6 +16,7 @@
 #include "common/video.h"
 #include "common/keyboard.h"
 #include "common/fileutils.h"
+#include "common/sound.h"
 #undef printf
 int autoboot;
 FILE *rlog;
@@ -175,7 +176,7 @@ void initelk(int argc, char *argv[])
                 if (tapenext) tapenext--;
         }
 
-        initalmain(0,NULL);
+        sound_init_part1(0,NULL);
         loadroms();
         reset6502();
         initula();
@@ -200,7 +201,7 @@ void initelk(int argc, char *argv[])
 
         video_init_part3(drawitint);
 
-        inital();
+        sound_init_part2();
         initsound();
         loaddiscsamps();
         maketapenoise();

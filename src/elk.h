@@ -221,12 +221,6 @@ void update_menu_keys();
 void loadconfig();
 void saveconfig();
 
-void initalmain(int argc, char *argv[]);
-void inital();
-void addsnd(uint8_t dat);
-void mixbuffer(int16_t *d);
-void givealbufferdd(int16_t *buf);
-
 void loadroms();
 void loadrom_n(int, char *fn);
 void resetmem();
