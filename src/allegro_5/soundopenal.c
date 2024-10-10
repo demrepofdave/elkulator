@@ -31,6 +31,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "elk.h"
+#include "config_vars.h"
 #include "logger.h"
 
 /******************************************************************************
@@ -53,7 +54,6 @@
 int samples=0;
 FILE *allog;
 //#undef printf
-int sndddnoise,sndtape;
 
 ALuint buffers[4];    // front and back buffers
 ALuint source[2];     // audio source
@@ -170,9 +170,6 @@ void sound_givealbuffer(int16_t *buf)
     int state;
     int c;
 
-  //      rpclog("GiveALBuffer\n");
-//        if (!sndinternal && !sndbeebsid) return;
-//return;
     samples+=2000;
     
     alGetSourcei(source[0], AL_SOURCE_STATE, &state);
@@ -182,20 +179,13 @@ void sound_givealbuffer(int16_t *buf)
             alSourcePlay(source[0]);
             printf("Resetting sound\n");
     }
-//        printf("State - %i %08X\n",state,state);
     alGetSourcei(source[0], AL_BUFFERS_PROCESSED, &processed);
-
-//        printf("P ");
     check();
-//        printf("Processed - %i\n",processed);
 
     if (processed>=1)
     {
         ALuint buffer;
-//                ALint temp;
-
         alSourceUnqueueBuffers(source[0], 1, &buffer);
-//                printf("U ");
         check();
 
         for (c=0;c<(BUFLEN>>1);c++)
@@ -204,19 +194,10 @@ void sound_givealbuffer(int16_t *buf)
         }
             
         alBufferData(buffer, AL_FORMAT_STEREO16, zbuf, BUFLEN, 31250);
-//                printf("Passing %i bytes\n",BUFLEN);
         check();
 
         alSourceQueueBuffers(source[0], 1, &buffer);
         check();
-                
-//                alGetBufferi(buffer,AL_FREQUENCY,&temp);
-//                printf("Freq - %i\n",temp);
-                
-//                printf("\n");
-
-//                if (!allog) allog=fopen("al.pcm","wb");
-//                fwrite(buf,BUFLEN,1,allog);
     }
 }
 
@@ -225,12 +206,15 @@ int sndbufpos=0;
 
 void addsnd(uint8_t dat)
 {
-        if (sndbufpos<2000) sndbufi[sndbufpos++]=(sndint)?(dat*31):0;
-/*        if (sndbufpos==2000)
-        {
-                sound_givealbuffer(sndbuf);
-                sndbufpos=0;
-        }*/
+    if (sndbufpos<2000)
+    {
+        sndbufi[sndbufpos++]=(elkConfig.sound.sndint)?(dat*31):0;
+    }
+/*   if (sndbufpos==2000)
+     {
+         sound_givealbuffer(sndbuf);
+         sndbufpos=0;
+     }*/
 }
 
 FILE *f;
@@ -250,45 +234,35 @@ void mixbuffer(int16_t *d)
 
 void sound_givealbufferdd(int16_t *buf)
 {
-        int processed;
-        int state;
-        int c;
-//        rpclog("DDnoise1 %i %i\n",sndddnoise,sndtape);
+    int processed;
+    int state;
+    int c;
 
-        if (!sndddnoise && !sndtape) return;
-//        rpclog("DDnoise2\n");
+    if (elkConfig.sound.sndddnoise || elkConfig.sound.sndtape)
+    {
 
-//return;
         alGetSourcei(source[1], AL_SOURCE_STATE, &state);
 
         if (state==0x1014)
         {
                 alSourcePlay(source[1]);
-                printf("Resetting sounddd\n");
+                log_debug("Resetting sounddd\n");
         }
         alGetSourcei(source[1], AL_BUFFERS_PROCESSED, &processed);
-//rpclog("Get source\n");
         check();
-//rpclog("Got source\n");
         if (processed>=1)
         {
                 ALuint buffer;
-//                ALint temp;
-
-//rpclog("Unqueue\n");
                 alSourceUnqueueBuffers(source[1], 1, &buffer);
                 check();
 
                 for (c=0;c<(4410*2);c++) zbuf[c]=buf[c>>1];//^0x8000;
 
-//rpclog("BufferData\n");
                 alBufferData(buffer, AL_FORMAT_STEREO16, zbuf, 4410*4, 44100);
                 check();
 
-//rpclog("Queue\n");
                 alSourceQueueBuffers(source[1], 1, &buffer);
                 check();
         }
-
-//        rpclog("DDnoise3\n");
+    }
 }

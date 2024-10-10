@@ -5,6 +5,7 @@
 #include <math.h>
 #include <unistd.h>
 #include "elk.h"
+#include "config_vars.h"
 #include "common/samples.h"
 
 static const char * ddnoise = "ddnoise"; // Name of directory containing wav files to emulate tape noise
@@ -26,8 +27,14 @@ void maketapenoise()
         int c;
 
         getcwd(p2,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-        if (ddtype) sprintf(path,"%s%s",exedir, ddnoise);
-        else        sprintf(path,"%s%s",exedir, ddnoise);
+        if (elkConfig.sound.ddtype)
+        {
+                sprintf(path,"%s%s",exedir, ddnoise);
+        } 
+        else
+        {
+                sprintf(path,"%s%s",exedir, ddnoise);
+        }
         printf("path now %s\n",path);
         chdir(path);
         sample_tape_noise_motor_load(0, "motoron.wav");
@@ -116,31 +123,28 @@ void mixtapenoise(int16_t *tapebuffer)
 {
         int c;
         tpnoisep=0;
-        if (!sndtape) return;
-//        rpclog("Mix!\n");
-
-        for (c=0;c<4410;c++)
+        if (elkConfig.sound.sndtape)
         {
-                tapebuffer[c]+=tapenoise[c];
-                tapenoise[c]=0;
-        }
-
-        for (c=0;c<4410;c++)
-        {
-                if (tnoise_sstat>=0)
+                for (c=0;c<4410;c++)
                 {
-//                        rpclog("SSTAT %i %i\n",tnoise_sstat,c);
-                        if (tnoise_spos >= sample_tape_noise_get_length(tnoise_sstat))
+                        tapebuffer[c]+=tapenoise[c];
+                        tapenoise[c]=0;
+                }
+
+                for (c=0;c<4410;c++)
+                {
+                        if (tnoise_sstat>=0)
                         {
-                                tnoise_spos=0;
-                                tnoise_sstat=-1;
-//                                rpclog("Stat off!\n");
-                        }
-                        else
-                        {
-//                                if (!c) rpclog("MixS!\n");
-                                tapebuffer[c]+=((int16_t)((((int16_t *)sample_tape_noise_get_data_ptr(tnoise_sstat))[(int)tnoise_spos])^0x8000)/4);
-                                tnoise_spos+=((float)sample_tape_noise_get_frequency(tnoise_sstat)/44100.0);
+                                if (tnoise_spos >= sample_tape_noise_get_length(tnoise_sstat))
+                                {
+                                        tnoise_spos=0;
+                                        tnoise_sstat=-1;
+                                }
+                                else
+                                {
+                                        tapebuffer[c]+=((int16_t)((((int16_t *)sample_tape_noise_get_data_ptr(tnoise_sstat))[(int)tnoise_spos])^0x8000)/4);
+                                        tnoise_spos+=((float)sample_tape_noise_get_frequency(tnoise_sstat)/44100.0);
+                                }
                         }
                 }
         }

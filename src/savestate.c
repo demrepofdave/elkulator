@@ -30,9 +30,9 @@ void dosavestate(const char * filename)
         putc(elkConfig.expansion.dfsena,f);
         putc(0,f);
         
-        putc(sndex,f);
+        putc(elkConfig.sound.sndex,f);
         putc(elkConfig.expansion.plus1,f);
-        putc(firstbyte,f); putc(0,f);
+        putc(elkConfig.expansion.firstbyte,f); putc(0,f);
         
         save6502state(f);
         saveulastate(f);
@@ -59,9 +59,9 @@ void doloadstate(const char * filename)
         elkConfig.expansion.dfsena  = getc(f);
         getc(f);
         
-        sndex=getc(f);
+        elkConfig.sound.sndex=getc(f);
         elkConfig.expansion.plus1=getc(f);
-        firstbyte=getc(f);
+        elkConfig.expansion.firstbyte=getc(f);
         getc(f);
         
         load6502state(f);

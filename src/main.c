@@ -77,7 +77,9 @@ void initelk(int argc, char *argv[])
             p = fileutils_get_filename(exedir);
             p[0] = 0;
         #endif
-        discname[0]=discname2[0]=tapename[0]=0;
+        elkConfig.disc.discname[0]  = 0;
+        elkConfig.disc.discname2[0] = 0;
+        tapename[0] = 0;
         parallelname[0]=0;serialname[0]=0;
         for (int i = 0; i < 16; i++)
         {
@@ -141,8 +143,8 @@ void initelk(int argc, char *argv[])
                 }
                 else if (discnext)
                 {
-                        if (discnext==2) strcpy(discname2,argv[c]);
-                        else             strcpy(discname,argv[c]);
+                        if (discnext==2) strcpy(elkConfig.disc.discname2,argv[c]);
+                        else             strcpy(elkConfig.disc.discname,argv[c]);
                         discnext=0;
                 }
                 else if (romnext > -2)
@@ -188,8 +190,8 @@ void initelk(int argc, char *argv[])
         #endif // WIN32
         
         loadtape(tapename);
-        loaddisc(0,discname);
-        loaddisc(1,discname2);
+        loaddisc(0,elkConfig.disc.discname);
+        loaddisc(1,elkConfig.disc.discname2);
         /* For temporary compatibility: */
         if (romnames[0][0] != 0) loadcart(romnames[0]);
         if (romnames[1][0] != 0) loadcart2(romnames[1]);

@@ -19,14 +19,8 @@ char moviename[260];
 
 int fullscreen=0;
 int gotofullscreen=0;
-int videoresize=0;
 int wantloadstate=0,wantsavestate=0;
 
-int ulamode=0;
-int drawmode=0;
-
-char discname[260];
-char discname2[260];
 int quited=0;
 int infocus=1;
 

@@ -766,7 +766,7 @@ void yield()
                                         
                                         if (ula.draw)
                                         {
-                                                video_blit_to_screen(drawmode, coldepth);
+                                                video_blit_to_screen(elkConfig.display.drawmode, coldepth);
                                                 //startblit()
                                                 if (wantsavescrshot) dosavescrshot();
                                                 if (wantmovieframe) saveframe();
@@ -811,7 +811,7 @@ void waitforramsync()
 
                 if (!(ula.mode & 4))
                 {
-                        if (ulamode != ULA_RAM_8BIT_DUAL_ACCESS)
+                        if (elkConfig.expansion.ulamode != ULA_RAM_8BIT_DUAL_ACCESS)
                                 cycles += ((640 - ula.x) / 8);
                         else
                                 cycles++;
@@ -827,7 +827,7 @@ void waitforramsync()
 
                 else
                 {
-                        if (ulamode != ULA_RAM_8BIT_DUAL_ACCESS)
+                        if (elkConfig.expansion.ulamode != ULA_RAM_8BIT_DUAL_ACCESS)
                         {
                                 if (cycles & 1)
                                         cycles++;
@@ -844,7 +844,7 @@ void waitforramsync()
 
         else
         {
-                if (!(ulamode & ULA_RAM_8BIT))
+                if (!(elkConfig.expansion.ulamode & ULA_RAM_8BIT))
                 {
                         if (cycles & 1)
                                 cycles++;
@@ -924,7 +924,7 @@ void savescrshot()
 // TODO: Disable for now.
 void dosavescrshot()
 {
-        video_capture_screenshot(drawmode, coldepth);
+        video_capture_screenshot(elkConfig.display.drawmode, coldepth);
         video_save_bmp(scrshotname);
         video_destroy_screenshot();
         wantsavescrshot=0;

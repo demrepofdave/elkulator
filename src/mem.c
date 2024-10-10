@@ -67,7 +67,7 @@ void loadrom_n(int bank, char *name)
 void update_rom_config(void)
 {
     rombank_enabled[PLUS1_BANK] = elkConfig.expansion.plus1;
-    rombank_enabled[SOUND_BANK] = sndex;
+    rombank_enabled[SOUND_BANK] = elkConfig.sound.sndex;
     rombank_enabled[ADFS_BANK]  = (elkConfig.expansion.plus3 && elkConfig.expansion.adfsena);
     rombank_enabled[DFS_BANK]   = (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena);
 }
@@ -144,7 +144,8 @@ void resetmem()
         FASTHIGH2 = (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode==2);
         banks[0] = 0;
         banks[1] = 0;
-        if (enable_mgc) {
+        if (elkConfig.expansion.enable_mgc) 
+        {
             fprintf(stderr, "ROM slot 0 bank = %i\n", banks[0]);
         }
 
@@ -192,7 +193,7 @@ uint8_t readmem(uint16_t addr)
         case 0xFC00:
         {
             if ((addr&0xFFF8)==0xFCC0 && elkConfig.expansion.plus3) return read1770(addr);
-            if (addr==0xFCC0 && firstbyte) return readfirstbyte();
+            if (addr==0xFCC0 && elkConfig.expansion.firstbyte) return readfirstbyte();
             if (elkConfig.expansion.plus1)
             {
                     if (addr==0xFC70) return readadc();
@@ -204,14 +205,14 @@ uint8_t readmem(uint16_t addr)
 
             /* Allow the JIM paging register to be read if enabled directly or
                indirectly. */
-            if (enable_jim && (addr == 0xfcff))
+            if (elkConfig.expansion.enable_jim && (addr == 0xfcff))
                 return jim_page;
 
             return addr>>8;
         }
         case 0xFD00: /* Paged RAM exposed in page FD */
         {
-            if (enable_jim) {
+            if (elkConfig.expansion.enable_jim) {
                 //fprintf(stdout, "FD: (%02x) %04x %02x\n", jim_page, addr, jim_ram[jim_page][addr & 0xff]);
                 return jim_ram[jim_page & 0x7f][addr & 0xff];
             }else
@@ -276,7 +277,7 @@ void writemem(uint16_t addr, uint8_t val)
             break;
         case 0xFD00:    /* Paged RAM exposed in page FD */
             //fprintf(stdout, "FD: (%02x) %04x %02x %02x\n", jim_page, addr, jim_ram[jim_page][addr & 0xff], val);
-            if (enable_jim)
+            if (elkConfig.expansion.enable_jim)
                 jim_ram[jim_page & 0x7f][addr & 0xff] = val;
             break;
         default:
@@ -315,17 +316,17 @@ void writemem(uint16_t addr, uint8_t val)
         #endif // WIN32
         /* The Mega Games Cartridge uses FC00 to select pairs of 16K banks in
            the two sets of ROMs. */
-        if (enable_mgc && (addr == 0xfc00)) {
+        if (elkConfig.expansion.enable_mgc && (addr == 0xfc00)) {
             fprintf(stderr, "bank = %i\n", val); banks[0] = val; banks[1] = val;
         }
         /* DB: My cartridge uses FC73 to select 32K regions in a flash ROM.
            For convenience we use the same paired 16K ROM arrangement as for
            the MGC. */
-        if (enable_db_flash_cartridge && (addr == 0xfc73)) {
+        if (elkConfig.expansion.enable_db_flash_cartridge && (addr == 0xfc73)) {
             fprintf(stderr, "bank = %i\n", val); banks[0] = val; banks[1] = val;
         }
         /* Support the JIM paging register when enabled directly or indirectly. */
-        if (enable_jim && (addr == 0xfcff)) {
+        if (elkConfig.expansion.enable_jim && (addr == 0xfcff)) {
             jim_page = val;
             //fprintf(stdout, "JIM: %02x pc=%04x (&f4)=%02x\n", jim_page, pc, ram[0xf4]);
         }
@@ -336,7 +337,7 @@ void savememstate(FILE *f)
         fwrite(ram,32768,1,f);
         if (elkConfig.expansion.mrb) fwrite(ram2,32768,1,f);
         if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fwrite(dfs,16384,1,f);
-        if (sndex)  fwrite(sndrom,16384,1,f);
+        if (elkConfig.sound.sndex)  fwrite(sndrom,16384,1,f);
         if (usedrom6) fwrite(ram6,16384,1,f);
 }
 
@@ -345,6 +346,6 @@ void loadmemstate(FILE *f)
         fread(ram,32768,1,f);
         if (elkConfig.expansion.mrb) fread(ram2,32768,1,f);
         if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fread(dfs,16384,1,f);
-        if (sndex)  fread(sndrom,16384,1,f);
+        if (elkConfig.sound.sndex)  fread(sndrom,16384,1,f);
         if (usedrom6) fread(ram6,16384,1,f);
 }

@@ -8,11 +8,11 @@
 #include <stdint.h>
 #include <string.h>
 #include "elk.h"
+#include "config_vars.h"
 
 int samples=0;
 FILE *allog;
 //#undef printf
-int sndddnoise,sndtape;
 
 ALuint buffers[4]; // front and back buffers
 ALuint source[2];     // audio source
@@ -172,7 +172,7 @@ int sndbufpos=0;
 
 void addsnd(uint8_t dat)
 {
-        if (sndbufpos<2000) sndbufi[sndbufpos++]=(sndint)?(dat*31):0;
+        if (sndbufpos<2000) sndbufi[sndbufpos++]=(elkConfig.sound.sndint)?(dat*31):0;
 /*        if (sndbufpos==2000)
         {
                 sound_givealbuffer(sndbuf);
@@ -202,7 +202,7 @@ void sound_givealbufferdd(int16_t *buf)
         int c;
 //        rpclog("DDnoise1 %i %i\n",sndddnoise,sndtape);
 
-        if (!sndddnoise && !sndtape) return;
+        if (!elkConfig.sound.sndddnoise && !elkConfig.sound.sndtape) return;
 //        rpclog("DDnoise2\n");
 
 //return;

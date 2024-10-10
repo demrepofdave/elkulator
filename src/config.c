@@ -13,13 +13,6 @@ elk_config_t elkConfig;
 
 FILE *cfgfile;
 uint8_t cfgbuffer[1024];
-int sndex;
-int sndint;
-int firstbyte;
-int joffset;
-int enable_mgc;
-int enable_db_flash_cartridge;
-int enable_jim;
 
 // TODO: Probably do not need this as loadconfig specifies defaults;
 
@@ -103,48 +96,49 @@ void loadconfig()
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"rt");
+
         elkConfig.tape.speed                 = getintcfg("tapespeed",0);
+
         elkConfig.expansion.plus1            = getintcfg("plus1",0);
         elkConfig.expansion.plus3            = getintcfg("plus3",0);
         elkConfig.expansion.dfsena           = getintcfg("dfsena",0);
         elkConfig.expansion.adfsena          = getintcfg("adfsena",0);
         elkConfig.expansion.defaultwriteprot = getintcfg("defaultwriteprotect",1);
         
-        elkConfig.expansion.turbo   = getintcfg("turbo",0);
-        elkConfig.expansion.mrb     = getintcfg("mrb",0);
-        elkConfig.expansion.mrbmode = getintcfg("mrbmode",0);
-        ulamode=getintcfg("ulamode",0);
-        enable_jim = getintcfg("enable_jim",0);
+        elkConfig.expansion.turbo      = getintcfg("turbo",0);
+        elkConfig.expansion.mrb        = getintcfg("mrb",0);
+        elkConfig.expansion.mrbmode    = getintcfg("mrbmode",0);
+        elkConfig.expansion.ulamode    = getintcfg("ulamode",0);
+        elkConfig.expansion.enable_jim = getintcfg("enable_jim",0);
 
-        drawmode=getintcfg("filter",0);
+        elkConfig.display.drawmode=getintcfg("filter",0);
         
         s=getstringcfg("discname_0");
         if (s)
         {
-                strcpy(discname,s);
-                loaddisc(0,discname);
+                strcpy(elkConfig.disc.discname,s);
+                loaddisc(0,elkConfig.disc.discname);
         }
-        else   discname[0]=0;
+        else   elkConfig.disc.discname[0]=0;
         s=getstringcfg("discname_1");
         if (s)
         {
-                strcpy(discname2,s);
-                loaddisc(1,discname2);
+                strcpy(elkConfig.disc.discname2,s);
+                loaddisc(1,elkConfig.disc.discname2);
         }
-        else   discname2[0]=0;
+        else   elkConfig.disc.discname2[0]=0;
 
-        sndint=getintcfg("sound_internal",1);
-        sndex=getintcfg("sound_exp",0);
-        sndddnoise=getintcfg("sound_ddnoise",1);
-        ddvol=getintcfg("sound_ddvol",2);
-        ddtype=getintcfg("sound_ddtype",1);
-        sndtape=getintcfg("sound_tape",0);
+        elkConfig.sound.sndint=getintcfg("sound_internal",1);
+        elkConfig.sound.sndex=getintcfg("sound_exp",0);
+        elkConfig.sound.sndddnoise=getintcfg("sound_ddnoise",1);
+        elkConfig.sound.ddvol=getintcfg("sound_ddvol",2);
+        elkConfig.sound.ddtype=getintcfg("sound_ddtype",1);
+        elkConfig.sound.sndtape=getintcfg("sound_tape",0);
         
-        videoresize=getintcfg("win_resize",0);
+        elkConfig.display.videoresize=getintcfg("win_resize",0);
         
-        firstbyte=getintcfg("joy_firstbyte",0);
-        
-        joffset=getintcfg("joy_offset",0);
+        elkConfig.expansion.firstbyte = getintcfg("joy_firstbyte",0);
+        elkConfig.expansion.joffset   = getintcfg("joy_offset",0);
 
         // Just use default keyboard for now for allegro5.
         #ifdef HAL_ALLEGRO_4
@@ -156,8 +150,8 @@ void loadconfig()
         #endif
 
         /* Cartridge expansions */
-        enable_mgc = getintcfg("enable_mgc", 0);
-        enable_db_flash_cartridge = getintcfg("enable_db_flash_cartridge", 0);
+        elkConfig.expansion.enable_mgc                = getintcfg("enable_mgc", 0);
+        elkConfig.expansion.enable_db_flash_cartridge = getintcfg("enable_db_flash_cartridge", 0);
 
         fclose(cfgfile);
 }
@@ -169,38 +163,37 @@ void saveconfig()
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"wt");
-        writeintcfg("tapespeed",elkConfig.tape.speed);
-        writeintcfg("plus1",elkConfig.expansion.plus1);
-        writeintcfg("plus3",elkConfig.expansion.plus3);
-        writeintcfg("dfsena", elkConfig.expansion.dfsena);
-        writeintcfg("adfsena",elkConfig.expansion.adfsena);
+        writeintcfg("tapespeed", elkConfig.tape.speed);
+        writeintcfg("plus1",     elkConfig.expansion.plus1);
+        writeintcfg("plus3",     elkConfig.expansion.plus3);
+        writeintcfg("dfsena",    elkConfig.expansion.dfsena);
+        writeintcfg("adfsena",   elkConfig.expansion.adfsena);
         writeintcfg("defaultwriteprotect",elkConfig.expansion.defaultwriteprot);
         
-        writestringcfg("discname_0",discname);
-        writestringcfg("discname_1",discname2);
+        writestringcfg("discname_0",elkConfig.disc.discname);
+        writestringcfg("discname_1",elkConfig.disc.discname2);
 
-        writeintcfg("turbo",  elkConfig.expansion.turbo);
-        writeintcfg("mrb",    elkConfig.expansion.mrb);
-        writeintcfg("mrbmode",elkConfig.expansion.mrbmode);
-        writeintcfg("ulamode",ulamode);
-        writeintcfg("enable_jim", enable_jim);
+        writeintcfg("turbo",      elkConfig.expansion.turbo);
+        writeintcfg("mrb",        elkConfig.expansion.mrb);
+        writeintcfg("mrbmode",    elkConfig.expansion.mrbmode);
+        writeintcfg("ulamode"    ,elkConfig.expansion.ulamode);
+        writeintcfg("enable_jim", elkConfig.expansion.enable_jim);
         
-        writeintcfg("filter",drawmode);
+        writeintcfg("filter",     elkConfig.display.drawmode);
         
-        writeintcfg("sound_internal",sndint);
-        writeintcfg("sound_exp",sndex);
+        writeintcfg("sound_internal", elkConfig.sound.sndint);
+        writeintcfg("sound_exp",      elkConfig.sound.sndex);
 
-        writeintcfg("sound_ddnoise",sndddnoise);
-        writeintcfg("sound_ddvol",ddvol);
-        writeintcfg("sound_ddtype",ddtype);
+        writeintcfg("sound_ddnoise",  elkConfig.sound.sndddnoise);
+        writeintcfg("sound_ddvol",    elkConfig.sound.ddvol);
+        writeintcfg("sound_ddtype",   elkConfig.sound.ddtype);
         
-        writeintcfg("sound_tape",sndtape);
+        writeintcfg("sound_tape", elkConfig.sound.sndtape);
 
-        writeintcfg("win_resize",videoresize);
+        writeintcfg("win_resize",elkConfig.display.videoresize);
         
-        writeintcfg("joy_firstbyte",firstbyte);
-        
-        writeintcfg("joy_offset",joffset);
+        writeintcfg("joy_firstbyte", elkConfig.expansion.firstbyte);
+        writeintcfg("joy_offset",    elkConfig.expansion.joffset);
         
         // Use default keyboard for now.
         #ifdef HAL_ALLEGRO_4
@@ -212,8 +205,8 @@ void saveconfig()
         #endif
 
         /* Cartridge expansions */
-        writeintcfg("enable_mgc", enable_mgc);
-        writeintcfg("enable_db_flash_cartridge", enable_db_flash_cartridge);
+        writeintcfg("enable_mgc",                elkConfig.expansion.enable_mgc);
+        writeintcfg("enable_db_flash_cartridge", elkConfig.expansion.enable_db_flash_cartridge);
 
         fclose(cfgfile);
 }

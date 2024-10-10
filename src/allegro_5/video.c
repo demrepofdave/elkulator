@@ -342,8 +342,14 @@ void video_blit_to_screen(int drawMode, int colDepth)
 /*        case LINEDBL:
             #ifdef WIN32
                 blit(b,vidb,0,0,0,0,640,256);
-                if (videoresize) stretch_blit(vidb,screen,0,0,640,256,0,0,winsizex,winsizey);
-                else             stretch_blit(vidb,screen,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                if (elkConfig.display.videoresize)
+                {
+                    stretch_blit(vidb,screen,0,0,640,256,0,0,winsizex,winsizey);
+                }
+                else
+                {
+                    stretch_blit(vidb,screen,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
+                }
             #else
                 for (c=0;c<512;c++)
                 {

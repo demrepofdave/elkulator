@@ -47,9 +47,6 @@ HMENU     ghmenu;
 int ulamode=0;
 int drawmode=0;
 
-char discname[260];
-char discname2[260];
-
 void setmenu(HMENU m)
 {
 	RECT ClientArea;
@@ -145,7 +142,7 @@ void initmenu()
         CheckMenuItem(ghmenu,IDM_OTHER_TURBO,(turbo)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_OTHER_MRB,(mrb)?MF_CHECKED:MF_UNCHECKED);
 
-        CheckMenuItem(ghmenu,IDM_OTHER_SNDIN,(sndint)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_OTHER_SNDIN,(elkConfig.sound.sndint)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_OTHER_SNDEX,(sndex)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_OTHER_FBJOY,(firstbyte)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_OTHER_PLUS1,(elkConfig.expansion.plus1)?MF_CHECKED:MF_UNCHECKED);
@@ -491,8 +488,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         stopwaiting();
                         break;
                         case IDM_OTHER_SNDIN:
-                        sndint^=1;
-                        CheckMenuItem(ghmenu,IDM_OTHER_SNDIN,(sndint)?MF_CHECKED:MF_UNCHECKED);
+                        elkConfig.sound.sndint^=1;
+                        CheckMenuItem(ghmenu,IDM_OTHER_SNDIN,(elkConfig.sound.sndint)?MF_CHECKED:MF_UNCHECKED);
                         break;
                         case IDM_OTHER_SNDEX:
                         waitforthread();

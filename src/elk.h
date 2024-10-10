@@ -12,8 +12,6 @@ extern "C" {
 
 void rpclog(char *format, ...);
 
-extern int videoresize;
-
 extern uint8_t a,x,y,s;
 extern uint16_t pc;
 
@@ -67,24 +65,17 @@ void resetsound();
 void dumpregs();
 
 extern int mrbmapped;
-extern int ulamode;
 
 
 void error(const char *format, ...);
 //void rpclog(const char *format, ...);
 
-extern char discname[260];
-extern char discname2[260];
 extern int discchanged[2];
 
 extern int tapewrite;
 
-extern int sndex;
-
-extern int drawmode;
-
-#define HALFSIZE   (drawmode==_2XSAI || drawmode==SCALE2X || drawmode==EAGLE)
-#define LINEDOUBLE (drawmode==SCANLINES || drawmode==PAL)
+#define HALFSIZE   (elkConfig.display.drawmode==_2XSAI || elkConfig.display.drawmode==SCALE2X || elkConfig.display.drawmode==EAGLE)
+#define LINEDOUBLE (elkConfig.display.drawmode==SCANLINES || elkConfig.display.drawmode==PAL)
 
 struct drives
 {
@@ -166,12 +157,6 @@ extern char ssname[260];
 
 extern int usedrom6;
 
-extern int firstbyte;
-
-extern int enable_mgc;
-extern int enable_db_flash_cartridge;
-extern int enable_jim;
-
 extern uint8_t plus1stat;
 extern int adctime;
 
@@ -185,9 +170,6 @@ extern uint8_t sndstreambuf[626];
 extern int sndstreamptr;
 
 extern int autoboot;
-extern int sndint;
-extern int sndddnoise,sndtape;
-extern int ddvol,ddtype;
 
 extern int discspd;
 extern int motorspin;
@@ -288,7 +270,6 @@ void startdebug();
 void enddebug();
 
 uint8_t readfirstbyte();
-extern int joffset;
 
 uint8_t readadc();
 void writeadc(uint8_t val);
