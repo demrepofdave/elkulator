@@ -1,9 +1,25 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * elk.h - Main header file
+ * 
+ * Contains a number of global variable and function called by the
+ * electron code.
+ * 
+ */
+
+
 #ifndef _ELK_H
 #define _ELK_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
 
 #include <stdint.h>
 #include <stdio.h>
@@ -194,9 +210,6 @@ int break_pressed();
 int menu_pressed();
 void update_break_keys();
 void update_menu_keys();
-
-void loadconfig();
-void saveconfig();
 
 void loadroms();
 void loadrom_n(int, char *fn);

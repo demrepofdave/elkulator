@@ -1,5 +1,15 @@
-/*Elkulator v1.0 by Sarah Walker
-  Configuration file handling*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * config.c - Handles loading and saving of configuration from elk.cfg
+ * 
+ */
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -7,23 +17,29 @@
 #include "config_vars.h"
 #include "config.h"
 
+/******************************************************************************
+* Preprocessor Macros
+*******************************************************************************/
+
 static const char * elk_cfg_filename = "/elk.cfg"; // Filename for elkulator config file.
 
-elk_config_t elkConfig;
+/******************************************************************************
+* Private Variable Definitions
+*******************************************************************************/
 
 FILE *cfgfile;
 uint8_t cfgbuffer[1024];
 
-// TODO: Probably do not need this as loadconfig specifies defaults;
+/******************************************************************************
+* Public Variable Definitions
+*******************************************************************************/
 
-void init_config()
-{
-        elkConfig.expansion.plus1 = 0;
-        elkConfig.expansion.plus3 = 0;
-        elkConfig.expansion.mrb = 0;
-        elkConfig.expansion.mrbmode = 0;
-        elkConfig.expansion.turbo = 0;
-}
+elk_config_t elkConfig;
+
+
+/******************************************************************************
+* Private Function Definitions
+*******************************************************************************/
 
 char *getstringcfg(char *name)
 {
@@ -88,6 +104,10 @@ void writeintcfg(char *name, int i)
         fprintf(cfgfile,"%s = %i\n",name,i);
 }
 
+/******************************************************************************
+* Public Function Definitions
+*******************************************************************************/
+
 void loadconfig()
 {
         char *s;
@@ -119,23 +139,29 @@ void loadconfig()
                 strcpy(elkConfig.disc.discname,s);
                 loaddisc(0,elkConfig.disc.discname);
         }
-        else   elkConfig.disc.discname[0]=0;
+        else
+        {
+                elkConfig.disc.discname[0]=0;
+        }
         s=getstringcfg("discname_1");
         if (s)
         {
                 strcpy(elkConfig.disc.discname2,s);
                 loaddisc(1,elkConfig.disc.discname2);
         }
-        else   elkConfig.disc.discname2[0]=0;
-
-        elkConfig.sound.sndint=getintcfg("sound_internal",1);
-        elkConfig.sound.sndex=getintcfg("sound_exp",0);
-        elkConfig.sound.sndddnoise=getintcfg("sound_ddnoise",1);
-        elkConfig.sound.ddvol=getintcfg("sound_ddvol",2);
-        elkConfig.sound.ddtype=getintcfg("sound_ddtype",1);
-        elkConfig.sound.sndtape=getintcfg("sound_tape",0);
+        else
+        {
+                elkConfig.disc.discname2[0]=0;
+        }
         
-        elkConfig.display.videoresize=getintcfg("win_resize",0);
+        elkConfig.sound.sndint     = getintcfg("sound_internal",1);
+        elkConfig.sound.sndex      = getintcfg("sound_exp",0);
+        elkConfig.sound.sndddnoise = getintcfg("sound_ddnoise",1);
+        elkConfig.sound.ddvol      = getintcfg("sound_ddvol",2);
+        elkConfig.sound.ddtype     = getintcfg("sound_ddtype",1);
+        elkConfig.sound.sndtape    = getintcfg("sound_tape",0);
+        
+        elkConfig.display.videoresize = getintcfg("win_resize",0);
         
         elkConfig.expansion.firstbyte = getintcfg("joy_firstbyte",0);
         elkConfig.expansion.joffset   = getintcfg("joy_offset",0);
@@ -162,12 +188,15 @@ void saveconfig()
         char s[20];
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
+
         cfgfile=fopen(fn,"wt");
+
         writeintcfg("tapespeed", elkConfig.tape.speed);
         writeintcfg("plus1",     elkConfig.expansion.plus1);
         writeintcfg("plus3",     elkConfig.expansion.plus3);
         writeintcfg("dfsena",    elkConfig.expansion.dfsena);
         writeintcfg("adfsena",   elkConfig.expansion.adfsena);
+
         writeintcfg("defaultwriteprotect",elkConfig.expansion.defaultwriteprot);
         
         writestringcfg("discname_0",elkConfig.disc.discname);
