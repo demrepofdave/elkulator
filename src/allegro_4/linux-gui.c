@@ -5,6 +5,9 @@
 #include <allegro.h>
 //#include <alleggl.h>
 #include "elk.h"
+#include "6502.h"
+#include "ula.h"
+#include "mem.h"
 #include "common/video.h"
 #include "config_vars.h"
 
