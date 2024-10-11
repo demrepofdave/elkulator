@@ -1,10 +1,19 @@
-/*Elkulator v1.0 by Sarah Walker
-  Memory handling*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * mem.c - Memory handling
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "elk.h"
+#include "mem.h"
+#include "6502.h"
+#include "ula.h"
 #include "config_vars.h"
 #include "common/keyboard.h"
 

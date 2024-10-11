@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "6502.h"
+#include "mem.h"
+#include "ula.h"
 #include "config.h"
 #include "config_vars.h"
 #include "callback_handlers.h"

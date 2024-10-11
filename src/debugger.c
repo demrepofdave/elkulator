@@ -201,6 +201,8 @@ void debugout(char *s)
 #include <stdio.h>
 #include <string.h>
 #include "elk.h"
+#include "6502.h"
+#include "mem.h"
 
 #undef printf
 

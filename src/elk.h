@@ -28,39 +28,13 @@ extern "C" {
 
 void rpclog(char *format, ...);
 
-extern uint8_t a,x,y,s;
-extern uint16_t pc;
-
-typedef struct
-{
-        int c,z,i,d,v,n;
-} CPUStatus;
-extern CPUStatus p;
-
-enum
-{
-        ULA_CONVENTIONAL = 0,
-        ULA_RAM_8BIT = 2,
-        ULA_RAM_8BIT_DUAL_ACCESS = 2,
-        ULA_RAM_8BIT_SINGLE_ACCESS = 3
-};
-
-extern uint8_t opcode;
-extern int nmi,irq;
 extern int rombank,intrombank;
-extern int cycles,ulacycles;
 extern int extrom;
-extern uint8_t ram[32768];
-extern uint16_t pc;
 #ifdef HAL_ALLEGRO_4
 extern int keylookup[128];
 #endif
 
-uint8_t readmem(uint16_t addr);
-void writemem(uint16_t addr, uint8_t val);
-
 extern int cswena;
-extern int tapeon;
 void polltape();
 void polluef();
 void pollcsw();
@@ -89,9 +63,6 @@ void error(const char *format, ...);
 extern int discchanged[2];
 
 extern int tapewrite;
-
-#define HALFSIZE   (elkConfig.display.drawmode==_2XSAI || elkConfig.display.drawmode==SCALE2X || elkConfig.display.drawmode==EAGLE)
-#define LINEDOUBLE (elkConfig.display.drawmode==SCANLINES || elkConfig.display.drawmode==PAL)
 
 struct drives
 {
@@ -210,40 +181,6 @@ int break_pressed();
 int menu_pressed();
 void update_break_keys();
 void update_menu_keys();
-
-void loadroms();
-void loadrom_n(int, char *fn);
-void resetmem();
-void dumpram();
-void loadcart(char *fn);
-void loadcart2(char *fn);
-void unloadcart();
-void loadmemstate(FILE *f);
-void savememstate(FILE *f);
-
-void reset6502();
-void reset6502e();
-void exec6502();
-void load6502state(FILE *f);
-void save6502state(FILE *f);
-
-void initula();
-void resetula();
-uint8_t readula(uint16_t addr);
-void writeula(uint16_t addr, uint8_t val);
-void yield();
-void waitforramsync();
-void intula(uint8_t num);
-void clearintula(uint8_t num);
-void receive(uint8_t val);
-void enterfullscreen();
-void leavefullscreen();
-void clearscreen();
-void savescrshot();
-void loadulastate(FILE *f);
-void saveulastate(FILE *f);
-void startmovie();
-void stopmovie();
 
 void reset1770();
 uint8_t read1770(uint16_t addr);

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <zlib.h>
 #include "elk.h"
+#include "ula.h"
 
 #define HIGHTONE 0x40
 static int reallyfasttapebreak;

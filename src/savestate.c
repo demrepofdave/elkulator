@@ -1,7 +1,10 @@
 /*Elkulator v1.0 by Sarah Walker
-  Savestate handling*/
+Savestate handling*/
 #include <stdio.h>
 #include "elk.h"
+#include "6502.h"
+#include "mem.h"
+#include "ula.h"
 #include "config_vars.h"
 
 void savestate()
