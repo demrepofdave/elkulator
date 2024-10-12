@@ -7,6 +7,7 @@
 #define ELK_EVENT_EXIT  0x01
 #define ELK_EVENT_RESET 0x02
 #define ELK_EVENT_TIMER_TRIGGERED 0x04
+#define ELK_EVENT_MENU_ITEM_STATE_CHANGE 0x80
 
 uint32_t event_await();
 

@@ -84,7 +84,7 @@ static void add_radio_item(ALLEGRO_MENU *parent, char const *title, uint16_t id,
     add_checkbox_item(parent, title, menu_id_num(id, this_value), this_value == cur_value);
 }
 
-static void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int cur_value)
+void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int cur_value)
 {
     int i;
     const char *label;
@@ -136,38 +136,9 @@ static int radio_event_with_deselect(ALLEGRO_EVENT *event, int current)
 
 // Variable and config handlers
 
-static void tape_speed_set(ALLEGRO_EVENT *event)
+void tape_speed_set(uint8_t new_speed)
 {
-    ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
-    // TODO: Working code but clean up a bit later.
-    if(elkConfig.tape.speed == TAPE_NORMAL && menu_get_id(event) != IDM_TAPE_SPEED_NORMAL)
-    {
-        al_set_menu_item_flags(menu, IDM_TAPE_SPEED_NORMAL, ALLEGRO_MENU_ITEM_CHECKBOX);
-    }
-
-    if(elkConfig.tape.speed == TAPE_FAST && menu_get_id(event) != IDM_TAPE_SPEED_FAST)
-    {
-        al_set_menu_item_flags(menu, IDM_TAPE_SPEED_FAST, ALLEGRO_MENU_ITEM_CHECKBOX);
-    }
-
-    if(elkConfig.tape.speed == TAPE_REALLY_FAST && menu_get_id(event) != IDM_TAPE_SPEED_REALLY_FAST)
-    {
-        al_set_menu_item_flags(menu, IDM_TAPE_SPEED_REALLY_FAST, ALLEGRO_MENU_ITEM_CHECKBOX);
-    }
-
-    switch(menu_get_id(event))
-    {
-        case IDM_TAPE_SPEED_NORMAL:
-            elkConfig.tape.speed = TAPE_NORMAL;
-            break;
-        case IDM_TAPE_SPEED_FAST:
-            elkConfig.tape.speed = TAPE_FAST;
-            break;
-        case IDM_TAPE_SPEED_REALLY_FAST:
-            elkConfig.tape.speed = TAPE_REALLY_FAST;
-            break;
-
-    }
+    elkConfig.tape.speed = new_speed;
 }
 // File Menu - All functions helpers
 
@@ -292,6 +263,8 @@ void menu_destroy(ALLEGRO_DISPLAY *display)
 static const char all_dext[] = "*.ssd;*.dsd;*.img;*.adf;*.ads;*.adm;*.adl;*.sdd;*.ddd;*.fdi;*.imd;*.hfe;"
                                "*.SSD;*.DSD;*.IMG;*.ADF;*.ADS;*.ADM;*.ADL;*.SDD;*.DDD;*.FDI;*.IMD;*.HFE";
 
+extern void tape_speed_set(uint8_t new_speed);
+
 uint32_t menu_handle_event(ALLEGRO_EVENT *event)
 {
     uint32_t elkEvent = 0;
@@ -313,15 +286,14 @@ uint32_t menu_handle_event(ALLEGRO_EVENT *event)
             break;
         case IDM_TAPE_LOAD:
             tape_load_ui(event, "Choose a tape to load", "*.uef;*.csw");
+            elkEvent = ELK_EVENT_MENU_ITEM_STATE_CHANGE;
             break;
         case IDM_TAPE_REWIND:
             break;
         case IDM_TAPE_EJECT:
             break;
-        case IDM_TAPE_SPEED_NORMAL:
-        case IDM_TAPE_SPEED_FAST:
-        case IDM_TAPE_SPEED_REALLY_FAST:
-            tape_speed_set(event);
+        case IDM_TAPE_SPEED:
+            tape_speed_set(radio_event_simple(event, elkConfig.tape.speed));
             break;
     }
     log_debug("menu_handle_event elkEvent = 0x%02x\n", elkEvent);
@@ -338,4 +310,9 @@ void setejecttext(int d, char *s)
 
 void setquit()
 {
+}
+
+void menu_update_on_state_change()
+{
+
 }
