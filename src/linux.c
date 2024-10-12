@@ -19,18 +19,8 @@ char moviename[260];
 
 int fullscreen=0;
 int gotofullscreen=0;
-int videoresize=0;
 int wantloadstate=0,wantsavestate=0;
 
-int plus3=0;
-int dfsena=0,adfsena=0;
-//int turbo=0;
-//int mrb=0,mrbmode=0;
-int ulamode=0;
-int drawmode=0;
-
-char discname[260];
-char discname2[260];
 int quited=0;
 int infocus=1;
 
@@ -43,6 +33,7 @@ void native_window_close_button_handler(void)
 
 int main(int argc, char *argv[])
 {
+        //init_config(); TODO: May need this not sure.
         int ret = video_init_part1();
         if (ret != 0)
         {

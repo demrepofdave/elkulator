@@ -44,15 +44,8 @@ HWND      ghwnd;
 HINSTANCE ghinstance;
 HMENU     ghmenu;
 
-int plus3=0;
-int dfsena=0,adfsena=0;
-int turbo=0;
-int mrb=0,mrbmode=0;
 int ulamode=0;
 int drawmode=0;
-
-char discname[260];
-char discname2[260];
 
 void setmenu(HMENU m)
 {
@@ -137,22 +130,22 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
 void initmenu()
 {
-        CheckMenuItem(ghmenu,IDM_DISC_PLUS3,(plus3)?MF_CHECKED:MF_UNCHECKED);
-        CheckMenuItem(ghmenu,IDM_DISC_ADFS,(adfsena)?MF_CHECKED:MF_UNCHECKED);
-        CheckMenuItem(ghmenu,IDM_DISC_DFS,(dfsena)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_DISC_PLUS3,(elkConfig.expansion.plus3)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_DISC_ADFS,(elkConfig.expansion.adfsena)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_DISC_DFS,(elkConfig.expansion.dfsena)?MF_CHECKED:MF_UNCHECKED);
         
         CheckMenuItem(ghmenu,IDM_DISC_WPROT_0,(writeprot[0])?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_DISC_WPROT_1,(writeprot[1])?MF_CHECKED:MF_UNCHECKED);
         
-        CheckMenuItem(ghmenu,IDM_DISC_WPROT_D,(defaultwriteprot)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_DISC_WPROT_D,(elkConfig.expansion.defaultwriteprot)?MF_CHECKED:MF_UNCHECKED);
         
         CheckMenuItem(ghmenu,IDM_OTHER_TURBO,(turbo)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_OTHER_MRB,(mrb)?MF_CHECKED:MF_UNCHECKED);
 
-        CheckMenuItem(ghmenu,IDM_OTHER_SNDIN,(sndint)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_OTHER_SNDIN,(elkConfig.sound.sndint)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_OTHER_SNDEX,(sndex)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_OTHER_FBJOY,(firstbyte)?MF_CHECKED:MF_UNCHECKED);
-        CheckMenuItem(ghmenu,IDM_OTHER_PLUS1,(plus1)?MF_CHECKED:MF_UNCHECKED);
+        CheckMenuItem(ghmenu,IDM_OTHER_PLUS1,(elkConfig.expansion.plus1)?MF_CHECKED:MF_UNCHECKED);
         
         CheckMenuItem(ghmenu,IDM_MRB_OFF,(mrbmode==0)?MF_CHECKED:MF_UNCHECKED);
         CheckMenuItem(ghmenu,IDM_MRB_TURBO,(mrbmode==1)?MF_CHECKED:MF_UNCHECKED);
@@ -454,16 +447,16 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         break;
                         case IDM_DISC_ADFS:
                         waitforthread();
-                        adfsena^=1;
-                        CheckMenuItem(ghmenu,IDM_DISC_ADFS,(adfsena)?MF_CHECKED:MF_UNCHECKED);
+                        elkConfig.expansion.adfsena^=1;
+                        CheckMenuItem(ghmenu,IDM_DISC_ADFS,(elkConfig.expansion.adfsena)?MF_CHECKED:MF_UNCHECKED);
                         reset6502e();
                         resetula();
                         stopwaiting();
                         break;
                         case IDM_DISC_DFS:
                         waitforthread();
-                        dfsena^=1;
-                        CheckMenuItem(ghmenu,IDM_DISC_DFS,(dfsena)?MF_CHECKED:MF_UNCHECKED);
+                        elkConfig.expansion.dfsena^=1;
+                        CheckMenuItem(ghmenu,IDM_DISC_DFS,(elkConfig.expansion.dfsena)?MF_CHECKED:MF_UNCHECKED);
                         reset6502e();
                         resetula();
                         stopwaiting();
@@ -495,8 +488,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         stopwaiting();
                         break;
                         case IDM_OTHER_SNDIN:
-                        sndint^=1;
-                        CheckMenuItem(ghmenu,IDM_OTHER_SNDIN,(sndint)?MF_CHECKED:MF_UNCHECKED);
+                        elkConfig.sound.sndint^=1;
+                        CheckMenuItem(ghmenu,IDM_OTHER_SNDIN,(elkConfig.sound.sndint)?MF_CHECKED:MF_UNCHECKED);
                         break;
                         case IDM_OTHER_SNDEX:
                         waitforthread();
@@ -522,7 +515,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         break;
                         case IDM_OTHER_PLUS1:
                         waitforthread();
-                        plus1^=1;
+                        elkConfig.expansion.plus1^=1;
                         CheckMenuItem(ghmenu,IDM_OTHER_PLUS1,(plus1)?MF_CHECKED:MF_UNCHECKED);
                         if (firstbyte)
                         {
@@ -604,7 +597,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         {
                                 closedisc(0);
                                 newdisc(0,discname);
-                                if (defaultwriteprot) writeprot[0]=1;
+                                if (elkConfig.expansion.defaultwriteprot) writeprot[0]=1;
                                 CheckMenuItem(hmenu,IDM_DISC_WPROT_0,(writeprot[0])?MF_CHECKED:MF_UNCHECKED);
                         }
                         break;
@@ -613,7 +606,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         {
                                 closedisc(1);
                                 newdisc(1,discname2);
-                                if (defaultwriteprot) writeprot[1]=1;
+                                if (elkConfig.expansion.defaultwriteprot) writeprot[1]=1;
                                 CheckMenuItem(hmenu,IDM_DISC_WPROT_1,(writeprot[1])?MF_CHECKED:MF_UNCHECKED);
                         }
                         break;
@@ -628,8 +621,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         CheckMenuItem(hmenu,IDM_DISC_WPROT_1,(writeprot[1])?MF_CHECKED:MF_UNCHECKED);
                         break;
                         case IDM_DISC_WPROT_D:
-                        defaultwriteprot=!defaultwriteprot;
-                        CheckMenuItem(hmenu,IDM_DISC_WPROT_D,(defaultwriteprot)?MF_CHECKED:MF_UNCHECKED);
+                        elkConfig.expansion.defaultwriteprot=!elkConfig.expansion.defaultwriteprot;
+                        CheckMenuItem(hmenu,IDM_DISC_WPROT_D,(elkConfig.expansion.defaultwriteprot)?MF_CHECKED:MF_UNCHECKED);
                         break;
                         case IDM_ROM_LOAD1:
                         EnterCriticalSection(&cs);

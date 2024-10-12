@@ -1,9 +1,25 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * elk.h - Main header file
+ * 
+ * Contains a number of global variable and function called by the
+ * electron code.
+ * 
+ */
+
+
 #ifndef _ELK_H
 #define _ELK_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
 
 #include <stdint.h>
 #include <stdio.h>
@@ -12,41 +28,13 @@ extern "C" {
 
 void rpclog(char *format, ...);
 
-extern int videoresize;
-
-extern uint8_t a,x,y,s;
-extern uint16_t pc;
-
-typedef struct
-{
-        int c,z,i,d,v,n;
-} CPUStatus;
-extern CPUStatus p;
-
-enum
-{
-        ULA_CONVENTIONAL = 0,
-        ULA_RAM_8BIT = 2,
-        ULA_RAM_8BIT_DUAL_ACCESS = 2,
-        ULA_RAM_8BIT_SINGLE_ACCESS = 3
-};
-
-extern uint8_t opcode;
-extern int nmi,irq;
 extern int rombank,intrombank;
-extern int cycles,ulacycles;
 extern int extrom;
-extern uint8_t ram[32768];
-extern uint16_t pc;
 #ifdef HAL_ALLEGRO_4
 extern int keylookup[128];
 #endif
 
-uint8_t readmem(uint16_t addr);
-void writemem(uint16_t addr, uint8_t val);
-
 extern int cswena;
-extern int tapeon;
 void polltape();
 void polluef();
 void pollcsw();
@@ -64,30 +52,17 @@ extern int infocus;
 
 void resetsound();
 
-extern int plus3;
-
 void dumpregs();
 
 extern int mrbmapped;
-extern int ulamode;
 
 
 void error(const char *format, ...);
 //void rpclog(const char *format, ...);
 
-extern char discname[260];
-extern char discname2[260];
 extern int discchanged[2];
 
 extern int tapewrite;
-
-extern int dfsena,adfsena;
-extern int sndex;
-
-extern int drawmode;
-
-#define HALFSIZE   (drawmode==_2XSAI || drawmode==SCALE2X || drawmode==EAGLE)
-#define LINEDOUBLE (drawmode==SCANLINES || drawmode==PAL)
 
 struct drives
 {
@@ -161,7 +136,6 @@ extern void (*fdcwriteprotect)();
 extern int  (*fdcgetdata)(int last);
 
 extern int writeprot[2],fwriteprot[2];
-extern int defaultwriteprot;
 
 extern int motoron,fdctime,disctime;
 
@@ -170,13 +144,6 @@ extern char ssname[260];
 
 extern int usedrom6;
 
-extern int firstbyte;
-
-extern int enable_mgc;
-extern int enable_db_flash_cartridge;
-extern int enable_jim;
-
-extern int plus1;
 extern uint8_t plus1stat;
 extern int adctime;
 
@@ -190,9 +157,6 @@ extern uint8_t sndstreambuf[626];
 extern int sndstreamptr;
 
 extern int autoboot;
-extern int sndint;
-extern int sndddnoise,sndtape;
-extern int ddvol,ddtype;
 
 extern int discspd;
 extern int motorspin;
@@ -217,49 +181,6 @@ int break_pressed();
 int menu_pressed();
 void update_break_keys();
 void update_menu_keys();
-
-void loadconfig();
-void saveconfig();
-
-void initalmain(int argc, char *argv[]);
-void inital();
-void addsnd(uint8_t dat);
-void mixbuffer(int16_t *d);
-void givealbufferdd(int16_t *buf);
-
-void loadroms();
-void loadrom_n(int, char *fn);
-void resetmem();
-void dumpram();
-void loadcart(char *fn);
-void loadcart2(char *fn);
-void unloadcart();
-void loadmemstate(FILE *f);
-void savememstate(FILE *f);
-
-void reset6502();
-void reset6502e();
-void exec6502();
-void load6502state(FILE *f);
-void save6502state(FILE *f);
-
-void initula();
-void resetula();
-uint8_t readula(uint16_t addr);
-void writeula(uint16_t addr, uint8_t val);
-void yield();
-void waitforramsync();
-void intula(uint8_t num);
-void clearintula(uint8_t num);
-void receive(uint8_t val);
-void enterfullscreen();
-void leavefullscreen();
-void clearscreen();
-void savescrshot();
-void loadulastate(FILE *f);
-void saveulastate(FILE *f);
-void startmovie();
-void stopmovie();
 
 void reset1770();
 uint8_t read1770(uint16_t addr);
@@ -299,7 +220,6 @@ void startdebug();
 void enddebug();
 
 uint8_t readfirstbyte();
-extern int joffset;
 
 uint8_t readadc();
 void writeadc(uint8_t val);

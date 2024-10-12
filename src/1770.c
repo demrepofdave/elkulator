@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "elk.h"
+#include "6502.h"
+#include "mem.h"
 
 extern int output;
 #ifndef ABS

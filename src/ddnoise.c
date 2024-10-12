@@ -5,12 +5,12 @@
 #include <string.h>
 #include <unistd.h>
 #include "elk.h"
+#include "config_vars.h"
 #include "common/samples.h"
+#include "common/sound.h"
 
 static const char * ddnoise35 = "ddnoise/35";   // Name of directory containing wav files to emulate noise of 3.5 inch Disk Drive
 static const char * ddnoise525 = "ddnoise/525"; // Name of directory containing wav files to emulate noise of 5.25 inch Disk Drive
-
-int ddvol=3;
 
 float ddnoise_mpos=0;
 int ddnoise_mstat=-1;
@@ -19,7 +19,6 @@ int oldmotoron=0;
 float ddnoise_spos=0;
 int ddnoise_sstat=-1;
 int ddnoise_sdir=0;
-int ddtype=0;
 
 void loaddiscsamps()
 {
@@ -28,8 +27,14 @@ void loaddiscsamps()
         bool result = false;
         getcwd(p2,(MAX_PATH_FILENAME_BUFFER_SIZE - 1));
         printf("In %s\n",p2);
-        if (ddtype) sprintf(path,"%s%s",exedir, ddnoise35);
-        else        sprintf(path,"%s%s",exedir, ddnoise525);
+        if (elkConfig.sound.ddtype)
+        {
+                sprintf(path,"%s%s",exedir, ddnoise35);
+        }
+        else
+        {
+                sprintf(path,"%s%s",exedir, ddnoise525);
+        } 
         printf("path now %s\n",path);
         chdir(path);
         result = sample_seek_load(0, 0, "stepo.wav");
@@ -80,7 +85,7 @@ void ddnoise_seek(int len)
         else if (len<7)  ddnoise_sstat=1;
         else if (len<30) ddnoise_sstat=2;
         else             ddnoise_sstat=3;
-        if (!sndddnoise) fdctime=200;
+        if (!elkConfig.sound.sndddnoise) fdctime=200;
         rpclog("Start seek!\n");
 }
 
@@ -104,7 +109,7 @@ void mixddnoise()
                 ddnoise_mpos=0;
         }
         
-        if (sndddnoise)
+        if (elkConfig.sound.sndddnoise)
         {
 printf("Mixing ddnoise...\n");
         for (c=0;c<4410;c++)
@@ -155,14 +160,14 @@ printf("Mixing ddnoise...\n");
                                 //ddnoise_spos+=((float)seeksmp[ddnoise_sstat][ddnoise_sdir]->freq/44100.0);
                         }
                 }
-                ddbuffer[c]=(ddbuffer[c]/3)*ddvol;
+                ddbuffer[c]=(ddbuffer[c]/3)*elkConfig.sound.ddvol;
         }
         }
         
         mixtapenoise(ddbuffer);
 //        fwrite(ddbuffer,4410*2,1,f2);
 //rpclog("Give buffer... %i %i\n",ddnoise_mstat,ddnoise_sstat);
-        givealbufferdd(ddbuffer);
+        sound_givealbufferdd(ddbuffer);
         
         oldmotoron=motoron;
 }

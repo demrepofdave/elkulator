@@ -16,6 +16,9 @@
         "callback_handlers.h": "c",
         "event_handler.h": "c",
         "allegro_native_dialog.h": "c",
-        "video_internal.h": "c"
+        "video_internal.h": "c",
+        "menu_internal.h": "c",
+        "zlib.h": "c",
+        "stdio.h": "c"
     }
 }

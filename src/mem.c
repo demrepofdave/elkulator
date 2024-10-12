@@ -1,10 +1,19 @@
-/*Elkulator v1.0 by Sarah Walker
-  Memory handling*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * mem.c - Memory handling
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "elk.h"
+#include "mem.h"
+#include "6502.h"
+#include "ula.h"
 #include "config_vars.h"
 #include "common/keyboard.h"
 
@@ -17,7 +26,6 @@ int FASTHIGH2=0;
 
 extern int output;
 int mrbmapped=0;
-int plus1=0;
 uint8_t rombanks[16][16384];
 uint8_t rombank_enabled[16];
 
@@ -67,10 +75,10 @@ void loadrom_n(int bank, char *name)
 
 void update_rom_config(void)
 {
-    rombank_enabled[PLUS1_BANK] = plus1;
-    rombank_enabled[SOUND_BANK] = sndex;
-    rombank_enabled[ADFS_BANK] = (plus3 && adfsena);
-    rombank_enabled[DFS_BANK] = (plus3 && dfsena);
+    rombank_enabled[PLUS1_BANK] = elkConfig.expansion.plus1;
+    rombank_enabled[SOUND_BANK] = elkConfig.sound.sndex;
+    rombank_enabled[ADFS_BANK]  = (elkConfig.expansion.plus3 && elkConfig.expansion.adfsena);
+    rombank_enabled[DFS_BANK]   = (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena);
 }
 
 void loadroms()
@@ -145,7 +153,8 @@ void resetmem()
         FASTHIGH2 = (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode==2);
         banks[0] = 0;
         banks[1] = 0;
-        if (enable_mgc) {
+        if (elkConfig.expansion.enable_mgc) 
+        {
             fprintf(stderr, "ROM slot 0 bank = %i\n", banks[0]);
         }
 
@@ -192,27 +201,27 @@ uint8_t readmem(uint16_t addr)
         switch (addr&0xFF00) {
         case 0xFC00:
         {
-            if ((addr&0xFFF8)==0xFCC0 && plus3) return read1770(addr);
-            if (addr==0xFCC0 && firstbyte) return readfirstbyte();
-            if (plus1)
+            if ((addr&0xFFF8)==0xFCC0 && elkConfig.expansion.plus3) return read1770(addr);
+            if (addr==0xFCC0 && elkConfig.expansion.firstbyte) return readfirstbyte();
+            if (elkConfig.expansion.plus1)
             {
                     if (addr==0xFC70) return readadc();
                     if (addr==0xFC72) return getplus1stat();
             }
             #ifndef WIN32
-                if (addr>=0xFC60 && addr<=0xFC6F && plus1) return readserial(addr);
+                if (addr>=0xFC60 && addr<=0xFC6F && elkConfig.expansion.plus1) return readserial(addr);
             #endif
 
             /* Allow the JIM paging register to be read if enabled directly or
                indirectly. */
-            if (enable_jim && (addr == 0xfcff))
+            if (elkConfig.expansion.enable_jim && (addr == 0xfcff))
                 return jim_page;
 
             return addr>>8;
         }
         case 0xFD00: /* Paged RAM exposed in page FD */
         {
-            if (enable_jim) {
+            if (elkConfig.expansion.enable_jim) {
                 //fprintf(stdout, "FD: (%02x) %04x %02x\n", jim_page, addr, jim_ram[jim_page][addr & 0xff]);
                 return jim_ram[jim_page & 0x7f][addr & 0xff];
             }else
@@ -268,7 +277,7 @@ void writemem(uint16_t addr, uint8_t val)
         if (addr<0xC000)
         {
                 if (extrom && rombank==SOUND_BANK && (addr&0x2000)) sndrom[addr&0x3FFF]=val;
-                if (extrom && rombank==DFS_BANK && plus3 && dfsena) dfs[addr&0x3FFF]=val;
+                if (extrom && rombank==DFS_BANK && elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) dfs[addr&0x3FFF]=val;
                 if (extrom && rombank==0x6) { ram6[addr&0x3FFF]=val; usedrom6=1; }
         }
         switch (addr & 0xFF00) {
@@ -277,13 +286,13 @@ void writemem(uint16_t addr, uint8_t val)
             break;
         case 0xFD00:    /* Paged RAM exposed in page FD */
             //fprintf(stdout, "FD: (%02x) %04x %02x %02x\n", jim_page, addr, jim_ram[jim_page][addr & 0xff], val);
-            if (enable_jim)
+            if (elkConfig.expansion.enable_jim)
                 jim_ram[jim_page & 0x7f][addr & 0xff] = val;
             break;
         default:
             break;
         }
-        if ((addr&0xFFF8)==0xFCC0 && plus3) write1770(addr,val);
+        if ((addr&0xFFF8)==0xFCC0 && elkConfig.expansion.plus3) write1770(addr,val);
 
         if (addr==0xFC98)
         {
@@ -309,24 +318,24 @@ void writemem(uint16_t addr, uint8_t val)
 //                rpclog("Write MRB %02X %i %i %04X\n",val,FASTLOW,FASTHIGH2,pc);
 //                if (!val) output=1;
         }
-        if (addr==0xFC70 && plus1) writeadc(val);
+        if (addr==0xFC70 && elkConfig.expansion.plus1) writeadc(val);
         #ifndef WIN32
-                if (addr>=0xFC60 && addr<=0xFC6F && plus1) return writeserial(addr, val);
-                if (addr==0xFC71 && plus1) writeparallel(val);
+                if (addr>=0xFC60 && addr<=0xFC6F && elkConfig.expansion.plus1) return writeserial(addr, val);
+                if (addr==0xFC71 && elkConfig.expansion.plus1) writeparallel(val);
         #endif // WIN32
         /* The Mega Games Cartridge uses FC00 to select pairs of 16K banks in
            the two sets of ROMs. */
-        if (enable_mgc && (addr == 0xfc00)) {
+        if (elkConfig.expansion.enable_mgc && (addr == 0xfc00)) {
             fprintf(stderr, "bank = %i\n", val); banks[0] = val; banks[1] = val;
         }
         /* DB: My cartridge uses FC73 to select 32K regions in a flash ROM.
            For convenience we use the same paired 16K ROM arrangement as for
            the MGC. */
-        if (enable_db_flash_cartridge && (addr == 0xfc73)) {
+        if (elkConfig.expansion.enable_db_flash_cartridge && (addr == 0xfc73)) {
             fprintf(stderr, "bank = %i\n", val); banks[0] = val; banks[1] = val;
         }
         /* Support the JIM paging register when enabled directly or indirectly. */
-        if (enable_jim && (addr == 0xfcff)) {
+        if (elkConfig.expansion.enable_jim && (addr == 0xfcff)) {
             jim_page = val;
             //fprintf(stdout, "JIM: %02x pc=%04x (&f4)=%02x\n", jim_page, pc, ram[0xf4]);
         }
@@ -336,8 +345,8 @@ void savememstate(FILE *f)
 {
         fwrite(ram,32768,1,f);
         if (elkConfig.expansion.mrb) fwrite(ram2,32768,1,f);
-        if (plus3 && dfsena) fwrite(dfs,16384,1,f);
-        if (sndex)  fwrite(sndrom,16384,1,f);
+        if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fwrite(dfs,16384,1,f);
+        if (elkConfig.sound.sndex)  fwrite(sndrom,16384,1,f);
         if (usedrom6) fwrite(ram6,16384,1,f);
 }
 
@@ -345,7 +354,7 @@ void loadmemstate(FILE *f)
 {
         fread(ram,32768,1,f);
         if (elkConfig.expansion.mrb) fread(ram2,32768,1,f);
-        if (plus3 && dfsena) fread(dfs,16384,1,f);
-        if (sndex)  fread(sndrom,16384,1,f);
+        if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fread(dfs,16384,1,f);
+        if (elkConfig.sound.sndex)  fread(sndrom,16384,1,f);
         if (usedrom6) fread(ram6,16384,1,f);
 }

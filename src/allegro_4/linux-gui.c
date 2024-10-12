@@ -5,6 +5,9 @@
 #include <allegro.h>
 //#include <alleggl.h>
 #include "elk.h"
+#include "6502.h"
+#include "ula.h"
+#include "mem.h"
 #include "common/video.h"
 #include "config_vars.h"
 
@@ -21,7 +24,6 @@ extern int fullscreen;
 extern int quited;
 int windx=640,windy=512;
 extern int dcol;
-extern int ddtype,ddvol,sndddnoise;
 
 MENU filemenu[6];
 MENU discmenu[8];
@@ -50,33 +52,33 @@ void updatelinuxgui()
         int x;
         discmenu[4].flags=(writeprot[0])?D_SELECTED:0;
         discmenu[5].flags=(writeprot[1])?D_SELECTED:0;
-        discmenu[6].flags=(defaultwriteprot)?D_SELECTED:0;
+        discmenu[6].flags=(elkConfig.expansion.defaultwriteprot)?D_SELECTED:0;
         tapespdmenu[0].flags = (!elkConfig.tape.speed)?D_SELECTED:0;
         tapespdmenu[1].flags = (elkConfig.tape.speed == 1)?D_SELECTED:0;
         tapespdmenu[2].flags = (elkConfig.tape.speed == 2)?D_SELECTED:0;
-        for (x=0;x<6;x++)  displaymenu[x].flags=(drawmode==(intptr_t)displaymenu[x].dp)?D_SELECTED:0;
+        for (x=0;x<6;x++)  displaymenu[x].flags=(elkConfig.display.drawmode==(intptr_t)displaymenu[x].dp)?D_SELECTED:0;
         videomenu[1].flags=(fullscreen)?D_SELECTED:0;
-        soundmenu[0].flags=(sndint)?D_SELECTED:0;
-        soundmenu[1].flags=(sndex)?D_SELECTED:0;
-        soundmenu[2].flags=(sndddnoise)?D_SELECTED:0;
-        soundmenu[3].flags=(sndtape)?D_SELECTED:0;
-        dischmenu[0].flags=(plus3)?D_SELECTED:0;
-        dischmenu[1].flags=(adfsena)?D_SELECTED:0;
-        dischmenu[2].flags=(dfsena)?D_SELECTED:0;
+        soundmenu[0].flags=(elkConfig.sound.sndint)?D_SELECTED:0;
+        soundmenu[1].flags=(elkConfig.sound.sndex)?D_SELECTED:0;
+        soundmenu[2].flags=(elkConfig.sound.sndddnoise)?D_SELECTED:0;
+        soundmenu[3].flags=(elkConfig.sound.sndtape)?D_SELECTED:0;
+        dischmenu[0].flags=(elkConfig.expansion.plus3)?D_SELECTED:0;
+        dischmenu[1].flags=(elkConfig.expansion.adfsena)?D_SELECTED:0;
+        dischmenu[2].flags=(elkConfig.expansion.dfsena)?D_SELECTED:0;
         memmenu[0].flags=(elkConfig.expansion.turbo)?D_SELECTED:0;
         memmenu[1].flags=(elkConfig.expansion.mrb)?D_SELECTED:0;
         for (x=0;x<3;x++)  mrbmenu[x].flags=(elkConfig.expansion.mrbmode==(intptr_t)mrbmenu[x].dp)?D_SELECTED:0;
-        for (x=0;x<3;x++)  ulamenu[x].flags=(ulamode==(intptr_t)ulamenu[x].dp)?D_SELECTED:0;
-        memmenu[4].flags=(enable_jim)?D_SELECTED:0;
-        joymenu[0].flags=(plus1)?D_SELECTED:0;
-        joymenu[1].flags=(firstbyte)?D_SELECTED:0;
+        for (x=0;x<3;x++)  ulamenu[x].flags=(elkConfig.expansion.ulamode==(intptr_t)ulamenu[x].dp)?D_SELECTED:0;
+        memmenu[4].flags=(elkConfig.expansion.enable_jim)?D_SELECTED:0;
+        joymenu[0].flags=(elkConfig.expansion.plus1)?D_SELECTED:0;
+        joymenu[1].flags=(elkConfig.expansion.firstbyte)?D_SELECTED:0;
 //        for (x=0;x<5;x++)  waveformmenu[x].flags=(curwave==(intptr_t)waveformmenu[x].dp)?D_SELECTED:0;
-        ddtypemenu[0].flags=(!ddtype)?D_SELECTED:0;
-        ddtypemenu[1].flags=(ddtype)?D_SELECTED:0;
-        for (x=0;x<3;x++)  ddvolmenu[x].flags=(ddvol==(intptr_t)ddvolmenu[x].dp)?D_SELECTED:0;
+        ddtypemenu[0].flags=(!elkConfig.sound.ddtype)?D_SELECTED:0;
+        ddtypemenu[1].flags=(elkConfig.sound.ddtype)?D_SELECTED:0;
+        for (x=0;x<3;x++)  ddvolmenu[x].flags=(elkConfig.sound.ddvol==(intptr_t)ddvolmenu[x].dp)?D_SELECTED:0;
 //        keymenu[1].flags=(keyas)?D_SELECTED:0;
-        romcartsmenu[0].flags = (enable_mgc)?D_SELECTED:0;
-        romcartsmenu[1].flags = (enable_db_flash_cartridge)?D_SELECTED:0;
+        romcartsmenu[0].flags = (elkConfig.expansion.enable_mgc)?D_SELECTED:0;
+        romcartsmenu[1].flags = (elkConfig.expansion.enable_db_flash_cartridge)?D_SELECTED:0;
 }
 
 int gui_keydefine();
@@ -141,14 +143,14 @@ int gui_load0()
         char tempname[260];
         int ret;
         int xsize=windx-32,ysize=windy-16;
-        memcpy(tempname,discname,260);
-        ret=file_select_ex("Please choose a disc image",tempname,"SSD;DSD;IMG;ADF;ADL;FDI",260,xsize,ysize);
+        memcpy(tempname,elkConfig.disc.discname,DISCNAME_CHARS_MAX);
+        ret=file_select_ex("Please choose a disc image",tempname,"SSD;DSD;IMG;ADF;ADL;FDI",DISCNAME_CHARS_MAX,xsize,ysize);
         if (ret)
         {
                 closedisc(0);
-                memcpy(discname,tempname,260);
-                loaddisc(0,discname);
-                if (defaultwriteprot) writeprot[0]=1;
+                memcpy(elkConfig.disc.discname,tempname,DISCNAME_CHARS_MAX);
+                loaddisc(0,elkConfig.disc.discname);
+                if (elkConfig.expansion.defaultwriteprot) writeprot[0]=1;
         }
         updatelinuxgui();
         return D_O_K;
@@ -201,14 +203,14 @@ int gui_load1()
         char tempname[260];
         int ret;
         int xsize=windx-32,ysize=windy-16;
-        memcpy(tempname,discname2,260);
+        memcpy(tempname,elkConfig.disc.discname2,DISCNAME_CHARS_MAX);
         ret=file_select_ex("Please choose a disc image",tempname,"SSD;DSD;IMG;ADF;ADL;FDI",260,xsize,ysize);
         if (ret)
         {
                 closedisc(1);
-                memcpy(discname2,tempname,260);
-                loaddisc(1,discname2);
-                if (defaultwriteprot) writeprot[1]=1;
+                memcpy(elkConfig.disc.discname2,tempname,DISCNAME_CHARS_MAX);
+                loaddisc(1,elkConfig.disc.discname2);
+                if (elkConfig.expansion.defaultwriteprot) writeprot[1]=1;
         }
         updatelinuxgui();
         return D_O_K;
@@ -217,13 +219,13 @@ int gui_load1()
 int gui_eject0()
 {
         closedisc(0);
-        discname[0]=0;
+        elkConfig.disc.discname[0]=0;
         return D_O_K;
 }
 int gui_eject1()
 {
         closedisc(1);
-        discname2[0]=0;
+        elkConfig.disc.discname2[0]=0;
         return D_O_K;
 }
 
@@ -243,7 +245,7 @@ int gui_wprot1()
 }
 int gui_wprotd()
 {
-        defaultwriteprot=!defaultwriteprot;
+        elkConfig.expansion.defaultwriteprot=!elkConfig.expansion.defaultwriteprot;
         updatelinuxgui();
         return D_O_K;
 }
@@ -341,7 +343,7 @@ MENU tapemenu[]=
 
 int gui_disp()
 {
-        drawmode=(intptr_t)active_menu->dp;
+        elkConfig.display.drawmode=(intptr_t)active_menu->dp;
         updatelinuxgui();
         return D_O_K;
 }
@@ -398,7 +400,7 @@ MENU waveformmenu[6]=
 
 int gui_ddtype()
 {
-        ddtype=(intptr_t)active_menu->dp;
+        elkConfig.sound.ddtype=(intptr_t)active_menu->dp;
         closeddnoise();
         loaddiscsamps();
         updatelinuxgui();
@@ -414,7 +416,7 @@ MENU ddtypemenu[3]=
 
 int gui_ddvol()
 {
-        ddvol=(intptr_t)active_menu->dp;
+        elkConfig.sound.ddvol=(intptr_t)active_menu->dp;
         updatelinuxgui();
         return D_O_K;
 }
@@ -429,26 +431,26 @@ MENU ddvolmenu[4]=
 
 int gui_internalsnd()
 {
-        sndint=!sndint;
+        elkConfig.sound.sndint=!elkConfig.sound.sndint;
         updatelinuxgui();
         return D_O_K;
 }
 int gui_sndex()
 {
-        sndex=!sndex;
+        elkConfig.sound.sndex=!elkConfig.sound.sndex;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
 }
 int gui_ddnoise()
 {
-        sndddnoise=!sndddnoise;
+        elkConfig.sound.sndddnoise=!elkConfig.sound.sndddnoise;
         updatelinuxgui();
         return D_O_K;
 }
 int gui_tnoise()
 {
-        sndtape=!sndtape;
+        elkConfig.sound.sndtape=!elkConfig.sound.sndtape;
         updatelinuxgui();
         return D_O_K;
 }
@@ -478,22 +480,25 @@ MENU keymenu[2]=
 
 int gui_plus3()
 {
-        plus3=!plus3;
-        if (plus3) firstbyte=0;
+        elkConfig.expansion.plus3=!elkConfig.expansion.plus3;
+        if (elkConfig.expansion.plus3)
+        {
+                elkConfig.expansion.firstbyte=0;
+        }
         resetit=1;
         updatelinuxgui();
         return D_O_K;
 }
 int gui_adfs()
 {
-        adfsena=!adfsena;
+        elkConfig.expansion.adfsena=!elkConfig.expansion.adfsena;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
 }
 int gui_dfs()
 {
-        dfsena=!dfsena;
+        elkConfig.expansion.dfsena=!elkConfig.expansion.dfsena;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
@@ -525,7 +530,7 @@ MENU mrbmenu[4]=
 
 int gui_ulamode()
 {
-        ulamode=(intptr_t)active_menu->dp;
+        elkConfig.expansion.ulamode=(intptr_t)active_menu->dp;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
@@ -559,7 +564,7 @@ int gui_mrb()
 
 int gui_jim()
 {
-        enable_jim=!enable_jim;
+        elkConfig.expansion.enable_jim=!elkConfig.expansion.enable_jim;
         resetit=1;
         updatelinuxgui();
         return D_O_K;
@@ -577,8 +582,11 @@ MENU memmenu[6]=
 
 int gui_plus1()
 {
-        plus1=!plus1;
-        if (plus1) firstbyte=0;
+        elkConfig.expansion.plus1=!elkConfig.expansion.plus1;
+        if (elkConfig.expansion.plus1)
+        {
+                elkConfig.expansion.firstbyte=0;
+        }
         resetit=1;
         updatelinuxgui();
         return D_O_K;
@@ -586,8 +594,11 @@ int gui_plus1()
 
 int gui_first()
 {
-        firstbyte=!firstbyte;
-        if (firstbyte) plus1=plus3=0;
+        elkConfig.expansion.firstbyte=!elkConfig.expansion.firstbyte;
+        if (elkConfig.expansion.firstbyte) 
+        {
+                elkConfig.expansion.plus1=elkConfig.expansion.plus3=0;
+        }
         resetit=1;
         updatelinuxgui();
         return D_O_K;
@@ -665,13 +676,13 @@ MENU miscmenu[5]=
 
 int gui_mgc()
 {
-        enable_mgc=!enable_mgc;
+        elkConfig.expansion.enable_mgc=!elkConfig.expansion.enable_mgc;
         updatelinuxgui();
         return D_O_K;
 }
 int gui_db_flash_cartridge()
 {
-        enable_db_flash_cartridge=!enable_db_flash_cartridge;
+        elkConfig.expansion.enable_db_flash_cartridge=!elkConfig.expansion.enable_db_flash_cartridge;
         updatelinuxgui();
         return D_O_K;
 }

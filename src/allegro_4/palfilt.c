@@ -16,7 +16,7 @@ void initcoef()
         ACoef2[1]=ftofix(0.58578643762667126000);
         ACoef2[2]=ftofix(0.29289321881333563000);
         BCoef2[2]=ftofix(0.17157287525380990000);
-        rpclog("%08X %08X %08X %08X\n",ACoef2[0],ACoef2[1],ACoef2[2],BCoef2[2]);
+        //rpclog("%08X %08X %08X %08X\n",ACoef2[0],ACoef2[1],ACoef2[2],BCoef2[2]);
 }
 
 

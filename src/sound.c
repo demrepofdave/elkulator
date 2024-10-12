@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "elk.h"
+#include "common/sound.h"
+#include "config_vars.h"
 
 int sndinternal=1;
 uint16_t snshift;
@@ -134,7 +136,10 @@ void logvols()
 //                printf("%i samples\n",BUFLEN);
                 memset(sndbuf,0,BUFLEN*2);
 //                fillbuf(sndbuf,BUFLEN);
-                if (sndex) updatebuffer(sndbuf,BUFLEN);
+                if (elkConfig.sound.sndex) 
+                {
+                        updatebuffer(sndbuf,BUFLEN);
+                }
         for (c=0;c<BUFLEN;c++)
         {
                 sndbuf[c]^=0x8000;
@@ -250,7 +255,7 @@ cursidline=0;
                 }
                 else
                    snstat[0]&=32767;
-                if (soundfilter && sndinternal) buffer[d]=(int)iirs((float)buffer[d]);
+                if (sndinternal) buffer[d]=(int)iirs((float)buffer[d]);
                 sidcount++;
                 if (sidcount==624)
                 {

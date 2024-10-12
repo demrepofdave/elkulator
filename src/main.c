@@ -10,12 +10,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include "elk.h"
+#include "6502.h"
+#include "mem.h"
+#include "ula.h"
+#include "config.h"
 #include "config_vars.h"
 #include "callback_handlers.h"
 #include "logger.h"
 #include "common/video.h"
 #include "common/keyboard.h"
 #include "common/fileutils.h"
+#include "common/sound.h"
 #undef printf
 int autoboot;
 FILE *rlog;
@@ -76,7 +81,9 @@ void initelk(int argc, char *argv[])
             p = fileutils_get_filename(exedir);
             p[0] = 0;
         #endif
-        discname[0]=discname2[0]=tapename[0]=0;
+        elkConfig.disc.discname[0]  = 0;
+        elkConfig.disc.discname2[0] = 0;
+        tapename[0] = 0;
         parallelname[0]=0;serialname[0]=0;
         for (int i = 0; i < 16; i++)
         {
@@ -140,8 +147,8 @@ void initelk(int argc, char *argv[])
                 }
                 else if (discnext)
                 {
-                        if (discnext==2) strcpy(discname2,argv[c]);
-                        else             strcpy(discname,argv[c]);
+                        if (discnext==2) strcpy(elkConfig.disc.discname2,argv[c]);
+                        else             strcpy(elkConfig.disc.discname,argv[c]);
                         discnext=0;
                 }
                 else if (romnext > -2)
@@ -175,7 +182,7 @@ void initelk(int argc, char *argv[])
                 if (tapenext) tapenext--;
         }
 
-        initalmain(0,NULL);
+        sound_init_part1(0,NULL);
         loadroms();
         reset6502();
         initula();
@@ -187,8 +194,8 @@ void initelk(int argc, char *argv[])
         #endif // WIN32
         
         loadtape(tapename);
-        loaddisc(0,discname);
-        loaddisc(1,discname2);
+        loaddisc(0,elkConfig.disc.discname);
+        loaddisc(1,elkConfig.disc.discname2);
         /* For temporary compatibility: */
         if (romnames[0][0] != 0) loadcart(romnames[0]);
         if (romnames[1][0] != 0) loadcart2(romnames[1]);
@@ -196,11 +203,11 @@ void initelk(int argc, char *argv[])
         for (int i = 0; i < 16; i++) {
             if (romnames[i][0] != 0) loadrom_n(i, romnames[i]);
         }
-        if (defaultwriteprot) writeprot[0]=writeprot[1]=1;
+        if (elkConfig.expansion.defaultwriteprot) writeprot[0]=writeprot[1]=1;
 
         video_init_part3(drawitint);
 
-        inital();
+        sound_init_part2();
         initsound();
         loaddiscsamps();
         maketapenoise();

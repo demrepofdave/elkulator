@@ -8,11 +8,11 @@
 #include <stdint.h>
 #include <string.h>
 #include "elk.h"
+#include "config_vars.h"
 
 int samples=0;
 FILE *allog;
 //#undef printf
-int sndddnoise,sndtape;
 
 ALuint buffers[4]; // front and back buffers
 ALuint source[2];     // audio source
@@ -40,7 +40,7 @@ void check()
         }*/
 }
 
-void initalmain(int argc, char *argv[])
+void sound_init_part1(int argc, char *argv[])
 {
 printf("Start...\n");
         alutInit(0,0);
@@ -58,7 +58,7 @@ void closeal()
 int16_t tempbuf[BUFLEN>>1];
 int16_t tempbufdd[4410*2];
 
-void inital()
+void sound_init_part2()
 {
         int c;
         format = AL_FORMAT_STEREO16;
@@ -110,7 +110,7 @@ void inital()
 
 int16_t zbuf[16384];
 
-void givealbuffer(int16_t *buf)
+void sound_givealbuffer(int16_t *buf)
 {
         int processed;
         int state;
@@ -172,10 +172,10 @@ int sndbufpos=0;
 
 void addsnd(uint8_t dat)
 {
-        if (sndbufpos<2000) sndbufi[sndbufpos++]=(sndint)?(dat*31):0;
+        if (sndbufpos<2000) sndbufi[sndbufpos++]=(elkConfig.sound.sndint)?(dat*31):0;
 /*        if (sndbufpos==2000)
         {
-                givealbuffer(sndbuf);
+                sound_givealbuffer(sndbuf);
                 sndbufpos=0;
         }*/
 }
@@ -192,17 +192,17 @@ void mixbuffer(int16_t *d)
 //        for (c=0;c<BUFLEN;c++) d[c]^=0x8000;
 //        fwrite(d,BUFLEN>>1,1,f);
 //        for (c=0;c<BUFLEN;c++) d[c]^=0x8000;
-        givealbuffer(d);
+        sound_givealbuffer(d);
 }
 
-void givealbufferdd(int16_t *buf)
+void sound_givealbufferdd(int16_t *buf)
 {
         int processed;
         int state;
         int c;
 //        rpclog("DDnoise1 %i %i\n",sndddnoise,sndtape);
 
-        if (!sndddnoise && !sndtape) return;
+        if (!elkConfig.sound.sndddnoise && !elkConfig.sound.sndtape) return;
 //        rpclog("DDnoise2\n");
 
 //return;

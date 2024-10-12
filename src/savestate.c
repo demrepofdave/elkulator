@@ -1,7 +1,10 @@
 /*Elkulator v1.0 by Sarah Walker
-  Savestate handling*/
+Savestate handling*/
 #include <stdio.h>
 #include "elk.h"
+#include "6502.h"
+#include "mem.h"
+#include "ula.h"
 #include "config_vars.h"
 
 void savestate()
@@ -25,14 +28,14 @@ void dosavestate(const char * filename)
         putc(elkConfig.expansion.mrbmode,f);
         putc(usedrom6,f);
         
-        putc(plus3,f);
-        putc(adfsena,f);
-        putc(dfsena,f);
+        putc(elkConfig.expansion.plus3,f);
+        putc(elkConfig.expansion.adfsena,f);
+        putc(elkConfig.expansion.dfsena,f);
         putc(0,f);
         
-        putc(sndex,f);
-        putc(plus1,f);
-        putc(firstbyte,f); putc(0,f);
+        putc(elkConfig.sound.sndex,f);
+        putc(elkConfig.expansion.plus1,f);
+        putc(elkConfig.expansion.firstbyte,f); putc(0,f);
         
         save6502state(f);
         saveulastate(f);
@@ -54,14 +57,14 @@ void doloadstate(const char * filename)
         elkConfig.expansion.mrbmode = getc(f);
         usedrom6=getc(f);
         
-        plus3=getc(f);
-        adfsena=getc(f);
-        dfsena=getc(f);
+        elkConfig.expansion.plus3   = getc(f);
+        elkConfig.expansion.adfsena = getc(f);
+        elkConfig.expansion.dfsena  = getc(f);
         getc(f);
         
-        sndex=getc(f);
-        plus1=getc(f);
-        firstbyte=getc(f);
+        elkConfig.sound.sndex=getc(f);
+        elkConfig.expansion.plus1=getc(f);
+        elkConfig.expansion.firstbyte=getc(f);
         getc(f);
         
         load6502state(f);
