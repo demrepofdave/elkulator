@@ -134,12 +134,51 @@ static int radio_event_with_deselect(ALLEGRO_EVENT *event, int current)
     return num;
 }
 
+static void uncheck_menu_item(ALLEGRO_MENU *menu, int id)
+{
+    if(menu)
+    {
+        int flags = al_get_menu_item_flags(menu, id);
+        if(flags & ALLEGRO_MENU_ITEM_CHECKED)
+        {
+            // If set, we untoggle
+            flags = flags ^ ALLEGRO_MENU_ITEM_CHECKED;
+            al_set_menu_item_flags(menu, id, flags);
+        }
+    }
+}
+
+// TODO: Does not seem to work for the moment.
+void disable_menu_item(ALLEGRO_MENU *menu, int id)
+{
+    if(menu)
+    {
+        int flags = al_get_menu_item_flags(menu, id);
+        if(flags & ALLEGRO_MENU_ITEM_DISABLED)
+        {
+            // If set, we untoggle
+            flags = ALLEGRO_MENU_ITEM_DISABLED;
+            al_set_menu_item_flags(menu, id, flags);
+        }
+    }
+}
+
 // Variable and config handlers
 
 void tape_speed_set(uint8_t new_speed)
 {
     elkConfig.tape.speed = new_speed;
 }
+
+void video_display_set(uint8_t new_drawmode)
+{
+    //elkConfig.display.drawmode = new_drawmode;
+}
+void master_ram_board_mode_set(uint8_t new_mrbmode)
+{
+    elkConfig.expansion.mrbmode = new_mrbmode;
+}
+
 // File Menu - All functions helpers
 
 char * savestate_name = NULL;
@@ -289,12 +328,62 @@ uint32_t menu_handle_event(ALLEGRO_EVENT *event)
             elkEvent = ELK_EVENT_MENU_ITEM_STATE_CHANGE;
             break;
         case IDM_TAPE_REWIND:
+            callback_handlers.rewind_tape();
             break;
         case IDM_TAPE_EJECT:
+            callback_handlers.eject_tape();
             break;
         case IDM_TAPE_SPEED:
             tape_speed_set(radio_event_simple(event, elkConfig.tape.speed));
             break;
+
+        case IDM_SETTINGS_VIDEO_DISPLAY:
+            video_display_set(radio_event_simple(event, elkConfig.display.drawmode));
+            break;
+
+        case IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD:
+            elkConfig.expansion.mrb ^= 1;
+            elkEvent = ELK_EVENT_RESET;
+
+        case IDM_SETTINGS_MEMORY_MRB_MODE:
+            master_ram_board_mode_set(radio_event_simple(event, elkConfig.expansion.mrbmode));
+            elkEvent = ELK_EVENT_RESET;
+            break;
+
+        case IDM_SETTINGS_DISC_PLUS3_ENABLE:
+            elkConfig.expansion.plus3 = 1;
+            elkEvent = ELK_EVENT_RESET;
+            break;
+
+        case IDM_SETTINGS_DISC_ADFS_ENABLE:
+        {
+            // TODO: Identiy of create helper function
+            elkConfig.expansion.adfsena = 1;
+            uncheck_menu_item((ALLEGRO_MENU *)(event->user.data3), IDM_SETTINGS_DISC_DFS_ENABLE);
+            //ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
+            //if(elkConfig.expansion.dfsena)
+            //{
+            //    al_set_menu_item_flags(menu, IDM_SETTINGS_DISC_DFS_ENABLE, ALLEGRO_MENU_ITEM_CHECKBOX);
+            //    elkConfig.expansion.dfsena = 0;
+            //}
+            elkEvent = ELK_EVENT_RESET;
+            break;
+        }
+
+        case IDM_SETTINGS_DISC_DFS_ENABLE:
+        {
+            // TODO: Identiy of create helper function
+            elkConfig.expansion.dfsena = 1;
+            uncheck_menu_item((ALLEGRO_MENU *)(event->user.data3), IDM_SETTINGS_DISC_ADFS_ENABLE);
+            //ALLEGRO_MENU *menu = ;
+            //if(elkConfig.expansion.adfsena)
+            //{
+            //    al_set_menu_item_flags(menu, IDM_SETTINGS_DISC_ADFS_ENABLE, ALLEGRO_MENU_ITEM_CHECKBOX);
+            //    elkConfig.expansion.adfsena = 0;
+            //}
+            elkEvent = ELK_EVENT_RESET;
+            break;
+        }
     }
     log_debug("menu_handle_event elkEvent = 0x%02x\n", elkEvent);
     return(elkEvent);

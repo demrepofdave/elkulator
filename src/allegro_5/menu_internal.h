@@ -30,12 +30,7 @@ typedef enum {
     IDM_ROMCARTS_MEGAGAMES,
     IDM_ROMCARTS_DAVIDS_FLASH_ROM,
     IDM_SETTINGS_VIDEO_FULLSCREEN,
-    IDM_SETTINGS_VIDEO_DISPLAY_SCANLINES,
-    IDM_SETTINGS_VIDEO_DISPLAY_LINEDOUBLING,
-    IDM_SETTINGS_VIDEO_DISPLAY_2XSAI,
-    IDM_SETTINGS_VIDEO_DISPLAY_SCALE2X,
-    IDM_SETTINGS_VIDEO_DISPLAY_SUPEREAGLE,
-    IDM_SETTINGS_VIDEO_DISPLAY_PALFILTER,
+    IDM_SETTINGS_VIDEO_DISPLAY,
     IDM_SETTINGS_SOUND_INTERNAL_SPEAKER,
     IDM_SETTINGS_SOUND_CSS_EXPANSION,
     IDM_SETTINGS_SOUND_DISC_DRIVE_NOISE,
@@ -45,9 +40,7 @@ typedef enum {
     IDM_SETTINGS_MEMORY_TURBO,
     IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD,
     IDM_SETTINGS_MEMORY_JIM_PAGED_RAM,
-    IDM_SETTINGS_MEMORY_MRB_OFF,
-    IDM_SETTINGS_MEMORY_MRB_TURBO,
-    IDM_SETTINGS_MEMORY_MRB_SHADOW,
+    IDM_SETTINGS_MEMORY_MRB_MODE,
     IDM_SETTINGS_MEMORY_ENHANCED_ULA_STANDARD,
     IDM_SETTINGS_MEMORY_ENHANCED_ULA_8BITDUEL,
     IDM_SETTINGS_MEMORY_ENHANCED_ULA_9BITSINGLE,
@@ -149,6 +142,8 @@ typedef enum {
 
 // Helper functions
 void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, bool checked);
+void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int cur_value);
+void disable_menu_item(ALLEGRO_MENU *menu, int id);
 
 // Menu creation functions
 ALLEGRO_MENU *create_file_menu(void);
@@ -163,5 +158,7 @@ ALLEGRO_MENU *create_misc_menu(void);
 extern void menu_init(ALLEGRO_DISPLAY *display);
 extern void menu_destroy(ALLEGRO_DISPLAY *display);
 extern uint32_t menu_handle_event(ALLEGRO_EVENT *event);
+
+uint32_t menu_handle_event(ALLEGRO_EVENT *event);
 
 #endif

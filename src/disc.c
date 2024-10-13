@@ -256,3 +256,16 @@ void loadtape(const char *fn)
                 }
         }
 }
+
+void handle_rewind_tape(void)
+{
+        closeuef();
+        closecsw();
+        loadtape(tapename);
+}
+
+void handle_eject_tape(void)
+{
+        closeuef();
+        closecsw();
+}

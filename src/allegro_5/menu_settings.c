@@ -16,30 +16,33 @@
 #include "config_vars.h"
 #include "menu_internal.h"
 
+
+/******************************************************************************
+* Private Variable Definitions
+*******************************************************************************/
+static const char *settings_memory_master_ramboard_items[] = { "Off",
+                                                               "Turbo",
+                                                               "Shadow", NULL };
+
+static const char *settings_video_display_type[] = { "Scanlines", 
+                                                     "Line doubling (disabled)", 
+                                                     "2xSai (disabled)",
+                                                     "Scale2X (disabled)",
+                                                     "Super Eagle (disabled)",
+                                                     "PAL Filter (disabled)", NULL };
+
 /******************************************************************************
 * Private Function Definitions
 *******************************************************************************/
 
-static ALLEGRO_MENU *create_settings_video_displaytype_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Scanlines",     IDM_SETTINGS_VIDEO_DISPLAY_SCANLINES,        0, NULL, NULL);
-    al_append_menu_item(menu, "Line doubling", IDM_SETTINGS_VIDEO_DISPLAY_LINEDOUBLING, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "2xSaI",         IDM_SETTINGS_VIDEO_DISPLAY_2XSAI,        ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Scale2X",       IDM_SETTINGS_VIDEO_DISPLAY_SCALE2X,      ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Super Eagle",   IDM_SETTINGS_VIDEO_DISPLAY_SUPEREAGLE,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "PAL Filter",    IDM_SETTINGS_VIDEO_DISPLAY_PALFILTER,    ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
-
-static ALLEGRO_MENU *create_settings_memory_masterramboard_menu(void)
-{
-    ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Off",    IDM_SETTINGS_MEMORY_MRB_OFF,    ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Turbo",  IDM_SETTINGS_MEMORY_MRB_TURBO,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Shadow", IDM_SETTINGS_MEMORY_MRB_SHADOW, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    return menu;
-}
+//static ALLEGRO_MENU *create_settings_memory_masterramboard_menu(void)
+//{
+//    ALLEGRO_MENU *menu = al_create_menu();
+//    al_append_menu_item(menu, "Off",    IDM_SETTINGS_MEMORY_MRB_OFF,    ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+//    al_append_menu_item(menu, "Turbo",  IDM_SETTINGS_MEMORY_MRB_TURBO,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+//    al_append_menu_item(menu, "Shadow", IDM_SETTINGS_MEMORY_MRB_SHADOW, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+//    return menu;
+//}
 
 static ALLEGRO_MENU *create_settings_memory_enhancedula_menu(void)
 {
@@ -53,7 +56,14 @@ static ALLEGRO_MENU *create_settings_memory_enhancedula_menu(void)
 static ALLEGRO_MENU *create_settings_video_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Display type",    0, 0, NULL, create_settings_video_displaytype_menu());
+    ALLEGRO_MENU *sub_menu_display_type = al_create_menu();
+
+    //disable_menu_item(sub_menu_settings_display_type, -2);
+
+    al_append_menu_item(menu, "Display type",   0,  0, NULL, sub_menu_display_type);
+
+    add_radio_set(sub_menu_display_type, settings_video_display_type, IDM_SETTINGS_VIDEO_DISPLAY, elkConfig.display.drawmode);
+
     al_append_menu_item(menu, "Fullscreen",            IDM_SETTINGS_VIDEO_FULLSCREEN, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
     return menu;
 }
@@ -73,9 +83,15 @@ static ALLEGRO_MENU *create_settings_sound_menu(void)
 static ALLEGRO_MENU *create_settings_memory_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
+    ALLEGRO_MENU *sub_menu_master_ram_board_mode = al_create_menu();
+
     al_append_menu_item(menu, "Elektuur/Slogger turbo board",  IDM_SETTINGS_MEMORY_TURBO,            ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Slogger/Jafa Master RAM board", IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Master RAM board mode",    0, 0, NULL, create_settings_memory_masterramboard_menu());
+    al_append_menu_item(menu, "Slogger/Jafa Master RAM board", IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD, 0, NULL, NULL);
+
+    al_append_menu_item(menu, "Master RAM board mode",   0,  0, NULL, sub_menu_master_ram_board_mode);
+
+    add_radio_set(sub_menu_master_ram_board_mode, settings_memory_master_ramboard_items, IDM_SETTINGS_MEMORY_MRB_MODE, elkConfig.expansion.mrbmode);
+
     al_append_menu_item(menu, "Enhanced ULA mode",        0, 0, NULL, create_settings_memory_enhancedula_menu());
     al_append_menu_item(menu, "Paged RAM in FD (JIM)",         IDM_SETTINGS_MEMORY_JIM_PAGED_RAM,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
     return menu;
@@ -84,9 +100,9 @@ static ALLEGRO_MENU *create_settings_memory_menu(void)
 static ALLEGRO_MENU *create_settings_disc_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Plus 3 enable", IDM_SETTINGS_DISC_PLUS3_ENABLE, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "ADFS enable",   IDM_SETTINGS_DISC_ADFS_ENABLE,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "DFS enable",    IDM_SETTINGS_DISC_DFS_ENABLE,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+    add_checkbox_item(menu, "Plus 3 enable", IDM_SETTINGS_DISC_PLUS3_ENABLE, elkConfig.expansion.plus3);
+    add_checkbox_item(menu, "ADFS enable",   IDM_SETTINGS_DISC_ADFS_ENABLE,  elkConfig.expansion.adfsena);
+    add_checkbox_item(menu, "DFS enable",    IDM_SETTINGS_DISC_DFS_ENABLE,   elkConfig.expansion.dfsena);
     return menu;
 }
 

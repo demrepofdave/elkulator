@@ -64,6 +64,8 @@ void initHandlers()
         callback_handlers.handler_save_state = dosavestate;
         callback_handlers.handler_load_state = doloadstate;
         callback_handlers.handler_load_tape  = loadtape;
+        callback_handlers.eject_tape  = handle_eject_tape;
+        callback_handlers.rewind_tape = handle_rewind_tape;
 }
 
 void initelk(int argc, char *argv[])
