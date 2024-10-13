@@ -56,7 +56,7 @@ char serialname[512];
 extern int serial_debug;
 char romnames[16][1024];
 
-CallbackHandlers callback_handlers;
+callback_handlers_t callback_handlers;
 
 void initHandlers()
 {

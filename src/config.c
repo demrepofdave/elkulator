@@ -184,8 +184,6 @@ void loadconfig()
 
 void saveconfig()
 {
-        int c;
-        char s[20];
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
 
@@ -226,6 +224,8 @@ void saveconfig()
         
         // Use default keyboard for now.
         #ifdef HAL_ALLEGRO_4
+        int c;
+        char s[20];
         for (c=0;c<128;c++)
         {
                 sprintf(s,"key_define_%03i",c);

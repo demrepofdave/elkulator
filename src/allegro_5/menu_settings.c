@@ -15,7 +15,16 @@
 #include <allegro5/allegro_native_dialog.h>
 #include "config_vars.h"
 #include "menu_internal.h"
+#include "common/event_handler.h"
 
+uint16_t menu_handle_video_display_set(ALLEGRO_EVENT * event);
+
+uint16_t menu_handle_master_ram_board_enable(ALLEGRO_EVENT * event);
+uint16_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event);
+
+uint16_t menu_handle_plus_3_enable(ALLEGRO_EVENT * event);
+uint16_t menu_handle_adfs_enable(ALLEGRO_EVENT * event);
+uint16_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
 
 /******************************************************************************
 * Private Variable Definitions
@@ -62,7 +71,7 @@ static ALLEGRO_MENU *create_settings_video_menu(void)
 
     al_append_menu_item(menu, "Display type",   0,  0, NULL, sub_menu_display_type);
 
-    add_radio_set(sub_menu_display_type, settings_video_display_type, IDM_SETTINGS_VIDEO_DISPLAY, elkConfig.display.drawmode);
+    add_radio_set(sub_menu_display_type, settings_video_display_type, IDM_SETTINGS_VIDEO_DISPLAY, elkConfig.display.drawmode, menu_handle_video_display_set);
 
     al_append_menu_item(menu, "Fullscreen",            IDM_SETTINGS_VIDEO_FULLSCREEN, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
     return menu;
@@ -86,11 +95,11 @@ static ALLEGRO_MENU *create_settings_memory_menu(void)
     ALLEGRO_MENU *sub_menu_master_ram_board_mode = al_create_menu();
 
     al_append_menu_item(menu, "Elektuur/Slogger turbo board",  IDM_SETTINGS_MEMORY_TURBO,            ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "Slogger/Jafa Master RAM board", IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD, 0, NULL, NULL);
+    append_menu_item(menu, "Slogger/Jafa Master RAM board",   IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD,  0, menu_handle_master_ram_board_enable);
 
     al_append_menu_item(menu, "Master RAM board mode",   0,  0, NULL, sub_menu_master_ram_board_mode);
 
-    add_radio_set(sub_menu_master_ram_board_mode, settings_memory_master_ramboard_items, IDM_SETTINGS_MEMORY_MRB_MODE, elkConfig.expansion.mrbmode);
+    add_radio_set(sub_menu_master_ram_board_mode, settings_memory_master_ramboard_items, IDM_SETTINGS_MEMORY_MRB_MODE, elkConfig.expansion.mrbmode, menu_handle_master_ram_board_mode);
 
     al_append_menu_item(menu, "Enhanced ULA mode",        0, 0, NULL, create_settings_memory_enhancedula_menu());
     al_append_menu_item(menu, "Paged RAM in FD (JIM)",         IDM_SETTINGS_MEMORY_JIM_PAGED_RAM,   ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
@@ -100,9 +109,9 @@ static ALLEGRO_MENU *create_settings_memory_menu(void)
 static ALLEGRO_MENU *create_settings_disc_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
-    add_checkbox_item(menu, "Plus 3 enable", IDM_SETTINGS_DISC_PLUS3_ENABLE, elkConfig.expansion.plus3);
-    add_checkbox_item(menu, "ADFS enable",   IDM_SETTINGS_DISC_ADFS_ENABLE,  elkConfig.expansion.adfsena);
-    add_checkbox_item(menu, "DFS enable",    IDM_SETTINGS_DISC_DFS_ENABLE,   elkConfig.expansion.dfsena);
+    add_checkbox_item(menu, "Plus 3 enable", IDM_SETTINGS_DISC_PLUS3_ENABLE, elkConfig.expansion.plus3,   menu_handle_plus_3_enable);
+    add_checkbox_item(menu, "ADFS enable",   IDM_SETTINGS_DISC_ADFS_ENABLE,  elkConfig.expansion.adfsena, menu_handle_adfs_enable);
+    add_checkbox_item(menu, "DFS enable",    IDM_SETTINGS_DISC_DFS_ENABLE,   elkConfig.expansion.dfsena,  menu_handle_dfs_enable);
     return menu;
 }
 
@@ -136,4 +145,59 @@ ALLEGRO_MENU *create_settings_menu(void)
     al_append_menu_item(menu, "Joystick", 0, 0, NULL, create_settings_joystick_menu());
     al_append_menu_item(menu, "Keyboard", 0, 0, NULL, create_settings_keyboard_menu());
     return menu;
+}
+
+
+// Menu event handler functions.
+
+// Called when IDM_SETTINGS_VIDEO_DISPLAY event is recieved.
+uint16_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
+{
+    //elkConfig.display.drawmode = radio_event_simple(event, elkConfig.display.drawmode);
+    elkConfig.display.drawmode = radio_event_simple(event, elkConfig.display.drawmode);
+    return(0);
+}
+
+// Called when IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD event is recieved.
+uint16_t menu_handle_master_ram_board_enable(ALLEGRO_EVENT * event)
+{
+    elkConfig.expansion.mrb ^= 1;
+    return(ELK_EVENT_RESET);
+}
+
+// Called when IDM_SETTINGS_MEMORY_MRB_MODE event is recieved.
+uint16_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event)
+{
+    elkConfig.expansion.mrbmode = (radio_event_simple(event, elkConfig.expansion.mrbmode));
+    return(ELK_EVENT_RESET);
+}
+
+// Called when IDM_SETTINGS_DISC_PLUS3_ENABLE event is recieved.
+uint16_t menu_handle_plus_3_enable(ALLEGRO_EVENT * event)
+{
+    elkConfig.expansion.plus3 ^= 1;
+    return(ELK_EVENT_RESET);
+}
+// Called when IDM_SETTINGS_DISC_ADFS_ENABLE event is recieved.
+uint16_t menu_handle_adfs_enable(ALLEGRO_EVENT * event)
+{
+    ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
+    elkConfig.expansion.adfsena ^= 1;
+    if(elkConfig.expansion.adfsena && elkConfig.expansion.dfsena)
+    {
+        al_set_menu_item_flags(menu, IDM_SETTINGS_DISC_DFS_ENABLE, ALLEGRO_MENU_ITEM_CHECKBOX);
+    }
+    return(ELK_EVENT_RESET);
+}
+// Called when IDM_SETTINGS_DISC_DFS_ENABLE event is recieved.
+uint16_t menu_handle_dfs_enable(ALLEGRO_EVENT * event)
+{
+    ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
+    elkConfig.expansion.dfsena ^= 1;
+    if(elkConfig.expansion.dfsena && elkConfig.expansion.adfsena)
+    {
+        // TODO: Following logic fails for some reason.
+        al_set_menu_item_flags(menu, IDM_SETTINGS_DISC_ADFS_ENABLE, ALLEGRO_MENU_ITEM_CHECKBOX);
+    }
+    return(ELK_EVENT_RESET);
 }

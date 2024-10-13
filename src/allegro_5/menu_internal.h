@@ -3,6 +3,7 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
+#include "event_handler_internal.h"
 
 typedef enum {
     IDM_ZERO,
@@ -139,11 +140,16 @@ typedef enum {
 } menu_id_t;
 
 
-
 // Helper functions
-void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, bool checked);
-void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int cur_value);
+void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, bool checked, callback_event_handler_t menu_handler_function);
+void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int cur_value,  callback_event_handler_t menu_handler_function);
 void disable_menu_item(ALLEGRO_MENU *menu, int id);
+void uncheck_menu_item(ALLEGRO_MENU *menu, int id);
+bool append_menu_item(ALLEGRO_MENU *menu, const char * title, uint16_t id, int flags, callback_event_handler_t menu_handler_function);
+
+bool register_menu_event_handler(int id, callback_event_handler_t menu_handler);
+
+int radio_event_simple(ALLEGRO_EVENT *event, int current);
 
 // Menu creation functions
 ALLEGRO_MENU *create_file_menu(void);
@@ -157,8 +163,7 @@ ALLEGRO_MENU *create_misc_menu(void);
 
 extern void menu_init(ALLEGRO_DISPLAY *display);
 extern void menu_destroy(ALLEGRO_DISPLAY *display);
-extern uint32_t menu_handle_event(ALLEGRO_EVENT *event);
 
-uint32_t menu_handle_event(ALLEGRO_EVENT *event);
+elk_event_t  menu_handle_event(ALLEGRO_EVENT *event);
 
 #endif

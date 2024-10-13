@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
                 }
         #else       
                 video_start_timer();
-                uint32_t elkEvent = 0;
+                elk_event_t elkEvent = 0;
                 while (!(elkEvent & ELK_EVENT_EXIT))
                 {
                         elkEvent = event_await();
