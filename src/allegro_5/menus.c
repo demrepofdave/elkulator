@@ -61,6 +61,7 @@ uint16_t menu_registered_handlers;
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
+elk_event_t menu_null_handler(ALLEGRO_EVENT * event);
 
 /******************************************************************************
 * Private Function Definitions
@@ -139,6 +140,8 @@ int radio_event_simple(ALLEGRO_EVENT *event, int current)
     int num = menu_get_num(event);
     ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
 
+    log_debug("radio_event_simple:menu %p id=%d, num=%d, current=%d data1=%lx\n", menu, id, num, current, event->user.data1);
+
     al_set_menu_item_flags(menu, menu_id_num(id, current), ALLEGRO_MENU_ITEM_CHECKBOX);
     return num;
 }
@@ -176,10 +179,13 @@ void uncheck_menu_item(ALLEGRO_MENU *menu, int id)
         if(flags & ALLEGRO_MENU_ITEM_CHECKED)
         {
             // If set, we untoggle
+            flags ^= ALLEGRO_MENU_ITEM_CHECKED;
             log_debug("uncheck_menu_item: flags are %d, menu_item_checked\n", flags);
-            flags = flags ^ ALLEGRO_MENU_ITEM_CHECKED;
+            al_set_menu_item_flags(menu, id, flags);
+
+            // Post verification check
+            flags = al_get_menu_item_flags(menu, id);
             log_debug("uncheck_menu_item: post flags are %d, menu_item_checked\n", flags);
-            al_set_menu_item_flags(menu, id, ALLEGRO_MENU_ITEM_CHECKBOX);
         }
     }
 }
@@ -203,7 +209,7 @@ void disable_menu_item(ALLEGRO_MENU *menu, int id)
 // File Menu - All functions helpers
 
 char * savestate_name = NULL;
-static void file_load_state(ALLEGRO_EVENT *event, const char * title, const char * patterns)
+void file_load_state(ALLEGRO_EVENT *event, const char * title, const char * patterns)
 {
     ALLEGRO_DISPLAY *display = (ALLEGRO_DISPLAY *)(event->user.data2);
     ALLEGRO_FILECHOOSER *chooser = al_create_native_file_dialog(savestate_name, title, patterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
@@ -232,16 +238,22 @@ static void file_load_state(ALLEGRO_EVENT *event, const char * title, const char
 
 // Tape menu.
 
-ALLEGRO_PATH *tape_fn = NULL;
-
-static void tape_load_ui(ALLEGRO_EVENT *event, const char * title, const char * patterns)
+ALLEGRO_PATH * menu_load_gui(ALLEGRO_EVENT *event, const char * title, const char * patterns, ALLEGRO_PATH * starting_path)
 {
     ALLEGRO_FILECHOOSER *chooser;
     ALLEGRO_DISPLAY *display;
     const char *fpath;
+    ALLEGRO_PATH *path = NULL;
 
-    if (!tape_fn || !(fpath = al_path_cstr(tape_fn, ALLEGRO_NATIVE_PATH_SEP)))
+    if(starting_path)
+    {
+        fpath = al_path_cstr(starting_path, ALLEGRO_NATIVE_PATH_SEP);
+    }
+    else
+    {
         fpath = ".";
+    }
+
     if ((chooser = al_create_native_file_dialog(fpath, title, patterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST))) 
     {
         display = (ALLEGRO_DISPLAY *)(event->user.data2);
@@ -249,25 +261,15 @@ static void tape_load_ui(ALLEGRO_EVENT *event, const char * title, const char * 
         {
             if (al_get_native_file_dialog_count(chooser) > 0) 
             {
-                //tape_close();
-                ALLEGRO_PATH *path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
-                const char * path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-                if(path_str)
-                {
-                    log_debug("tape_load_ui: path_str='%s'\n", path_str);
-                    callback_handlers.handler_load_tape(path_str);
-                } 
-                else
-                {
-                    log_debug("tape_load_ui: path_str is NULL\n");
-                }
-                tape_fn = path;
+                path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
             }
         }
     }
+
+    return(path);
 }
 
-static void file_save_state(ALLEGRO_EVENT *event, const char * title, const char * patterns)
+void file_save_state(ALLEGRO_EVENT *event, const char * title, const char * patterns)
 {
     ALLEGRO_FILECHOOSER *chooser;
     ALLEGRO_DISPLAY *display;
@@ -318,6 +320,9 @@ void menu_init(ALLEGRO_DISPLAY *display)
 {
     log_debug("menu_init\n");
     menu_registered_handlers = 0;
+
+    register_menu_event_handler(IDM_ZERO, menu_null_handler);
+
     ALLEGRO_MENU *menu = al_create_menu();
     al_append_menu_item(menu, "File",     0, 0, NULL, create_file_menu());
     al_append_menu_item(menu, "Tape",     0, 0, NULL, create_tape_menu());
@@ -341,13 +346,16 @@ static const char all_dext[] = "*.ssd;*.dsd;*.img;*.adf;*.ads;*.adm;*.adl;*.sdd;
 elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
 {
     elk_event_t elkEvent = 0;
+    uint16_t count = 0;
+    ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
+    menu_id_t menu_id = menu_get_id(event);
+    int num = menu_get_num(event);
 
     video_stop_timer();
-    log_debug("event_await: event Menu click\n");
+
+    log_debug("menu_handle_event: menu %p, id %d, num %d\n", menu, menu_id, num);
 
     // Handle menu events.
-    menu_id_t menu_id = menu_get_id(event);
-    uint16_t count = 0;
     while(count < menu_registered_handlers && !(elkEvent & ELK_EVENT_HANDLED))
     {
         if(menu_id == callback_menu_event_handler_list[count].menu_id)
@@ -364,28 +372,10 @@ elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
         log_debug("menu_handle_event: menu event %d detected\n", menu_id);
     }
 
-    switch(menu_get_id(event)) 
-    {
-        case IDM_ZERO:
-            break;
-        case IDM_FILE_EXIT:
-            elkEvent = ELK_EVENT_EXIT;
-            break;
-        case IDM_FILE_LOAD_STATE:
-            file_load_state(event, "Load state from file", "*.snp");
-            break;
-        case IDM_FILE_SAVE_STATE:
-            file_save_state(event, "Save state to file", "*.snp");
-            break;
-        case IDM_TAPE_LOAD:
-            tape_load_ui(event, "Choose a tape to load", "*.uef;*.csw");
-            elkEvent = ELK_EVENT_MENU_ITEM_STATE_CHANGE;
-            break;
-        default:
-            break;
-    }
     video_start_timer();
+
     log_debug("menu_handle_event elkEvent = 0x%02x\n", elkEvent);
+
     return(elkEvent);
 }
 
@@ -404,4 +394,9 @@ void setquit()
 void menu_update_on_state_change()
 {
 
+}
+
+elk_event_t menu_null_handler(ALLEGRO_EVENT * event)
+{
+    return 0;
 }

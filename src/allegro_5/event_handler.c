@@ -13,6 +13,7 @@
 bool register_main_event_handlers();
 elk_event_t handle_event_display_close(ALLEGRO_EVENT * event);
 elk_event_t handle_event_timer_expiry(ALLEGRO_EVENT * event);
+elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event);
 elk_event_t handle_null_event(ALLEGRO_EVENT * event);
 
 #define MAX_CALLBACK_EVENT_HANDLERS      128
@@ -85,25 +86,32 @@ bool register_main_event_handlers()
     result &= register_event_handler(ALLEGRO_EVENT_MOUSE_AXES,          handle_null_event);
     result &= register_event_handler(ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY, handle_null_event);
     result &= register_event_handler(ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY, handle_null_event);
-    result &= register_event_handler(ALLEGRO_EVENT_DISPLAY_RESIZE,      handle_null_event);
+    result &= register_event_handler(ALLEGRO_EVENT_DISPLAY_RESIZE,      handle_window_resize_event);
 
     return result;
 }
 
+// Called when ALLEGRO_EVENT_DISPLAY_RESIZE event is recieved.
+elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
+{
+    video_clearall();
+    return 0;
+}
+
 // Handler for events we want to acknowledge but are not yet implemented
-uint16_t handle_null_event(ALLEGRO_EVENT * event)
+elk_event_t handle_null_event(ALLEGRO_EVENT * event)
 {
     return 0;
 }
 
 // Called when ALLEGRO_EVENT_DISPLAY_CLOSE event is recieved.
-uint16_t handle_event_display_close(ALLEGRO_EVENT * event)
+elk_event_t handle_event_display_close(ALLEGRO_EVENT * event)
 {
     return(ELK_EVENT_EXIT);
 }
 
 // Called when ALLEGRO_EVENT_TIMER event is recieved.
-uint16_t handle_event_timer_expiry(ALLEGRO_EVENT * event)
+elk_event_t handle_event_timer_expiry(ALLEGRO_EVENT * event)
 {
     return(ELK_EVENT_TIMER_TRIGGERED);
 }

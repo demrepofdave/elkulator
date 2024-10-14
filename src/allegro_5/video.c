@@ -497,13 +497,13 @@ void video_shutdown()
 
 void video_start_timer()
 {
-    log_debug("video_start_timer: staring timer %p\n", timer);
+    //log_debug("video_start_timer: staring timer %p\n", timer);
     al_start_timer(timer);
 }
 
 void video_stop_timer()
 {
-    log_debug("video_start_timer: staring timer %p\n", timer);
+    //log_debug("video_start_timer: staring timer %p\n", timer);
     al_stop_timer(timer);   
 }
 

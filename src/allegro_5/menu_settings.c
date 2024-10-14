@@ -33,12 +33,12 @@ static const char *settings_memory_master_ramboard_items[] = { "Off",
                                                                "Turbo",
                                                                "Shadow", NULL };
 
-static const char *settings_video_display_type[] = { "Scanlines", 
-                                                     "Line doubling (disabled)", 
-                                                     "2xSai (disabled)",
-                                                     "Scale2X (disabled)",
-                                                     "Super Eagle (disabled)",
-                                                     "PAL Filter (disabled)", NULL };
+static const char *settings_video_display_type[] = { "Scanlines", NULL };
+//                                                     "Line doubling (disabled)", 
+//                                                     "2xSai (disabled)",
+//                                                     "Scale2X (disabled)",
+//                                                     "Super Eagle (disabled)",
+//                                                     "PAL Filter (disabled)", NULL };
 
 /******************************************************************************
 * Private Function Definitions
@@ -183,8 +183,10 @@ uint16_t menu_handle_adfs_enable(ALLEGRO_EVENT * event)
 {
     ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
     elkConfig.expansion.adfsena ^= 1;
+    //uncheck_menu_item(menu, IDM_SETTINGS_DISC_DFS_ENABLE);
     if(elkConfig.expansion.adfsena && elkConfig.expansion.dfsena)
     {
+        elkConfig.expansion.dfsena = 0;
         al_set_menu_item_flags(menu, IDM_SETTINGS_DISC_DFS_ENABLE, ALLEGRO_MENU_ITEM_CHECKBOX);
     }
     return(ELK_EVENT_RESET);
@@ -194,9 +196,10 @@ uint16_t menu_handle_dfs_enable(ALLEGRO_EVENT * event)
 {
     ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
     elkConfig.expansion.dfsena ^= 1;
+    //uncheck_menu_item(menu, IDM_SETTINGS_DISC_ADFS_ENABLE);
     if(elkConfig.expansion.dfsena && elkConfig.expansion.adfsena)
     {
-        // TODO: Following logic fails for some reason.
+        elkConfig.expansion.adfsena = 0;
         al_set_menu_item_flags(menu, IDM_SETTINGS_DISC_ADFS_ENABLE, ALLEGRO_MENU_ITEM_CHECKBOX);
     }
     return(ELK_EVENT_RESET);
