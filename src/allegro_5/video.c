@@ -77,7 +77,7 @@ elk_pallete_t elkpal[8] =
     0xffffffff
 };
 
-windowCoords_t main_window;
+window_config_t main_window;
 
 /******************************************************************************
 * Function Prototypes
@@ -102,9 +102,9 @@ int video_init_part1()
         exit(-1);
     }
 
-    main_window.winsizex = 800; // TODO: Will be configured in future
-    main_window.winsizey = 600; // TODO: Will be configured in future
-    main_window.maintain_aspect = true;
+    main_window.current_elk.winsizex = 800; // TODO: Will be configured in future
+    main_window.current_elk.winsizey = 600; // TODO: Will be configured in future
+    main_window.current_elk.maintain_aspect = true;
 
     al_init_native_dialog_addon();
     al_set_new_window_title(VERSION_STR);
@@ -130,7 +130,7 @@ int video_init_part1()
     }
     //video_set_window_size(true);
 
-    if ((display = al_create_display(main_window.winsizex, main_window.winsizey)) == NULL) {
+    if ((display = al_create_display(main_window.current_elk.winsizex, main_window.current_elk.winsizey)) == NULL) {
         log_fatal("video: unable to create display");
         exit(1);
     }
@@ -216,16 +216,61 @@ void video_rest(unsigned int period)
 
 void video_set_window_size(int w, int h, int v_w, int v_h)
 {
-    main_window.winsizex = w;
-    main_window.winsizey = h;
+    log_debug("Set window size %d, %d\n", w, h);
+    main_window.current_elk.winsizex = w;
+    main_window.current_elk.winsizey = h;
+    main_window.current_elk.maintain_aspect = true; // TODO: Hardcode for now.
 }
 
+void video_update_native_window_size(int w, int h)
+{
+    main_window.actual_window.winsizex = w;
+    main_window.actual_window.winsizex = h;
+    main_window.actual_window.maintain_aspect = false;
+
+    // Now we resize the screen based upon the above.
+    //if(main_window.current_elk.maintain_aspect)
+    //{
+    //    if(w > h)
+    //    {
+            // Resize based on height
+    //        video_set_window_size((h *4) / 3, h, 0,0);
+    //    }
+    //    else
+    //    {
+    //        video_set_window_size(w * 4, (w *3) / 40, 0,0);
+    //    }
+    //}
+    //else
+    {
+        video_set_window_size(w, h, 0,0);
+    }
+    video_apply_window_size();
+}
+
+void video_apply_window_size()
+{
+    if(main_window.future_elk.winsizex != -1)
+    {
+        main_window.current_elk.winsizex = main_window.future_elk.winsizex;
+        main_window.current_elk.winsizey = main_window.future_elk.winsizex;
+        main_window.current_elk.maintain_aspect = main_window.future_elk.maintain_aspect;
+    }
+    main_window.future_elk.winsizex = -1;
+    main_window.future_elk.winsizey = -1;
+    main_window.future_elk.maintain_aspect = false;
+
+    log_debug("Applied window size %d, %d\n", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
+}
 
 void video_set_gfx_mode_windowed()
 {
     ALLEGRO_DISPLAY *display;
     display = al_get_current_display();
-    al_resize_display(display, main_window.winsizex,  main_window.winsizey);
+
+    video_apply_window_size();
+
+    al_resize_display(display, main_window.current_elk.winsizex,  main_window.current_elk.winsizey);
     al_set_display_flag(display, ALLEGRO_MAXIMIZED, false);
     al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
@@ -334,6 +379,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
             al_unlock_bitmap(b);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,512, 0,0,640,512, 0);
+            //al_draw_scaled_bitmap(b, 0,0, 640,512, 0,0,main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0); // TODO: Experimental.
             //blit(b,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
             //al_draw_bitmap(b, (winsizeX-640)/2,(winsizeY-512)/2,0);
             //al_draw_bitmap(b, 0,0,0);

@@ -29,7 +29,7 @@ PALETTE elkpal =
       {63,63,63},
 };
 
-windowCoords_t main_window;
+window_config_t main_window;
 
 // Called from linux.c (main)
 int video_init_part1()
@@ -153,7 +153,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
-            blit(b,screen,0,0,(main_window.winsizex-640)/2,(main_window.winsizey-512)/2,640,512);
+            blit(b,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.winsizey-512)/2,640,512);
             break;
 
         case LINEDBL:

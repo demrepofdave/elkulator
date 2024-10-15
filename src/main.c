@@ -64,6 +64,8 @@ void initHandlers()
         callback_handlers.handler_save_state = dosavestate;
         callback_handlers.handler_load_state = doloadstate;
         callback_handlers.handler_load_tape  = loadtape;
+        callback_handlers.handler_load_disc0_2 = load_disc_0_2;
+        callback_handlers.handler_load_disc1_3 = load_disc_1_3;
         callback_handlers.eject_tape  = handle_eject_tape;
         callback_handlers.rewind_tape = handle_rewind_tape;
 }

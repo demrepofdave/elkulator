@@ -13,6 +13,10 @@ typedef struct
     callback_filename_t handler_load_state;
     callback_filename_t handler_save_state;
 
+    // Disc menu callback handlers
+    callback_filename_t handler_load_disc0_2; // TODO: will be one handler not two in future.
+    callback_filename_t handler_load_disc1_3; // TODO: will be one handler not two in future.
+
     // Tape menu callback handlers
     callback_filename_t handler_load_tape;
     callback_void_t rewind_tape;
