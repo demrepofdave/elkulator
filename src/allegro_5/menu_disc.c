@@ -40,8 +40,8 @@ ALLEGRO_MENU *create_disc_menu(void)
     append_menu_item(menu, "Load disc :1/3...", IDM_DISC_LOAD_1_3,   0, menu_handle_disc_load_1_3);
     append_menu_item(menu, "Eject disc :0/2",         IDM_DISC_EJECT_0_2, 0, menu_handle_disc_eject_0_2);
     append_menu_item(menu, "Eject disc :1/3",         IDM_DISC_EJECT_1_3, 0, menu_handle_disc_eject_1_3);
-    append_menu_item(menu, "Write protect disc :0/2", IDM_DISC_WRITE_PROTECT_0_2,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    append_menu_item(menu, "Write protect disc :1/3", IDM_DISC_WRITE_PROTECT_1_3,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+    al_append_menu_item(menu, "Write protect disc :0/2", IDM_DISC_WRITE_PROTECT_0_2,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+    al_append_menu_item(menu, "Write protect disc :1/3", IDM_DISC_WRITE_PROTECT_1_3,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
     al_append_menu_item(menu, "Default write protect",   IDM_DISC_WRITE_PROTECT_DEFAULT, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
     return menu;
 }
