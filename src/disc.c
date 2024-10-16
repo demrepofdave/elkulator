@@ -47,7 +47,7 @@ void load_disc_0_2(const char *filename)
     closedisc(0);
     memcpy(elkConfig.disc.discname, filename, DISCNAME_CHARS_MAX);
     loaddisc(0,elkConfig.disc.discname);
-    if (elkConfig.expansion.defaultwriteprot)
+    if (elkConfig.disc.defaultwriteprot)
     {
         writeprot[0]=1;
     }
@@ -58,7 +58,7 @@ void load_disc_1_3(const char *filename)
     closedisc(1);
     memcpy(elkConfig.disc.discname2, filename, DISCNAME_CHARS_MAX);
     loaddisc(1,elkConfig.disc.discname2);
-    if (elkConfig.expansion.defaultwriteprot)
+    if (elkConfig.disc.defaultwriteprot)
     {
         writeprot[1]=1; 
     } 

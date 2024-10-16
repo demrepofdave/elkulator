@@ -123,7 +123,7 @@ void loadconfig()
         elkConfig.expansion.plus3            = getintcfg("plus3",0);
         elkConfig.expansion.dfsena           = getintcfg("dfsena",0);
         elkConfig.expansion.adfsena          = getintcfg("adfsena",0);
-        elkConfig.expansion.defaultwriteprot = getintcfg("defaultwriteprotect",1);
+        elkConfig.disc.defaultwriteprot = getintcfg("defaultwriteprotect",1);
         
         elkConfig.expansion.turbo      = getintcfg("turbo",0);
         elkConfig.expansion.mrb        = getintcfg("mrb",0);
@@ -195,7 +195,7 @@ void saveconfig()
         writeintcfg("dfsena",    elkConfig.expansion.dfsena);
         writeintcfg("adfsena",   elkConfig.expansion.adfsena);
 
-        writeintcfg("defaultwriteprotect",elkConfig.expansion.defaultwriteprot);
+        writeintcfg("defaultwriteprotect",elkConfig.disc.defaultwriteprot);
         
         writestringcfg("discname_0",elkConfig.disc.discname);
         writestringcfg("discname_1",elkConfig.disc.discname2);
