@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
         initelk(argc,argv);
         video_register_close_button_handler(native_window_close_button_handler);
         
+        log_config_vars();
         #ifdef HAL_ALLEGRO_4 
                         while (!quited)
                 {
@@ -63,6 +64,7 @@ int main(int argc, char *argv[])
                         if(elkEvent & ELK_EVENT_RESET)
                         {
                                 resetit = 1;
+                                log_config_vars();
                         }
                         runelk();
                 }

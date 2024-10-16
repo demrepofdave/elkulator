@@ -48,7 +48,9 @@ ALLEGRO_MENU *create_roms_menu(void)
     ALLEGRO_MENU *menu = al_create_menu();
     append_menu_item(menu, "Load ROM cartridge 1...",  IDM_ROMS_LOAD_CARTRIDGE1,   0, menu_handle_load_cart1);
     append_menu_item(menu, "Load ROM cartridge 2...",  IDM_ROMS_LOAD_CARTRIDGE2,   0, menu_handle_load_cart2);
+    append_menu_separator(menu);
     append_menu_item(menu, "Unload ROM cartridges...", IDM_ROMS_UNLOAD,            0, menu_handle_unload_rom_carts);
+    append_menu_separator(menu);
     al_append_menu_item(menu, "Multi-ROM expansions",  0, 0, NULL, create_romscarts_menu());
     return menu;
 }

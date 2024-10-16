@@ -48,8 +48,10 @@ ALLEGRO_MENU *create_tape_menu(void)
     log_debug("create_tape_menu:menu %p\n", menu);
     log_debug("create_tape_menu:sub_menu_tape_speed %p\n", sub_menu_tape_speed);
     append_menu_item(menu, "Load tape...", IDM_TAPE_LOAD,   0, menu_handle_load_tape);
+    append_menu_separator(menu);
     append_menu_item(menu, "Rewind tape",  IDM_TAPE_REWIND, 0, menu_handle_rewind_tape);  // TODO: Does not appear to work at the moment.
     append_menu_item(menu, "Eject tape",   IDM_TAPE_EJECT,  0, menu_handle_tape_eject);
+    append_menu_separator(menu);
     al_append_menu_item(menu, "Tape speed",   0,               0, NULL, sub_menu_tape_speed);
     
     add_radio_set(sub_menu_tape_speed, tape_speed_names, IDM_TAPE_SPEED, elkConfig.tape.speed, menu_handle_tape_speed);

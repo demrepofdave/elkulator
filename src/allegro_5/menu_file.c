@@ -38,8 +38,10 @@ ALLEGRO_MENU *create_file_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
     append_menu_item(menu, "Hard Reset",    IDM_FILE_HARD_RESET, 0, handle_menu_event_file_hard_reset);
+    append_menu_separator(menu);
     append_menu_item(menu, "Load state...", IDM_FILE_LOAD_STATE, 0, handle_menu_event_file_load_state);
     append_menu_item(menu, "Save State...", IDM_FILE_SAVE_STATE, 0, handle_menu_event_file_save_state);
+    append_menu_separator(menu);
     append_menu_item(menu, "Exit",          IDM_FILE_EXIT,       0, handle_menu_event_file_exit);
     return menu;
 }
@@ -65,11 +67,12 @@ elk_event_t  handle_menu_event_file_load_state(ALLEGRO_EVENT * event)
 {
     file_load_state(event, "Load state from file", "*.snp");
     // TODO: anything further?
+    return(0);
 }
 
 elk_event_t handle_menu_event_file_save_state(ALLEGRO_EVENT * event)
 {
     file_save_state(event, "Save state to file", "*.snp");
     // TODO: anything further?
-    return(ELK_EVENT_RESET);
+    return(0);
 }

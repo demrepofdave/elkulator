@@ -169,6 +169,11 @@ bool append_menu_item(ALLEGRO_MENU *menu, const char * title, uint16_t id, int f
     return(true); // TODO: Fix.
 }
 
+void append_menu_separator(ALLEGRO_MENU *menu)
+{
+    al_append_menu_item(menu, NULL, 0, 0, NULL, NULL);
+}
+
 
 void uncheck_menu_item(ALLEGRO_MENU *menu, int id)
 {

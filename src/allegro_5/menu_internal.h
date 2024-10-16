@@ -146,6 +146,7 @@ void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int c
 void disable_menu_item(ALLEGRO_MENU *menu, int id);
 void uncheck_menu_item(ALLEGRO_MENU *menu, int id);
 bool append_menu_item(ALLEGRO_MENU *menu, const char * title, uint16_t id, int flags, callback_event_handler_t menu_handler_function);
+void append_menu_separator(ALLEGRO_MENU *menu);
 
 bool register_menu_event_handler(int id, callback_event_handler_t menu_handler);
 

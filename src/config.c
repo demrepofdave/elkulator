@@ -16,6 +16,7 @@
 #include "elk.h"
 #include "config_vars.h"
 #include "config.h"
+#include "logger.h"
 
 /******************************************************************************
 * Preprocessor Macros
@@ -239,3 +240,40 @@ void saveconfig()
 
         fclose(cfgfile);
 }
+
+void log_config_vars()
+{
+    log_debug("Config vars\n");
+    log_debug("===========\n");
+    log_debug("- display:\n");
+    log_debug("  - drawmode    : %d\n", elkConfig.display.drawmode);
+    log_debug("  - videoresize : %d\n", elkConfig.display.drawmode);
+    log_debug("- expansion:\n");
+    log_debug("  - plus1                : %d\n", elkConfig.expansion.plus1);
+    log_debug("  - plus3                : %d\n", elkConfig.expansion.plus3);
+    log_debug("  - firstbyte            : %d\n", elkConfig.expansion.firstbyte);
+    log_debug("  - joffset              : %d\n", elkConfig.expansion.joffset);
+    log_debug("  - dfsena               : %d\n", elkConfig.expansion.dfsena);
+    log_debug("  - adfsena              : %d\n", elkConfig.expansion.adfsena);
+    log_debug("  - mrb                  : %d\n", elkConfig.expansion.mrb);
+    log_debug("  - mrbmode              : %d\n", elkConfig.expansion.mrbmode);
+    log_debug("  - turbo                : %d\n", elkConfig.expansion.turbo);
+    log_debug("  - ulamode              : %d\n", elkConfig.expansion.ulamode);
+    log_debug("  - enable_jim           : %d\n", elkConfig.expansion.enable_jim);
+    log_debug("  - enable_mgc           : %d\n", elkConfig.expansion.enable_mgc);
+    log_debug("  - enable_db_flash_cart : %d\n", elkConfig.expansion.enable_db_flash_cartridge);
+    log_debug("- sound:\n");
+    log_debug("  - sndint     : %d\n", elkConfig.sound.sndint);
+    log_debug("  - sndex      : %d\n", elkConfig.sound.sndex);
+    log_debug("  - sndddnoise : %d\n", elkConfig.sound.sndddnoise);
+    log_debug("  - ddvol      : %d\n", elkConfig.sound.ddvol);
+    log_debug("  - ddtype     : %d\n", elkConfig.sound.ddtype);
+    log_debug("  - sndtape    : %d\n", elkConfig.sound.sndtape);
+    log_debug("  - sndex      : %d\n", elkConfig.sound.sndex);
+    log_debug("- tape:\n");
+    log_debug("  - speed      : %d\n", elkConfig.tape.speed);
+    log_debug("- disc:\n");
+    log_debug("  - defaultwriteprot : %d\n", elkConfig.disc.defaultwriteprot);
+    log_debug("  - discname         : %s\n", elkConfig.disc.discname);
+    log_debug("  - discname2        : %s\n", elkConfig.disc.discname2);
+ }

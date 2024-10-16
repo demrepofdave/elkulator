@@ -17,6 +17,8 @@
 #include "menu_internal.h"
 #include "callback_handlers.h"
 #include "logger.h"
+// TODO: Remove below.
+#include "elk.h"
 
 elk_event_t menu_handle_disc_load_0_2 (ALLEGRO_EVENT * event);
 elk_event_t menu_handle_disc_load_1_3 (ALLEGRO_EVENT * event);
@@ -39,10 +41,13 @@ ALLEGRO_MENU *create_disc_menu(void)
 
     append_menu_item(menu, "Load disc :0/2...", IDM_DISC_LOAD_0_2,   0, menu_handle_disc_load_0_2);
     append_menu_item(menu, "Load disc :1/3...", IDM_DISC_LOAD_1_3,   0, menu_handle_disc_load_1_3);
+    append_menu_separator(menu);
     append_menu_item(menu, "Eject disc :0/2",         IDM_DISC_EJECT_0_2, 0, menu_handle_disc_eject_0_2);
     append_menu_item(menu, "Eject disc :1/3",         IDM_DISC_EJECT_1_3, 0, menu_handle_disc_eject_1_3);
+    append_menu_separator(menu);
     al_append_menu_item(menu, "Write protect disc :0/2", IDM_DISC_WRITE_PROTECT_0_2,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL); // TODO:
     al_append_menu_item(menu, "Write protect disc :1/3", IDM_DISC_WRITE_PROTECT_1_3,     ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL); // TODO:
+    append_menu_separator(menu);
     add_checkbox_item(menu, "Default write protect",   IDM_DISC_WRITE_PROTECT_DEFAULT,  elkConfig.disc.defaultwriteprot, menu_handle_default_write_protect);
     return menu;
 }
