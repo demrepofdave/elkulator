@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include "elk.h"
+#include "config.h"
 #include "logger.h"
 #include "callback_handlers.h"
 #include "common/video.h"
