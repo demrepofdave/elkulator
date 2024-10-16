@@ -22,6 +22,11 @@ typedef struct
     callback_void_t rewind_tape;
     callback_void_t eject_tape;
 
+    // ROM menu callback handlers
+    callback_filename_t handler_load_cart1;
+    callback_filename_t handler_load_cart2;
+    callback_void_t     handle_unload_carts;
+
 } callback_handlers_t;
 
 extern callback_handlers_t callback_handlers;

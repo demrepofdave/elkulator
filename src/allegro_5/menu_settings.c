@@ -17,14 +17,14 @@
 #include "menu_internal.h"
 #include "common/event_handler.h"
 
-uint16_t menu_handle_video_display_set(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event);
 
-uint16_t menu_handle_master_ram_board_enable(ALLEGRO_EVENT * event);
-uint16_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_master_ram_board_enable(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event);
 
-uint16_t menu_handle_plus_3_enable(ALLEGRO_EVENT * event);
-uint16_t menu_handle_adfs_enable(ALLEGRO_EVENT * event);
-uint16_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_plus_3_enable(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_adfs_enable(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
 
 /******************************************************************************
 * Private Variable Definitions
@@ -151,7 +151,7 @@ ALLEGRO_MENU *create_settings_menu(void)
 // Menu event handler functions.
 
 // Called when IDM_SETTINGS_VIDEO_DISPLAY event is recieved.
-uint16_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
+elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
 {
     //elkConfig.display.drawmode = radio_event_simple(event, elkConfig.display.drawmode);
     elkConfig.display.drawmode = radio_event_simple(event, elkConfig.display.drawmode);
@@ -159,27 +159,27 @@ uint16_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
 }
 
 // Called when IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD event is recieved.
-uint16_t menu_handle_master_ram_board_enable(ALLEGRO_EVENT * event)
+elk_event_t menu_handle_master_ram_board_enable(ALLEGRO_EVENT * event)
 {
     elkConfig.expansion.mrb ^= 1;
     return(ELK_EVENT_RESET);
 }
 
 // Called when IDM_SETTINGS_MEMORY_MRB_MODE event is recieved.
-uint16_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event)
+elk_event_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event)
 {
     elkConfig.expansion.mrbmode = (radio_event_simple(event, elkConfig.expansion.mrbmode));
     return(ELK_EVENT_RESET);
 }
 
 // Called when IDM_SETTINGS_DISC_PLUS3_ENABLE event is recieved.
-uint16_t menu_handle_plus_3_enable(ALLEGRO_EVENT * event)
+elk_event_t menu_handle_plus_3_enable(ALLEGRO_EVENT * event)
 {
     elkConfig.expansion.plus3 ^= 1;
     return(ELK_EVENT_RESET);
 }
 // Called when IDM_SETTINGS_DISC_ADFS_ENABLE event is recieved.
-uint16_t menu_handle_adfs_enable(ALLEGRO_EVENT * event)
+elk_event_t menu_handle_adfs_enable(ALLEGRO_EVENT * event)
 {
     ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
     elkConfig.expansion.adfsena ^= 1;
@@ -192,7 +192,7 @@ uint16_t menu_handle_adfs_enable(ALLEGRO_EVENT * event)
     return(ELK_EVENT_RESET);
 }
 // Called when IDM_SETTINGS_DISC_DFS_ENABLE event is recieved.
-uint16_t menu_handle_dfs_enable(ALLEGRO_EVENT * event)
+elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event)
 {
     ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
     elkConfig.expansion.dfsena ^= 1;
