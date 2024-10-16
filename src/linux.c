@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
                 while (!(elkEvent & ELK_EVENT_EXIT))
                 {
                         elkEvent = event_await();
-                        if(!(elkEvent & ELK_EVENT_EXIT)) 
+                        if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
                         {
                                 drawit++;
                         }
