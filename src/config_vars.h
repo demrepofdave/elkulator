@@ -37,7 +37,6 @@ typedef struct
     int     joffset; // TODO: leaving as int for now as unsure of the range for this item.
     uint8_t dfsena;
     uint8_t adfsena;
-    uint8_t defaultwriteprot;
     // Turbo and Shadow board configuration
     uint8_t mrb;
     uint8_t mrbmode;
@@ -59,6 +58,7 @@ typedef struct
 
 typedef struct
 {
+    uint8_t defaultwriteprot;
     char discname[DISCNAME_CHARS_MAX];
     char discname2[DISCNAME_CHARS_MAX];
 } disc_config_t;

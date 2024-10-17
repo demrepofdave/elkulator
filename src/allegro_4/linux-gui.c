@@ -52,7 +52,7 @@ void updatelinuxgui()
         int x;
         discmenu[4].flags=(writeprot[0])?D_SELECTED:0;
         discmenu[5].flags=(writeprot[1])?D_SELECTED:0;
-        discmenu[6].flags=(elkConfig.expansion.defaultwriteprot)?D_SELECTED:0;
+        discmenu[6].flags=(elkConfig.disc.defaultwriteprot)?D_SELECTED:0;
         tapespdmenu[0].flags = (!elkConfig.tape.speed)?D_SELECTED:0;
         tapespdmenu[1].flags = (elkConfig.tape.speed == 1)?D_SELECTED:0;
         tapespdmenu[2].flags = (elkConfig.tape.speed == 2)?D_SELECTED:0;
@@ -150,7 +150,7 @@ int gui_load0()
                 closedisc(0);
                 memcpy(elkConfig.disc.discname,tempname,DISCNAME_CHARS_MAX);
                 loaddisc(0,elkConfig.disc.discname);
-                if (elkConfig.expansion.defaultwriteprot) writeprot[0]=1;
+                if (elkConfig.disc.defaultwriteprot) writeprot[0]=1;
         }
         updatelinuxgui();
         return D_O_K;
@@ -210,7 +210,7 @@ int gui_load1()
                 closedisc(1);
                 memcpy(elkConfig.disc.discname2,tempname,DISCNAME_CHARS_MAX);
                 loaddisc(1,elkConfig.disc.discname2);
-                if (elkConfig.expansion.defaultwriteprot) writeprot[1]=1;
+                if (elkConfig.disc.defaultwriteprot) writeprot[1]=1;
         }
         updatelinuxgui();
         return D_O_K;
@@ -245,7 +245,7 @@ int gui_wprot1()
 }
 int gui_wprotd()
 {
-        elkConfig.expansion.defaultwriteprot=!elkConfig.expansion.defaultwriteprot;
+        elkConfig.disc.defaultwriteprot=!elkConfig.disc.defaultwriteprot;
         updatelinuxgui();
         return D_O_K;
 }

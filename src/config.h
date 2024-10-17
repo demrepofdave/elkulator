@@ -22,5 +22,7 @@
 void loadconfig();
 void saveconfig();
 
+void log_config_vars();
+
 
 #endif // _CONFIG_H

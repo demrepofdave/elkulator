@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include "elk.h"
+#include "config.h"
 #include "logger.h"
 #include "callback_handlers.h"
 #include "common/video.h"
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
         initelk(argc,argv);
         video_register_close_button_handler(native_window_close_button_handler);
         
+        log_config_vars();
         #ifdef HAL_ALLEGRO_4 
                         while (!quited)
                 {
@@ -52,17 +54,18 @@ int main(int argc, char *argv[])
                 }
         #else       
                 video_start_timer();
-                uint32_t elkEvent = 0;
+                elk_event_t elkEvent = 0;
                 while (!(elkEvent & ELK_EVENT_EXIT))
                 {
                         elkEvent = event_await();
-                        if(!(elkEvent & ELK_EVENT_EXIT)) 
+                        if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
                         {
                                 drawit++;
                         }
                         if(elkEvent & ELK_EVENT_RESET)
                         {
                                 resetit = 1;
+                                log_config_vars();
                         }
                         runelk();
                 }

@@ -1,6 +1,7 @@
 #include <allegro5/allegro.h>
 #include "common/keyboard.h"
 #include "elk.h"
+#include "common/event_handler.h"
 #include "logger.h"
 
 
@@ -209,9 +210,9 @@ void key_char_event(ALLEGRO_EVENT *event)
 
 
 // Main event handling Code
-uint32_t keyboard_handle_event(ALLEGRO_EVENT *event)
+elk_event_t keyboard_handle_event(ALLEGRO_EVENT *event)
 {
-    uint32_t elkEvent = 0;
+    elk_event_t elkEvent = 0;
     switch(event->type) 
     {
         // Keyboard handling.

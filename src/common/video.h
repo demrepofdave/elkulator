@@ -45,13 +45,20 @@
 
 // This structure will all information related to the native window state
 // and coordinates.
+
 typedef struct
 {
-    int winsizex; // Current window size in ???
-    int winsizey; // Current window size in ???
+    int winsizex;         // Current window size in pixels
+    int winsizey;         // Current window size in pixels
     bool maintain_aspect; // If true maintain 4:3 aspect ration (used recalce winsizey based on winsizex)
-} windowCoords_t;
+} window_info_t;
 
+typedef struct
+{
+    window_info_t actual_window;  // Main window size
+    window_info_t current_elk;    // Window size electron
+    window_info_t future_elk;     // Future settings for window size electron yet to be applied.
+} window_config_t;
 
 /******************************************************************************
 * Public Function Definitions
@@ -67,7 +74,9 @@ int video_set_display_switch_mode_background();
 int video_poll_joystick();
 void video_rest(unsigned int period);  // Only used in allegro4.
 
+void video_update_native_window_size(int w, int h);
 void video_set_window_size(int w, int h, int v_w, int v_h);
+void video_apply_window_size();
 void video_set_gfx_mode_windowed();
 void video_set_gfx_mode_fullscreen();
 void video_set_depth_and_elk_palette();

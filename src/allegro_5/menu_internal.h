@@ -3,6 +3,7 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
+#include "event_handler_internal.h"
 
 typedef enum {
     IDM_ZERO,
@@ -16,9 +17,7 @@ typedef enum {
     IDM_TAPE_REWIND,
     IDM_TAPE_EJECT,
     IDM_TAPE_CAT,
-    IDM_TAPE_SPEED_NORMAL,
-    IDM_TAPE_SPEED_FAST,
-    IDM_TAPE_SPEED_REALLY_FAST,
+    IDM_TAPE_SPEED,
     IDM_DISC_LOAD_0_2,
     IDM_DISC_LOAD_1_3,
     IDM_DISC_EJECT_0_2,
@@ -32,12 +31,7 @@ typedef enum {
     IDM_ROMCARTS_MEGAGAMES,
     IDM_ROMCARTS_DAVIDS_FLASH_ROM,
     IDM_SETTINGS_VIDEO_FULLSCREEN,
-    IDM_SETTINGS_VIDEO_DISPLAY_SCANLINES,
-    IDM_SETTINGS_VIDEO_DISPLAY_LINEDOUBLING,
-    IDM_SETTINGS_VIDEO_DISPLAY_2XSAI,
-    IDM_SETTINGS_VIDEO_DISPLAY_SCALE2X,
-    IDM_SETTINGS_VIDEO_DISPLAY_SUPEREAGLE,
-    IDM_SETTINGS_VIDEO_DISPLAY_PALFILTER,
+    IDM_SETTINGS_VIDEO_DISPLAY,
     IDM_SETTINGS_SOUND_INTERNAL_SPEAKER,
     IDM_SETTINGS_SOUND_CSS_EXPANSION,
     IDM_SETTINGS_SOUND_DISC_DRIVE_NOISE,
@@ -47,9 +41,7 @@ typedef enum {
     IDM_SETTINGS_MEMORY_TURBO,
     IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD,
     IDM_SETTINGS_MEMORY_JIM_PAGED_RAM,
-    IDM_SETTINGS_MEMORY_MRB_OFF,
-    IDM_SETTINGS_MEMORY_MRB_TURBO,
-    IDM_SETTINGS_MEMORY_MRB_SHADOW,
+    IDM_SETTINGS_MEMORY_MRB_MODE,
     IDM_SETTINGS_MEMORY_ENHANCED_ULA_STANDARD,
     IDM_SETTINGS_MEMORY_ENHANCED_ULA_8BITDUEL,
     IDM_SETTINGS_MEMORY_ENHANCED_ULA_9BITSINGLE,
@@ -148,9 +140,18 @@ typedef enum {
 } menu_id_t;
 
 
-
 // Helper functions
-void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, bool checked);
+void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, bool checked, callback_event_handler_t menu_handler_function);
+void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int cur_value,  callback_event_handler_t menu_handler_function);
+void disable_menu_item(ALLEGRO_MENU *menu, int id);
+void uncheck_menu_item(ALLEGRO_MENU *menu, int id);
+bool append_menu_item(ALLEGRO_MENU *menu, const char * title, uint16_t id, int flags, callback_event_handler_t menu_handler_function);
+void append_menu_separator(ALLEGRO_MENU *menu);
+
+bool register_menu_event_handler(int id, callback_event_handler_t menu_handler);
+
+int radio_event_simple(ALLEGRO_EVENT *event, int current);
+ALLEGRO_PATH * menu_load_gui(ALLEGRO_EVENT *event, const char * title, const char * patterns, ALLEGRO_PATH * starting_path);
 
 // Menu creation functions
 ALLEGRO_MENU *create_file_menu(void);
@@ -164,6 +165,7 @@ ALLEGRO_MENU *create_misc_menu(void);
 
 extern void menu_init(ALLEGRO_DISPLAY *display);
 extern void menu_destroy(ALLEGRO_DISPLAY *display);
-extern uint32_t menu_handle_event(ALLEGRO_EVENT *event);
+
+elk_event_t  menu_handle_event(ALLEGRO_EVENT *event);
 
 #endif

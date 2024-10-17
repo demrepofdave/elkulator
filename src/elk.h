@@ -192,7 +192,12 @@ void writeserial(uint16_t addr, uint8_t val);
 void pollserial(int cycles);
 
 void loadtape(const char *fn);
+void handle_rewind_tape(void);
+void handle_eject_tape(void);
 void reallyfasttapepoll();
+
+void load_disc_0_2(const char *filename);
+void load_disc_1_3(const char *filename);
 
 void initsound();
 void writesound(uint8_t data);

@@ -100,7 +100,7 @@ int sample_motor_get_frequency(uint8_t index)
 
 void sample_motor_destroy_all()
 {
-    int index;
+//    int index;
 //    for (index=0;index<3;index++)
 //    {
 //        if (motorsmp[index])
@@ -116,6 +116,7 @@ bool sample_tape_noise_motor_load(uint8_t index, const char * filename) // Don't
 {
 //    tsamples[index] = al_load_sample(filename);
 //    return (tsamples[index] != NULL);
+    return(false);
 }
 
 unsigned long sample_tape_noise_get_length(uint8_t index)

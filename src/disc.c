@@ -6,6 +6,7 @@
 #include "elk.h"
 #include "logger.h"
 #include "common/fileutils.h"
+#include "config_vars.h"
 
 void (*fdccallback)();
 void (*fdcdata)(uint8_t dat);
@@ -40,6 +41,28 @@ loaders[]=
 };
 
 int driveloaders[2];
+
+void load_disc_0_2(const char *filename)
+{
+    closedisc(0);
+    memcpy(elkConfig.disc.discname, filename, DISCNAME_CHARS_MAX);
+    loaddisc(0,elkConfig.disc.discname);
+    if (elkConfig.disc.defaultwriteprot)
+    {
+        writeprot[0]=1;
+    }
+}
+
+void load_disc_1_3(const char *filename)
+{
+    closedisc(1);
+    memcpy(elkConfig.disc.discname2, filename, DISCNAME_CHARS_MAX);
+    loaddisc(1,elkConfig.disc.discname2);
+    if (elkConfig.disc.defaultwriteprot)
+    {
+        writeprot[1]=1; 
+    } 
+}
 
 void loaddisc(int drive, char *fn)
 {
@@ -255,4 +278,17 @@ void loadtape(const char *fn)
                         }
                 }
         }
+}
+
+void handle_rewind_tape(void)
+{
+        closeuef();
+        closecsw();
+        loadtape(tapename);
+}
+
+void handle_eject_tape(void)
+{
+        closeuef();
+        closecsw();
 }

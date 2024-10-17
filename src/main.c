@@ -56,7 +56,7 @@ char serialname[512];
 extern int serial_debug;
 char romnames[16][1024];
 
-CallbackHandlers callback_handlers;
+callback_handlers_t callback_handlers;
 
 void initHandlers()
 {
@@ -64,6 +64,13 @@ void initHandlers()
         callback_handlers.handler_save_state = dosavestate;
         callback_handlers.handler_load_state = doloadstate;
         callback_handlers.handler_load_tape  = loadtape;
+        callback_handlers.handler_load_disc0_2 = load_disc_0_2;
+        callback_handlers.handler_load_disc1_3 = load_disc_1_3;
+        callback_handlers.handler_load_cart1   = loadcart;
+        callback_handlers.handler_load_cart2   = loadcart2;
+        callback_handlers.handle_unload_carts  = unloadcart;
+        callback_handlers.eject_tape  = handle_eject_tape;
+        callback_handlers.rewind_tape = handle_rewind_tape;
 }
 
 void initelk(int argc, char *argv[])
@@ -203,7 +210,7 @@ void initelk(int argc, char *argv[])
         for (int i = 0; i < 16; i++) {
             if (romnames[i][0] != 0) loadrom_n(i, romnames[i]);
         }
-        if (elkConfig.expansion.defaultwriteprot) writeprot[0]=writeprot[1]=1;
+        if (elkConfig.disc.defaultwriteprot) writeprot[0]=writeprot[1]=1;
 
         video_init_part3(drawitint);
 

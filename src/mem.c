@@ -116,17 +116,17 @@ void loadroms()
         chdir(p2);
 }
 
-void loadcart(char *fn)
+void loadcart(const char *filename)
 {
-        FILE *f=fopen(fn,"rb");
+        FILE *f=fopen(filename,"rb");
         if (!f) return;
         fread(cart0,NUM_BANKS * 16384,1,f);
         fclose(f);
 }
 
-void loadcart2(char *fn)
+void loadcart2(const char *filename)
 {
-        FILE *f=fopen(fn,"rb");
+        FILE *f=fopen(filename,"rb");
         if (!f) return;
         fread(cart1,NUM_BANKS * 16384,1,f);
         fclose(f);
