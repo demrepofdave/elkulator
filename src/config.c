@@ -158,9 +158,13 @@ void loadconfig()
         elkConfig.sound.sndint     = getintcfg("sound_internal",1);
         elkConfig.sound.sndex      = getintcfg("sound_exp",0);
         elkConfig.sound.sndddnoise = getintcfg("sound_ddnoise",1);
+        // TODO: Temporarily disabled due to crash bug.
+        elkConfig.sound.sndddnoise = 0;
         elkConfig.sound.ddvol      = getintcfg("sound_ddvol",2);
         elkConfig.sound.ddtype     = getintcfg("sound_ddtype",1);
         elkConfig.sound.sndtape    = getintcfg("sound_tape",0);
+        // TODO: Temporarily disabled due to tape sound issues.
+        elkConfig.sound.sndtape = 0;
         
         elkConfig.display.videoresize = getintcfg("win_resize",0);
         
