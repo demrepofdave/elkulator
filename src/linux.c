@@ -12,7 +12,9 @@
 #include "config.h"
 #include "logger.h"
 #include "callback_handlers.h"
+#include "config_vars.h"
 #include "common/video.h"
+#include "ula.h"
 
 char ssname[260];
 char scrshotname[260];
@@ -32,9 +34,12 @@ void native_window_close_button_handler(void)
        quited = 1;
 }
 
+int ms_tick = 0;
+
 int main(int argc, char *argv[])
 {
         //init_config(); TODO: May need this not sure.
+        log_msg(__FUNCTION__, "Elkulator has started");
         int ret = video_init_part1();
         if (ret != 0)
         {
@@ -58,20 +63,34 @@ int main(int argc, char *argv[])
                 while (!(elkEvent & ELK_EVENT_EXIT))
                 {
                         elkEvent = event_await();
+                        //log_debug("elkEvent=%04x", elkEvent);
                         if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
                         {
-                                drawit++;
+                                //ms_tick +=2;
+                                //if(ms_tick >= 20)
+                                //{
+                                    drawit++;
+                                //    ms_tick = 0;
+                                //}
                         }
                         if(elkEvent & ELK_EVENT_RESET)
                         {
                                 resetit = 1;
                                 log_config_vars();
                         }
+
                         runelk();
+                        if(tapeon && elkConfig.tape.speed)
+                        {
+                            for(int i=0; i<19; i++)
+                            {
+                                runelk();
+                            }
+                        }
                 }
         #endif // HAL_ALLEGRO_4
         closeelk();
-
+        log_msg(__FUNCTION__, "Elkulator has ended");
         return 0;
 }
 

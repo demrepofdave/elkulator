@@ -135,7 +135,7 @@ int video_init_part1()
         exit(1);
     }
 
-    log_debug("Display = %p\n", display);
+    log_debug("Display = %p", display);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP|ALLEGRO_NO_PRESERVE_TEXTURE);
 
     ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
@@ -185,7 +185,7 @@ void video_init_part2()
     //ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
     //b = al_create_bitmap(640,616);
 
-    log_debug("display = %p\n", display);
+    log_debug("display = %p", display);
     menu_init(display);
 
     if (!(timer = al_create_timer(0.02)))
@@ -216,7 +216,7 @@ void video_rest(unsigned int period)
 
 void video_set_window_size(int w, int h, int v_w, int v_h)
 {
-    log_debug("Set window size %d, %d\n", w, h);
+    log_debug("Set window size %d, %d", w, h);
     main_window.current_elk.winsizex = w;
     main_window.current_elk.winsizey = h;
     main_window.current_elk.maintain_aspect = true; // TODO: Hardcode for now.
@@ -260,7 +260,7 @@ void video_apply_window_size()
     main_window.future_elk.winsizey = -1;
     main_window.future_elk.maintain_aspect = false;
 
-    log_debug("Applied window size %d, %d\n", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
+    log_debug("Applied window size %d, %d", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
 }
 
 void video_set_gfx_mode_windowed()
@@ -543,13 +543,13 @@ void video_shutdown()
 
 void video_start_timer()
 {
-    //log_debug("video_start_timer: staring timer %p\n", timer);
+    //log_debug("video_start_timer: staring timer %p", timer);
     al_start_timer(timer);
 }
 
 void video_stop_timer()
 {
-    //log_debug("video_start_timer: staring timer %p\n", timer);
+    //log_debug("video_start_timer: staring timer %p", timer);
     al_stop_timer(timer);   
 }
 

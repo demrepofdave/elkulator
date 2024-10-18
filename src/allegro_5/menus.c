@@ -316,7 +316,7 @@ bool register_menu_event_handler(int id, callback_event_handler_t menu_handler)
         callback_menu_event_handler_list[menu_registered_handlers].handler_function = menu_handler;
         menu_registered_handlers++;
         registered = true;
-        log_debug("Registered menu %d to %p\n", id, menu_handler);
+        log_debug("Registered menu %d to %p", id, menu_handler);
     }
     return (registered);
 }

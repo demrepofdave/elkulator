@@ -19,6 +19,7 @@
         "video_internal.h": "c",
         "menu_internal.h": "c",
         "zlib.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "logger.h": "c"
     }
 }

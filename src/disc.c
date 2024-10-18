@@ -264,7 +264,7 @@ void loadtape(const char *fn)
         const char *p;
         if (fn)
         {
-                log_debug("loadtape(%s)\n", fn);
+                log_debug("loadtape('%s')", fn);
                 p = fileutils_get_extension(fn);
                 if (p)
                 {

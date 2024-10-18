@@ -66,7 +66,7 @@ elk_event_t menu_handle_disc_load_0_2(ALLEGRO_EVENT * event)
         const char * path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
         if(path_str)
         {
-            log_debug("menu_handle_disc_load: path_str='%s'\n", path_str);
+            log_debug("menu_handle_disc_load: path_str='%s'", path_str);
             callback_handlers.handler_load_disc0_2(path_str);
             if(disc_fn)
             {
@@ -76,7 +76,7 @@ elk_event_t menu_handle_disc_load_0_2(ALLEGRO_EVENT * event)
         } 
         else
         {
-            log_debug("menu_handle_disc_load: path_str is NULL\n");
+            log_debug("menu_handle_disc_load: path_str is NULL");
             al_destroy_path(path);  
         }
     }
@@ -93,7 +93,7 @@ elk_event_t menu_handle_disc_load_1_3(ALLEGRO_EVENT * event)
         const char * path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
         if(path_str)
         {
-            log_debug("menu_handle_disc_load: path_str='%s'\n", path_str);
+            log_debug("menu_handle_disc_load: path_str='%s'", path_str);
             callback_handlers.handler_load_disc1_3(path_str);
             if(disc_fn)
             {
@@ -103,7 +103,7 @@ elk_event_t menu_handle_disc_load_1_3(ALLEGRO_EVENT * event)
         } 
         else
         {
-            log_debug("menu_handle_disc_load: path_str is NULL\n");
+            log_debug("menu_handle_disc_load: path_str is NULL");
             al_destroy_path(path);  
         }
     }
