@@ -16,7 +16,8 @@ void log_msg(const char * function, char *format, ...)
     size_t offset = 0;
 
     gettimeofday(&tv,&tz);
-    struct tm *local = localtime(&tv.tv_sec);
+    time_t time_val = tv.tv_sec;
+    struct tm *local = localtime(&time_val);
     offset = strftime(time_buf, 128, "%Y-%b-%d %H:%M:%S", local);
     if(offset > 0)
     {
