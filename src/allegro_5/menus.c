@@ -175,23 +175,56 @@ void append_menu_separator(ALLEGRO_MENU *menu)
 }
 
 
+void check_menu_item_id_num(ALLEGRO_MENU *menu, int id, int num)
+{
+    if(menu)
+    {
+        int flags = al_get_menu_item_flags(menu, menu_id_num(id, num));
+        log_debug("Pre Menu item ,%d,%d, flags %d", id, num, flags);
+        if(!(flags & ALLEGRO_MENU_ITEM_CHECKED))
+        {
+            // If set, we untoggle
+            al_set_menu_item_flags(menu, menu_id_num(id, num), ALLEGRO_MENU_ITEM_CHECKBOX | ALLEGRO_MENU_ITEM_CHECKED);
+            log_debug("checked!");
+        }
+        // Post verification check
+        log_debug("Pre Menu item ,%d,%d, post flags %d", id, num, flags);
+    }
+}
+
 void uncheck_menu_item(ALLEGRO_MENU *menu, int id)
 {
     if(menu)
     {
         int flags = al_get_menu_item_flags(menu, id);
-        log_debug("uncheck_menu_item: Menu item %d, flags %d\n", id, flags);
+        log_debug("Pre Menu item %d, flags %d\n", id, flags);
         if(flags & ALLEGRO_MENU_ITEM_CHECKED)
         {
             // If set, we untoggle
-            flags ^= ALLEGRO_MENU_ITEM_CHECKED;
-            log_debug("uncheck_menu_item: flags are %d, menu_item_checked\n", flags);
-            al_set_menu_item_flags(menu, id, flags);
-
-            // Post verification check
-            flags = al_get_menu_item_flags(menu, id);
-            log_debug("uncheck_menu_item: post flags are %d, menu_item_checked\n", flags);
+            al_set_menu_item_flags(menu, id, ALLEGRO_MENU_ITEM_CHECKBOX);
+            log_debug("unchecked!");
         }
+        // Post verification check
+        flags = al_get_menu_item_flags(menu, id);
+        log_debug("Pre Menu item %d, post flags %d", id, flags);
+    }
+}
+
+void uncheck_menu_item_id_num(ALLEGRO_MENU *menu, int id, int num)
+{
+    if(menu)
+    {
+        int flags = al_get_menu_item_flags(menu, menu_id_num(id, num));
+        log_debug("Pre Menu item ,%d, flags %d\n", id, flags);
+        if(flags & ALLEGRO_MENU_ITEM_CHECKED)
+        {
+            // If set, we untoggle
+            al_set_menu_item_flags(menu, menu_id_num(id, num), ALLEGRO_MENU_ITEM_CHECKBOX);
+            log_debug("unchecked!");
+        }
+        // Post verification check
+        flags = al_get_menu_item_flags(menu, menu_id_num(id, num));
+        log_debug("Pre Menu item ,%d,%d, post flags %d", id, num, flags);
     }
 }
 
