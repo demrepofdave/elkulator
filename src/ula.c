@@ -532,6 +532,28 @@ int wantsavescrshot=0;
 int wantmovieframe=0;
 FILE *moviefile;
 
+// Allegro4 build requires the ula to still be tightly bounded (for now).
+// This adjustment is not done for allegro5 build.
+void allegro4_linedouble_adjust_begin()
+{
+#ifdef HAL_ALLEGRO_4
+        if (LINEDOUBLE)
+        {
+                ula.y<<=1; 
+        }
+#endif
+}
+
+void allegro4_linedouble_adjust_end()
+{
+#ifdef HAL_ALLEGRO_4
+        if (LINEDOUBLE)
+        {
+                ula.y>>=1;
+        } 
+#endif
+}
+
 void yield()
 {
         uint8_t temp;
@@ -547,14 +569,13 @@ void yield()
                 {
                         if (ula.sc&8)
                         {
-                                if (LINEDOUBLE) ula.y<<=1;
+                                allegro4_linedouble_adjust_begin();
                                 for (x=0;x<8;x++)
                                 {
                                     video_put_pixel(ula.y, (ula.x+x), 0);
                                     // b->line[ula.y][ula.x+x]=0;
                                 }
-
-                                if (LINEDOUBLE) ula.y>>=1;
+                                allegro4_linedouble_adjust_end();
                         }
                         else if (!(ula.x&8) || !(ula.mode&4))
                         {
@@ -574,10 +595,7 @@ void yield()
 
                                 temp=ram[tempaddr];
 
-                                if (LINEDOUBLE)
-                                {
-                                        ula.y<<=1;
-                                }
+                                allegro4_linedouble_adjust_begin();
 
                                 if (HALFSIZE)
                                 {
@@ -685,7 +703,7 @@ void yield()
                                                 break;
                                         }
                                 }
-                                if (LINEDOUBLE) ula.y>>=1;
+                                allegro4_linedouble_adjust_end();
                         }
                         ula.x+=8;
                         ulacycles++;
@@ -693,13 +711,13 @@ void yield()
                 while (ula.x<640 && ula.y<256 && !ula.dispon && ula.draw && (ulacycles<cycles))
                 {
 //                        if (!ula.x) rpclog("Blank line %i\n",ula.y);
-                        if (LINEDOUBLE) ula.y<<=1;
+                        allegro4_linedouble_adjust_begin();
                         for (x=0;x<8;x++)
                         {
                             video_put_pixel(ula.y, (ula.x+x), 0);
                             //b->line[ula.y][ula.x+x]=0;
                         }
-                        if (LINEDOUBLE) ula.y>>=1;
+                        allegro4_linedouble_adjust_end();
                         ula.x+=8;
                         ulacycles++;
                 }

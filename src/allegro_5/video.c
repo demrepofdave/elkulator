@@ -309,13 +309,12 @@ void video_set_gfx_mode_fullscreen()
 
 void video_set_depth_and_elk_palette()
 {
-    //set_color_depth(8); // TODO: May not need this in allegro5.
-    //set_palette(elkpal);  - Does not exist in allegro5
+    // Nothing to do in allegro5
 }
 
 void video_set_desktop_color_depth()
 {
-    //set_color_depth(desktop_color_depth()); // TODO: may not need this in allegro5
+    // Nothing to do in allegro5
 }
 
 int video_get_desktop_color_depth()
@@ -360,53 +359,28 @@ void endblit()
 void video_blit_to_screen(int drawMode, int colDepth)
 {
     int c;
-    //int firstx = 0;
-    //int firsty = 0;
-    //int scr_x_start = 0;
-    //int scr_y_start = 0;
-    //int scr_x_size  = 640;
-    //int scr_y_size  = 512;
-
-    //int xsize = lastx - firstx;
-    //int ysize = lasty - firsty + 1;
-    //int xsize = 640;
-    //int ysize = 512;
 
     startblit();
     switch (drawMode)
     {
         case SCANLINES:
             al_unlock_bitmap(b);
+            al_set_target_bitmap(b16);
+            al_clear_to_color(al_map_rgb(0, 0,0));
+            for (int c = 0; c < 256; c++)
+            {
+                al_draw_bitmap_region(b, 0, c, 640, 1, 0, c << 1, 0);
+            }
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b, 0,0,640,512, 0,0,640,512, 0);
-            //al_draw_scaled_bitmap(b, 0,0, 640,512, 0,0,main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0); // TODO: Experimental.
-            //blit(b,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
-            //al_draw_bitmap(b, (winsizeX-640)/2,(winsizeY-512)/2,0);
-            //al_draw_bitmap(b, 0,0,0);
+            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0);
             break;
 
-/*        case LINEDBL:
-            #ifdef WIN32
-                blit(b,vidb,0,0,0,0,640,256);
-                if (elkConfig.display.videoresize)
-                {
-                    stretch_blit(vidb,screen,0,0,640,256,0,0,winsizex,winsizey);
-                }
-                else
-                {
-                    stretch_blit(vidb,screen,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                }
-            #else
-                for (c=0;c<512;c++)
-                {
-//                    blit(b,b16,0,c>>1,0,c,640,1);
-                }
-                al_set_target_backbuffer(al_get_current_display());
-                //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
-                al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
-            #endif
+        case LINEDBL:
+            al_unlock_bitmap(b);
+            al_set_target_backbuffer(al_get_current_display());
+            al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,512, 0);
             break;
-
+/*
         case _2XSAI:
             blit(b,b162,0,0,0,0,640,256);
             Super2xSaI(b162,b16,0,0,0,0,320,256);
@@ -449,18 +423,6 @@ void video_blit_to_screen(int drawMode, int colDepth)
 
 void video_capture_screenshot(int drawMode, int colDepth)
 {
-    int firstx = 0;
-    int firsty = 0;
-    int scr_x_start = 0;
-    int scr_y_start = 0;
-    int scr_x_size  = 640;
-    int scr_y_size  = 512;
-
-    //int xsize = lastx - firstx;
-    //int ysize = lasty - firsty + 1;
-    int xsize = 640;
-    int ysize = 512;
-
     video_set_desktop_color_depth();
     bm_screenshot = al_create_bitmap(640,512);
     switch (drawMode)

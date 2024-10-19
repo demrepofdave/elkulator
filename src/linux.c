@@ -38,6 +38,7 @@ int ms_tick = 0;
 
 int main(int argc, char *argv[])
 {
+        int count = 0;
         //init_config(); TODO: May need this not sure.
         log_msg(__FUNCTION__, "Elkulator has started");
         int ret = video_init_part1();
@@ -80,12 +81,17 @@ int main(int argc, char *argv[])
                         }
 
                         runelk();
-                        if(tapeon && elkConfig.tape.speed)
+
+                        // If tape is running and its speed is fast or really fast
+                        // We need to runelk another 19 times (or until tape is
+                        // stopped, this maintains the fast loading that allegro4
+                        // does as it runs the function every 1 millisecond with
+                        // drawing every normal 20ms).
+                        count = 19;
+                        while(count && tapeon && elkConfig.tape.speed)
                         {
-                            for(int i=0; i<19; i++)
-                            {
                                 runelk();
-                            }
+                                count--;
                         }
                 }
         #endif // HAL_ALLEGRO_4
