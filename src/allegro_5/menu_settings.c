@@ -40,7 +40,7 @@ elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
 *******************************************************************************/
 
 static const char *settings_video_display_type[] = { "Scanlines",
-                                                     "Line doubling (disabled)", NULL };
+                                                     "Line doubling", NULL };
 //                                                     "2xSai (disabled)",
 //                                                     "Scale2X (disabled)",
 //                                                     "Super Eagle (disabled)",
