@@ -90,7 +90,7 @@ void check()
 
 void closeal()
 {
-    log_debug("End!\n");
+    log_debug("End!");
     alutExit();
 }
 
@@ -100,11 +100,11 @@ void closeal()
 
 void sound_init_part1(int argc, char *argv[])
 {
-    log_debug("Start...\n");
+    log_debug("Start...");
     alutInit(0,0);
     check();
     atexit(closeal);
-    log_debug("AlutInit\n");
+    log_debug("AlutInit");
 }
 
 
@@ -138,7 +138,7 @@ void sound_init_part2()
     check();
     alSourcePlay(source[0]);
     check();
-    printf("InitAL\n");
+    log_debug("InitAL");
 
     alGenBuffers(4, buffersdd);
     check();
@@ -161,7 +161,7 @@ void sound_init_part2()
     check();
     alSourcePlay(source[1]);
     check();
-    log_debug("InitAL\n");
+    log_debug("InitAL");
 }
 
 void sound_givealbuffer(int16_t *buf)
@@ -246,7 +246,7 @@ void sound_givealbufferdd(int16_t *buf)
         if (state==0x1014)
         {
                 alSourcePlay(source[1]);
-                log_debug("Resetting sounddd\n");
+                log_debug("Resetting sounddd");
         }
         alGetSourcei(source[1], AL_BUFFERS_PROCESSED, &processed);
         check();

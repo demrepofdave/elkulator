@@ -38,7 +38,7 @@
 * Preprocessor Macros
 *******************************************************************************/
 
-#define VERSION_STR "Elkulator v2.00a-1016"
+#define VERSION_STR "Elkulator v2.00a-1020"
 
 /******************************************************************************
 * Typedefs
@@ -135,7 +135,7 @@ int video_init_part1()
         exit(1);
     }
 
-    log_debug("Display = %p\n", display);
+    log_debug("Display = %p", display);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP|ALLEGRO_NO_PRESERVE_TEXTURE);
 
     ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
@@ -185,7 +185,7 @@ void video_init_part2()
     //ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
     //b = al_create_bitmap(640,616);
 
-    log_debug("display = %p\n", display);
+    log_debug("display = %p", display);
     menu_init(display);
 
     if (!(timer = al_create_timer(0.02)))
@@ -216,7 +216,7 @@ void video_rest(unsigned int period)
 
 void video_set_window_size(int w, int h, int v_w, int v_h)
 {
-    log_debug("Set window size %d, %d\n", w, h);
+    log_debug("Set window size %d, %d", w, h);
     main_window.current_elk.winsizex = w;
     main_window.current_elk.winsizey = h;
     main_window.current_elk.maintain_aspect = true; // TODO: Hardcode for now.
@@ -260,7 +260,7 @@ void video_apply_window_size()
     main_window.future_elk.winsizey = -1;
     main_window.future_elk.maintain_aspect = false;
 
-    log_debug("Applied window size %d, %d\n", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
+    log_debug("Applied window size %d, %d", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
 }
 
 void video_set_gfx_mode_windowed()
@@ -309,13 +309,12 @@ void video_set_gfx_mode_fullscreen()
 
 void video_set_depth_and_elk_palette()
 {
-    //set_color_depth(8); // TODO: May not need this in allegro5.
-    //set_palette(elkpal);  - Does not exist in allegro5
+    // Nothing to do in allegro5
 }
 
 void video_set_desktop_color_depth()
 {
-    //set_color_depth(desktop_color_depth()); // TODO: may not need this in allegro5
+    // Nothing to do in allegro5
 }
 
 int video_get_desktop_color_depth()
@@ -360,53 +359,28 @@ void endblit()
 void video_blit_to_screen(int drawMode, int colDepth)
 {
     int c;
-    //int firstx = 0;
-    //int firsty = 0;
-    //int scr_x_start = 0;
-    //int scr_y_start = 0;
-    //int scr_x_size  = 640;
-    //int scr_y_size  = 512;
-
-    //int xsize = lastx - firstx;
-    //int ysize = lasty - firsty + 1;
-    //int xsize = 640;
-    //int ysize = 512;
 
     startblit();
     switch (drawMode)
     {
         case SCANLINES:
             al_unlock_bitmap(b);
+            al_set_target_bitmap(b16);
+            al_clear_to_color(al_map_rgb(0, 0,0));
+            for (int c = 0; c < 256; c++)
+            {
+                al_draw_bitmap_region(b, 0, c, 640, 1, 0, c << 1, 0);
+            }
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b, 0,0,640,512, 0,0,640,512, 0);
-            //al_draw_scaled_bitmap(b, 0,0, 640,512, 0,0,main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0); // TODO: Experimental.
-            //blit(b,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
-            //al_draw_bitmap(b, (winsizeX-640)/2,(winsizeY-512)/2,0);
-            //al_draw_bitmap(b, 0,0,0);
+            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0);
             break;
 
-/*        case LINEDBL:
-            #ifdef WIN32
-                blit(b,vidb,0,0,0,0,640,256);
-                if (elkConfig.display.videoresize)
-                {
-                    stretch_blit(vidb,screen,0,0,640,256,0,0,winsizex,winsizey);
-                }
-                else
-                {
-                    stretch_blit(vidb,screen,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                }
-            #else
-                for (c=0;c<512;c++)
-                {
-//                    blit(b,b16,0,c>>1,0,c,640,1);
-                }
-                al_set_target_backbuffer(al_get_current_display());
-                //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
-                al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
-            #endif
+        case LINEDBL:
+            al_unlock_bitmap(b);
+            al_set_target_backbuffer(al_get_current_display());
+            al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,512, 0);
             break;
-
+/*
         case _2XSAI:
             blit(b,b162,0,0,0,0,640,256);
             Super2xSaI(b162,b16,0,0,0,0,320,256);
@@ -449,18 +423,6 @@ void video_blit_to_screen(int drawMode, int colDepth)
 
 void video_capture_screenshot(int drawMode, int colDepth)
 {
-    int firstx = 0;
-    int firsty = 0;
-    int scr_x_start = 0;
-    int scr_y_start = 0;
-    int scr_x_size  = 640;
-    int scr_y_size  = 512;
-
-    //int xsize = lastx - firstx;
-    //int ysize = lasty - firsty + 1;
-    int xsize = 640;
-    int ysize = 512;
-
     video_set_desktop_color_depth();
     bm_screenshot = al_create_bitmap(640,512);
     switch (drawMode)
@@ -543,13 +505,13 @@ void video_shutdown()
 
 void video_start_timer()
 {
-    //log_debug("video_start_timer: staring timer %p\n", timer);
+    //log_debug("video_start_timer: staring timer %p", timer);
     al_start_timer(timer);
 }
 
 void video_stop_timer()
 {
-    //log_debug("video_start_timer: staring timer %p\n", timer);
+    //log_debug("video_start_timer: staring timer %p", timer);
     al_stop_timer(timer);   
 }
 

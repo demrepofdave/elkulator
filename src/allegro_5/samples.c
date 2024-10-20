@@ -17,30 +17,30 @@ bool sample_seek_load(uint8_t indexA, uint8_t indexB, const char * filename) // 
 unsigned long sample_seek_get_length(uint8_t indexA, uint8_t indexB)
 {
     int length = 0;
-//    if(seeksmp[indexA][indexB])
-//    {
-//        length = seeksmp[indexA][indexB]->len;
-//    }
+    if(seeksmp[indexA][indexB])
+    {
+        length = al_get_sample_length(seeksmp[indexA][indexB]);
+    }
     return (length);
 }
 
 void * sample_seek_get_data_ptr(uint8_t indexA, uint8_t indexB)
 {
     void * data = 0;
-//    if(seeksmp[indexA][indexB])
-//    {
-//        data = seeksmp[indexA][indexB]->data;
-//    }
+    if(seeksmp[indexA][indexB])
+    {
+        data = al_get_sample_data(seeksmp[indexA][indexB]);
+    }
     return (data);
 }
 
 int sample_seek_get_frequency(uint8_t indexA, uint8_t indexB)
 {
     int freq = 0;
-//    if(seeksmp[indexA][indexB])
-//    {
-//        freq = seeksmp[indexA][indexB]->freq;
-//    }
+    if(seeksmp[indexA][indexB])
+    {
+        freq = al_get_sample_frequency(seeksmp[indexA][indexB]);
+    }
     return (freq);
 }                    
 
@@ -71,30 +71,30 @@ bool sample_motor_load(uint8_t index, const char * filename) // Don't know what 
 unsigned long sample_motor_get_length(uint8_t index)
 {
     int length = 0;
-//    if(motorsmp[index])
-//    {
-//        length = motorsmp[index]->len;
-//    }
+    if(motorsmp[index])
+    {
+        length = al_get_sample_length(motorsmp[index]);
+    }
     return (length);
 }
 
 void * sample_motor_get_data_ptr(uint8_t index)
 {
     void * data = 0;
-//    if(motorsmp[index])
-//    {
-//        data = motorsmp[index]->data;
-//    }
+    if(motorsmp[index])
+    {
+        data = al_get_sample_data(motorsmp[index]);
+    }
     return (data);
 }
 
 int sample_motor_get_frequency(uint8_t index)
 {
     int freq = 0;
-//    if(motorsmp[index])
-//    {
-//        freq = motorsmp[index]->freq;
-//    }
+    if(motorsmp[index])
+    {
+        freq = al_get_sample_frequency(motorsmp[index]);
+    }
     return (freq);
 }    
 
@@ -114,38 +114,37 @@ void sample_motor_destroy_all()
 
 bool sample_tape_noise_motor_load(uint8_t index, const char * filename) // Don't know what a is at the moment.
 {
-//    tsamples[index] = al_load_sample(filename);
-//    return (tsamples[index] != NULL);
-    return(false);
+    tsamples[index] = al_load_sample(filename);
+    return (tsamples[index] != NULL);
 }
 
 unsigned long sample_tape_noise_get_length(uint8_t index)
 {
     int length = 0;
-//    if(tsamples[index])
-//    {
-//        length = tsamples[index]->len;
-//    }
+    if(tsamples[index])
+    {
+        length = al_get_sample_length(tsamples[index]);
+    }
     return (length);
 }
 
 void * sample_tape_noise_get_data_ptr(uint8_t index)
 {
     void * data = 0;
-//    if(tsamples[index])
-//    {
-//        data = tsamples[index]->data;
-//    }
+    if(tsamples[index])
+    {
+        data = al_get_sample_data(tsamples[index]);
+    }
     return (data);
 }
 
 int sample_tape_noise_get_frequency(uint8_t index)
 {
     int freq = 0;
-//    if(tsamples[index])
-//    {
-//        freq = tsamples[index]->freq;
-//    }
+    if(tsamples[index])
+    {
+        freq = al_get_sample_frequency(tsamples[index]);
+    }
     return (freq);
 }    
 

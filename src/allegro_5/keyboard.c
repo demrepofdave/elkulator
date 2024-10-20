@@ -86,8 +86,8 @@ uint8_t keyboard_read(uint16_t addr)
         {
                 if (key[d]) // If host key is pressed.
                 {
-                    //log_debug("keyboard_read - key detected %d\n", d);
-                    //log_debug("keylookup[%d] is %d\n,", d, keylookup[d]);
+                    //log_debug("keyboard_read - key detected %d", d);
+                    //log_debug("keylookup[%d] is %d,", d, keylookup[d]);
                     if(keyl[keylookup[d]]&0x80 && !(addr&(1<<(keyl[keylookup[d]]&15))))
                     {
                         temp|=1<<((keyl[keylookup[d]]&0x30)>>4);
@@ -101,14 +101,14 @@ uint8_t keyboard_read(uint16_t addr)
 
 void key_down(uint8_t allegro_keycode)
 {
-    log_debug("keydown %d\n", allegro_keycode);
+    log_debug("keydown %d", allegro_keycode);
     key[allegro_keycode] = true;
 }
 
 void key_down_event(ALLEGRO_EVENT *event)
 {
     int keycode = event->keyboard.keycode;
-    log_debug("keyboard: key down event, keycode=%d:%s, modifiers=%04X\n", keycode, al_keycode_to_name(keycode), event->keyboard.modifiers);
+    log_debug("keyboard: key down event, keycode=%d:%s, modifiers=%04X", keycode, al_keycode_to_name(keycode), event->keyboard.modifiers);
 //    if (keycode == ALLEGRO_KEY_ALT || keycode == ALLEGRO_KEY_ALTGR)
 //        hostalt = true;
 //    else if (keycode == ALLEGRO_KEY_CAPSLOCK)
@@ -134,14 +134,14 @@ void key_down_event(ALLEGRO_EVENT *event)
 
 void key_up(uint8_t allegro_keycode)
 {
-    log_debug("keyup %d\n", allegro_keycode);
+    log_debug("keyup %d", allegro_keycode);
     key[allegro_keycode] = false;
 }
 
 void key_up_event(ALLEGRO_EVENT *event)
 {
     int keycode = event->keyboard.keycode;
-    log_debug("keyboard: key up event, keycode=%d:%s, modifiers=%04X\n", keycode, al_keycode_to_name(keycode), event->keyboard.modifiers);
+    log_debug("keyboard: key up event, keycode=%d:%s, modifiers=%04X", keycode, al_keycode_to_name(keycode), event->keyboard.modifiers);
     if (keycode < ALLEGRO_KEY_MAX)
     { 
         key_up(keycode);
@@ -186,7 +186,7 @@ void key_char_event(ALLEGRO_EVENT *event)
 {
     int keycode = event->keyboard.keycode;
     int unichar = event->keyboard.unichar;
-    log_debug("keyboard: key char event, keycode=%d:%s, unichar=%d\n", keycode, al_keycode_to_name(keycode), unichar);
+    log_debug("keyboard: key char event, keycode=%d:%s, unichar=%d", keycode, al_keycode_to_name(keycode), unichar);
 //    if ((!event->keyboard.repeat || unichar != last_unichar[keycode]) && keycode < ALLEGRO_KEY_MAX) {
 //        last_unichar[keycode] = unichar;
 //        keycode = map_keypad_intern(keycode, unichar);

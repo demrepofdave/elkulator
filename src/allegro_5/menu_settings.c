@@ -39,8 +39,8 @@ elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
 * Private Variable Definitions
 *******************************************************************************/
 
-static const char *settings_video_display_type[] = { "Scanlines", NULL };
-//                                                     "Line doubling (disabled)", 
+static const char *settings_video_display_type[] = { "Scanlines",
+                                                     "Line doubling", NULL };
 //                                                     "2xSai (disabled)",
 //                                                     "Scale2X (disabled)",
 //                                                     "Super Eagle (disabled)",
@@ -228,16 +228,14 @@ elk_event_t menu_handle_master_ram_board_enable(ALLEGRO_EVENT * event)
 // Called when IDM_SETTINGS_MEMORY_TURBO event is recieved.
 elk_event_t menu_handle_memory_turbo_toggle(ALLEGRO_EVENT * event)
 {
+    ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
     elkConfig.expansion.turbo = !elkConfig.expansion.turbo;
     if (elkConfig.expansion.turbo)
     {
         elkConfig.expansion.mrb = 0;
-        if(elkConfig.expansion.mrbmode > 0)
-        {
-            // Toggle turbo.
-            elkConfig.expansion.mrb = 0;
-            elkConfig.expansion.mrbmode = radio_event_simple(event, 0); // TODO: Does not work.
-        }
+        check_menu_item_id_num  (menu, IDM_SETTINGS_MEMORY_MRB_MODE, 0);
+        uncheck_menu_item_id_num(menu, IDM_SETTINGS_MEMORY_MRB_MODE, 1);
+        uncheck_menu_item_id_num(menu, IDM_SETTINGS_MEMORY_MRB_MODE, 2);
     }
     return(ELK_EVENT_RESET);
 }
@@ -245,6 +243,7 @@ elk_event_t menu_handle_memory_turbo_toggle(ALLEGRO_EVENT * event)
 // Called when IDM_SETTINGS_MEMORY_MRB_MODE event is recieved.
 elk_event_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event)
 {
+    ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
     elkConfig.expansion.mrbmode = (radio_event_simple(event, elkConfig.expansion.mrbmode));
     if(elkConfig.expansion.mrbmode > 0)
     {
@@ -253,6 +252,11 @@ elk_event_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event)
     else
     {
         elkConfig.expansion.mrb = 0;
+    }
+    if(elkConfig.expansion.turbo > 0)
+    {
+        elkConfig.expansion.turbo = 0;
+        uncheck_menu_item(menu, IDM_SETTINGS_MEMORY_TURBO);
     }
     return(ELK_EVENT_RESET);
 }

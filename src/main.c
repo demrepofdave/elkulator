@@ -60,7 +60,7 @@ callback_handlers_t callback_handlers;
 
 void initHandlers()
 {
-        log_debug("initHandlers\n");
+        log_debug("initHandlers");
         callback_handlers.handler_save_state = dosavestate;
         callback_handlers.handler_load_state = doloadstate;
         callback_handlers.handler_load_tape  = loadtape;

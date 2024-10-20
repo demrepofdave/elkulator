@@ -96,7 +96,8 @@ elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
 {
     // if not fullscreen!
     video_update_native_window_size(event->display.width, event->display.height);
-    video_clearall();
+    al_acknowledge_resize(event->display.source);
+    //video_clearall();
     // endif
     return 0;
 }
@@ -116,6 +117,7 @@ elk_event_t handle_event_display_close(ALLEGRO_EVENT * event)
 // Called when ALLEGRO_EVENT_TIMER event is recieved.
 elk_event_t handle_event_timer_expiry(ALLEGRO_EVENT * event)
 {
+    //log_debug("handle_event_timer_expiry");
     return(ELK_EVENT_TIMER_TRIGGERED);
 }
 
@@ -149,17 +151,17 @@ uint32_t event_await()
 
         if(!(elkEvent & ELK_EVENT_HANDLED))
         {
-            log_debug("event_await: event %d detected\n", event.type);
+            log_debug("event_await: event %d detected", event.type);
         }
     }
 
     if(elkEvent & ELK_EVENT_RESET)
     {
-        log_debug("Elk Reset trigger\n");
+        log_debug("Elk Reset trigger");
     }
     if(elkEvent & ELK_EVENT_EXIT)
     {
-        log_debug("quitting\n");
+        log_debug("quitting");
     }
     return elkEvent;
 }
