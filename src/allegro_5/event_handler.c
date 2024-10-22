@@ -8,6 +8,7 @@
 #include "common/video.h"
 #include "menu_internal.h"
 #include "keyboard_internal.h"
+#include "config_vars.h"
 
 
 bool register_main_event_handlers();
@@ -95,8 +96,9 @@ bool register_main_event_handlers()
 elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
 {
     // if not fullscreen!
-    video_update_native_window_size(event->display.width, event->display.height);
     al_acknowledge_resize(event->display.source);
+    video_update_native_window_size(event->display.width, event->display.height);
+    video_resize_elk_window((elkConfig.display.maintain_aspect_ratio == 1));
     //video_clearall();
     // endif
     return 0;

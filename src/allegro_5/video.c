@@ -88,6 +88,13 @@ window_config_t main_window;
 * Private Function Definitions
 *******************************************************************************/
 
+void log_window_config(const char * title)
+{
+    log_debug("Window status (%s)", title);
+    log_debug("-------------");
+    log_debug("- Actual window: %d, %d", main_window.actual_window.winsizex, main_window.actual_window.winsizey);
+    log_debug("- Current Elk  : %d, %d", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
+}
 
 /******************************************************************************
 * Public Function Definitions
@@ -104,7 +111,8 @@ int video_init_part1()
 
     main_window.current_elk.winsizex = 800; // TODO: Will be configured in future
     main_window.current_elk.winsizey = 600; // TODO: Will be configured in future
-    main_window.current_elk.maintain_aspect = true;
+    main_window.current_elk.startx = 0;
+    main_window.current_elk.starty = 0;
 
     al_init_native_dialog_addon();
     al_set_new_window_title(VERSION_STR);
@@ -219,48 +227,60 @@ void video_set_window_size(int w, int h, int v_w, int v_h)
     log_debug("Set window size %d, %d", w, h);
     main_window.current_elk.winsizex = w;
     main_window.current_elk.winsizey = h;
-    main_window.current_elk.maintain_aspect = true; // TODO: Hardcode for now.
 }
 
 void video_update_native_window_size(int w, int h)
 {
     main_window.actual_window.winsizex = w;
-    main_window.actual_window.winsizex = h;
-    main_window.actual_window.maintain_aspect = false;
+    main_window.actual_window.winsizey = h;
+    log_window_config("video_update_native_window_size");
+    //main_window.actual_window.maintain_aspect = false;
+}
 
+void video_resize_elk_window(bool aspect_ratio)
+{
     // Now we resize the screen based upon the above.
-    //if(main_window.current_elk.maintain_aspect)
-    //{
-    //    if(w > h)
-    //    {
-            // Resize based on height
-    //        video_set_window_size((h *4) / 3, h, 0,0);
-    //    }
-    //    else
-    //    {
-    //        video_set_window_size(w * 4, (w *3) / 40, 0,0);
-    //    }
-    //}
-    //else
+    int winsizeX = main_window.actual_window.winsizex;
+    int winsizeY = main_window.actual_window.winsizey;
+
+    log_window_config("video_resize_elk_window");
+
+    if(aspect_ratio)
     {
-        video_set_window_size(w, h, 0,0);
+        int adjusted_width = ((main_window.actual_window.winsizex * 3) / 4) + 1;
+        log_debug("Adjusted width = %d\n", adjusted_width);
+        if(adjusted_width > main_window.actual_window.winsizey)
+        {
+            // Resize based on height
+            winsizeX = ((main_window.actual_window.winsizey *4) / 3) + 1;
+            winsizeY = main_window.actual_window.winsizey;
+            log_debug("w > h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
+        }
+        else
+        {
+            winsizeX = main_window.actual_window.winsizex;
+            winsizeY = ((main_window.actual_window.winsizex * 3) / 4) + 1;
+            log_debug("w <= h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
+        }
+        // Calculate startx and starty offsets.
+        main_window.current_elk.startx = (main_window.actual_window.winsizex - winsizeX) / 2;
+        main_window.current_elk.starty = (main_window.actual_window.winsizey - winsizeY) / 2;
     }
+    else
+    {
+        main_window.current_elk.startx = 0;
+        main_window.current_elk.starty = 0;
+    }
+
+    video_set_window_size(winsizeX, winsizeY, 0,0);
     video_apply_window_size();
 }
 
 void video_apply_window_size()
 {
-    if(main_window.future_elk.winsizex != -1)
-    {
-        main_window.current_elk.winsizex = main_window.future_elk.winsizex;
-        main_window.current_elk.winsizey = main_window.future_elk.winsizex;
-        main_window.current_elk.maintain_aspect = main_window.future_elk.maintain_aspect;
-    }
-    main_window.future_elk.winsizex = -1;
-    main_window.future_elk.winsizey = -1;
-    main_window.future_elk.maintain_aspect = false;
-
-    log_debug("Applied window size %d, %d", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
+    log_window_config("video_apply_window_size");
+    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
+    al_draw_filled_rectangle(0,0, main_window.actual_window.winsizex, main_window.actual_window.winsizey, blue);
 }
 
 void video_set_gfx_mode_windowed()
@@ -372,13 +392,17 @@ void video_blit_to_screen(int drawMode, int colDepth)
                 al_draw_bitmap_region(b, 0, c, 640, 1, 0, c << 1, 0);
             }
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0);
+            al_draw_scaled_bitmap(b16, 0,0,640,512,
+                                       main_window.current_elk.startx, main_window.current_elk.starty,
+                                       main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
             break;
 
         case LINEDBL:
             al_unlock_bitmap(b);
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,512, 0);
+            al_draw_scaled_bitmap(b, 0,0,640,256, 
+                                     main_window.current_elk.startx, main_window.current_elk.starty,
+                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
             break;
 /*
         case _2XSAI:

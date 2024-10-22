@@ -50,14 +50,19 @@ typedef struct
 {
     int winsizex;         // Current window size in pixels
     int winsizey;         // Current window size in pixels
-    bool maintain_aspect; // If true maintain 4:3 aspect ration (used recalce winsizey based on winsizex)
-} window_info_t;
+} window_info_native_t;
+typedef struct
+{
+    int startx;           // Start position within the native window for the electron window.
+    int starty;           // Start position within the native window for the electron window.
+    int winsizex;         // Current window size in pixels
+    int winsizey;         // Current window size in pixels
+} window_info_elk_t;
 
 typedef struct
 {
-    window_info_t actual_window;  // Main window size
-    window_info_t current_elk;    // Window size electron
-    window_info_t future_elk;     // Future settings for window size electron yet to be applied.
+    window_info_native_t actual_window;  // Main window size
+    window_info_elk_t current_elk;    // Window size electron
 } window_config_t;
 
 /******************************************************************************
@@ -75,6 +80,7 @@ int video_poll_joystick();
 void video_rest(unsigned int period);  // Only used in allegro4.
 
 void video_update_native_window_size(int w, int h);
+void video_resize_elk_window(bool aspect_ratio);
 void video_set_window_size(int w, int h, int v_w, int v_h);
 void video_apply_window_size();
 void video_set_gfx_mode_windowed();

@@ -16,8 +16,10 @@
 #include "config_vars.h"
 #include "menu_internal.h"
 #include "common/event_handler.h"
+#include "common/video.h"
 
 elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_toggle_aspect_ratio(ALLEGRO_EVENT * event);
 
 elk_event_t menu_handle_toggle_internal_sound(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_toggle_sound_css_expansion(ALLEGRO_EVENT * event);
@@ -75,6 +77,7 @@ static ALLEGRO_MENU *create_settings_video_menu(void)
     ALLEGRO_MENU *menu = al_create_menu();
     ALLEGRO_MENU *sub_menu_display_type = al_create_menu();
 
+    add_checkbox_item(menu, "Maintain Aspect Ratio",    IDM_SETTINGS_VIDEO_MAINTAIN_RATIO, elkConfig.sound.sndint,      menu_handle_toggle_aspect_ratio);
     //disable_menu_item(sub_menu_settings_display_type, -2);
 
     al_append_menu_item(menu, "Display type",   0,  0, NULL, sub_menu_display_type);
@@ -174,6 +177,13 @@ elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
     return(0);
 }
 
+// Called when IDM_SETTINGS_SOUND_INTERNAL_SPEAKER event is recieved.
+elk_event_t menu_handle_toggle_aspect_ratio(ALLEGRO_EVENT * event)
+{
+    elkConfig.display.maintain_aspect_ratio=!elkConfig.display.maintain_aspect_ratio;
+    video_resize_elk_window((elkConfig.display.maintain_aspect_ratio == 1));
+    return(0);
+}
 
 // Called when IDM_SETTINGS_SOUND_INTERNAL_SPEAKER event is recieved.
 elk_event_t menu_handle_toggle_internal_sound(ALLEGRO_EVENT * event)
