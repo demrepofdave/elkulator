@@ -244,37 +244,7 @@ void disable_menu_item(ALLEGRO_MENU *menu, int id)
 }
 
 
-// File Menu - All functions helpers
-
-char * savestate_name = NULL;
-void file_load_state(ALLEGRO_EVENT *event, const char * title, const char * patterns)
-{
-    ALLEGRO_DISPLAY *display = (ALLEGRO_DISPLAY *)(event->user.data2);
-    ALLEGRO_FILECHOOSER *chooser = al_create_native_file_dialog(savestate_name, title, patterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
-    if (chooser) 
-    {
-        if (al_show_native_file_dialog(display, chooser)) 
-        {
-            if (al_get_native_file_dialog_count(chooser) > 0)
-            {
-                ALLEGRO_PATH *path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
-                const char * path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-                if(path_str)
-                {
-                    log_debug("file_load_state: path_str='%s'\n", path_str);
-                    callback_handlers.handler_load_state(path_str);
-                } 
-                else
-                {
-                    log_debug("file_load_state: path_str is NULL\n");
-                }
-            }
-        }
-        al_destroy_native_file_dialog(chooser);
-    }
-}
-
-// Tape menu.
+// Menu - All functions helpers
 
 ALLEGRO_PATH * menu_load_gui(ALLEGRO_EVENT *event, const char * title, const char * patterns, ALLEGRO_PATH * starting_path)
 {
@@ -303,37 +273,40 @@ ALLEGRO_PATH * menu_load_gui(ALLEGRO_EVENT *event, const char * title, const cha
             }
         }
     }
+    al_destroy_native_file_dialog(chooser);
 
     return(path);
 }
 
-void file_save_state(ALLEGRO_EVENT *event, const char * title, const char * patterns)
+ALLEGRO_PATH * menu_save_gui(ALLEGRO_EVENT *event, const char * title, const char * patterns, ALLEGRO_PATH * starting_path)
 {
     ALLEGRO_FILECHOOSER *chooser;
     ALLEGRO_DISPLAY *display;
+    const char *fpath;
+    ALLEGRO_PATH *path = NULL;
 
-    if ((chooser = al_create_native_file_dialog(savestate_name, "Save state to file", "*.snp", ALLEGRO_FILECHOOSER_SAVE))) 
+    if(starting_path)
+    {
+        fpath = al_path_cstr(starting_path, ALLEGRO_NATIVE_PATH_SEP);
+    }
+    else
+    {
+        fpath = ".";
+    }
+
+    if ((chooser = al_create_native_file_dialog(fpath, title, patterns, ALLEGRO_FILECHOOSER_SAVE))) 
     {
         display = (ALLEGRO_DISPLAY *)(event->user.data2);
         if (al_show_native_file_dialog(display, chooser))
         {
             if (al_get_native_file_dialog_count(chooser) > 0)
             {
-                ALLEGRO_PATH *path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
-                const char * path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-                if(path_str)
-                {
-                    log_debug("file_save_state: path_str='%s'\n", path_str);
-                    callback_handlers.handler_save_state(path_str);
-                } 
-                else
-                {
-                    log_debug("file_save_state: path_str is NULL\n");
-                }
+                path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
             }
         }
-        al_destroy_native_file_dialog(chooser);
     }
+    al_destroy_native_file_dialog(chooser);
+    return(path);
 }
 
 /******************************************************************************

@@ -20,6 +20,7 @@
 #include "config_vars.h"
 #include "common/sound.h"
 #include "common/video.h"
+#include "logger.h"
 
 #define HALFSIZE   (elkConfig.display.drawmode==_2XSAI || elkConfig.display.drawmode==SCALE2X || elkConfig.display.drawmode==EAGLE)
 #define LINEDOUBLE (elkConfig.display.drawmode==SCANLINES || elkConfig.display.drawmode==PAL)
@@ -963,14 +964,19 @@ void loadulastate(FILE *f)
         ulacycles|=getc(f)<<24;
 }
 
-void savescrshot()
+void savescrshot(const char * filename)
 {
-        wantsavescrshot=1;
+        if(filename)
+        {
+                strncpy(scrshotname, filename, 260);
+                wantsavescrshot=1;
+        }
 }
 
 // TODO: Disable for now.
 void dosavescrshot()
 {
+        log_debug("name='%s'", scrshotname);
         video_capture_screenshot(elkConfig.display.drawmode, coldepth);
         video_save_bmp(scrshotname);
         video_destroy_screenshot();

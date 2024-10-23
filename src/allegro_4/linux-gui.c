@@ -631,8 +631,7 @@ int gui_scrshot()
         ret=file_select_ex("Please enter filename",tempname,"BMP",260,xsize,ysize);
         if (ret)
         {
-                memcpy(scrshotname,tempname,260);
-                savescrshot(scrshotname);
+                savescrshot(tempname);
         }
         return D_O_K;
 }

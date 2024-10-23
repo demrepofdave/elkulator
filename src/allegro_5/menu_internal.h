@@ -155,6 +155,8 @@ bool register_menu_event_handler(int id, callback_event_handler_t menu_handler);
 
 int radio_event_simple(ALLEGRO_EVENT *event, int current);
 ALLEGRO_PATH * menu_load_gui(ALLEGRO_EVENT *event, const char * title, const char * patterns, ALLEGRO_PATH * starting_path);
+ALLEGRO_PATH * menu_save_gui(ALLEGRO_EVENT *event, const char * title, const char * patterns, ALLEGRO_PATH * starting_path);
+
 
 // Menu creation functions
 ALLEGRO_MENU *create_file_menu(void);

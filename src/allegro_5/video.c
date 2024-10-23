@@ -447,26 +447,17 @@ void video_blit_to_screen(int drawMode, int colDepth)
 
 void video_capture_screenshot(int drawMode, int colDepth)
 {
-    video_set_desktop_color_depth();
     bm_screenshot = al_create_bitmap(640,512);
     switch (drawMode)
     {
         case SCANLINES:
-            al_unlock_bitmap(b);
             al_set_target_bitmap(bm_screenshot);
-            al_draw_bitmap(b16, 0,0,0);
-//            blit(b,bm_screenshot,0,0,0,0,640,512);
+            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0);
             break;
 
         case LINEDBL:
-//            #ifdef WIN32
-//                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
-//            #else
-                al_unlock_bitmap(b);
-                al_set_target_bitmap(bm_screenshot);
-                al_draw_bitmap(b16, 0,0,0);
-//                blit(b16,bm_screenshot,0,0,0,0,640,512);
-//            #endif // WIN32
+            al_set_target_bitmap(bm_screenshot);
+            al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,512, 0);
             break;
 
 /*        case _2XSAI:
@@ -492,7 +483,6 @@ void video_capture_screenshot(int drawMode, int colDepth)
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break; */
     }
-    //set_color_depth(8); // TODO: May not need this in allegro5.
 }
 
 int video_save_bmp(const char * filename)

@@ -27,6 +27,9 @@ typedef struct
     callback_filename_t handler_load_cart2;
     callback_void_t     handle_unload_carts;
 
+    // Misc menu callback handlers
+    callback_filename_t handle_screenshot;
+
 } callback_handlers_t;
 
 extern callback_handlers_t callback_handlers;

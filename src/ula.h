@@ -52,7 +52,7 @@ void receive(uint8_t val);
 void enterfullscreen();
 void leavefullscreen();
 
-void savescrshot();
+void savescrshot(const char * filename);
 void loadulastate(FILE *f);
 void saveulastate(FILE *f);
 

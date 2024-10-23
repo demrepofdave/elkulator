@@ -71,6 +71,7 @@ void initHandlers()
         callback_handlers.handle_unload_carts  = unloadcart;
         callback_handlers.eject_tape  = handle_eject_tape;
         callback_handlers.rewind_tape = handle_rewind_tape;
+        callback_handlers.handle_screenshot = savescrshot;
 }
 
 void initelk(int argc, char *argv[])
