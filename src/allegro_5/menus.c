@@ -140,7 +140,7 @@ int radio_event_simple(ALLEGRO_EVENT *event, int current)
     int num = menu_get_num(event);
     ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
 
-    log_debug("radio_event_simple:menu %p id=%d, num=%d, current=%d data1=%lx\n", menu, id, num, current, event->user.data1);
+    log_debug("radio_event_simple:menu %p id=%d, num=%d, current=%d data1=%lx", menu, id, num, current, event->user.data1);
 
     al_set_menu_item_flags(menu, menu_id_num(id, current), ALLEGRO_MENU_ITEM_CHECKBOX);
     return num;
@@ -197,7 +197,7 @@ void uncheck_menu_item(ALLEGRO_MENU *menu, int id)
     if(menu)
     {
         int flags = al_get_menu_item_flags(menu, id);
-        log_debug("Pre Menu item %d, flags %d\n", id, flags);
+        log_debug("Pre Menu item %d, flags %d", id, flags);
         if(flags & ALLEGRO_MENU_ITEM_CHECKED)
         {
             // If set, we untoggle
@@ -215,7 +215,7 @@ void uncheck_menu_item_id_num(ALLEGRO_MENU *menu, int id, int num)
     if(menu)
     {
         int flags = al_get_menu_item_flags(menu, menu_id_num(id, num));
-        log_debug("Pre Menu item ,%d, flags %d\n", id, flags);
+        log_debug("Pre Menu item ,%d, flags %d", id, flags);
         if(flags & ALLEGRO_MENU_ITEM_CHECKED)
         {
             // If set, we untoggle
@@ -329,7 +329,7 @@ bool register_menu_event_handler(int id, callback_event_handler_t menu_handler)
 
 void menu_init(ALLEGRO_DISPLAY *display)
 {
-    log_debug("menu_init\n");
+    log_debug("menu_init");
     menu_registered_handlers = 0;
 
     register_menu_event_handler(IDM_ZERO, menu_null_handler);
@@ -364,7 +364,7 @@ elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
 
     video_stop_timer();
 
-    log_debug("menu_handle_event: menu %p, id %d, num %d\n", menu, menu_id, num);
+    log_debug("menu_handle_event: menu %p, id %d, num %d", menu, menu_id, num);
 
     // Handle menu events.
     while(count < menu_registered_handlers && !(elkEvent & ELK_EVENT_HANDLED))
@@ -380,12 +380,12 @@ elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
 
     if(!(elkEvent & ELK_EVENT_HANDLED))
     {
-        log_debug("menu_handle_event: menu event %d detected\n", menu_id);
+        log_debug("menu_handle_event: menu event %d detected", menu_id);
     }
 
     video_start_timer();
 
-    log_debug("menu_handle_event elkEvent = 0x%02x\n", elkEvent);
+    log_debug("menu_handle_event elkEvent = 0x%02x", elkEvent);
 
     return(elkEvent);
 }

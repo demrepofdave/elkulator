@@ -34,10 +34,13 @@
 // Various defines for various type of display and display filters
 #define SCANLINES 0
 #define LINEDBL   1
-#define _2XSAI    2
+#define _2XSAI    5
 #define SCALE2X   3
 #define EAGLE     4
-#define PAL       5
+//#define PAL       5 
+
+// TODO: For now..
+#define PAL       2
 
 /******************************************************************************
 * Typedefs

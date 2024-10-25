@@ -86,7 +86,7 @@ elk_event_t menu_handle_load_cart1(ALLEGRO_EVENT * event)
             al_destroy_path(path);  
         }
     }
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_ROMS_LOAD_CARTRIDGE1 event is recieved.
@@ -112,11 +112,11 @@ elk_event_t menu_handle_load_cart2(ALLEGRO_EVENT * event)
         } 
         else
         {
-            log_debug("menu_handle_load_cart2: path_str is NULL\n");
+            log_debug("menu_handle_load_cart2: path_str is NULL");
             al_destroy_path(path);  
         }
     }
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_ROMS_UNLOAD event is recieved.
@@ -125,19 +125,19 @@ elk_event_t menu_handle_unload_rom_carts(ALLEGRO_EVENT * event)
     callback_handlers.handle_unload_carts();
     reset6502e();  // TODO: To this another way?
     resetula();    // TODO: To this another way?
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_DISC_PLUS3_ENABLE event is recieved.
 elk_event_t menu_handle_toggle_mega_games_cart(ALLEGRO_EVENT * event)
 {
     elkConfig.expansion.enable_mgc=!elkConfig.expansion.enable_mgc;
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_DISC_PLUS3_ENABLE event is recieved.
 elk_event_t menu_handle_toggle_db_flash_cartridge(ALLEGRO_EVENT * event)
 {
     elkConfig.expansion.enable_db_flash_cartridge=!elkConfig.expansion.enable_db_flash_cartridge;
-    return(0);
+    return(ELK_EVENT_NONE);
 }

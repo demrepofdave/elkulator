@@ -80,7 +80,7 @@ elk_event_t menu_handle_disc_load_0_2(ALLEGRO_EVENT * event)
             al_destroy_path(path);  
         }
     }
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_DISC_LOAD_0_2 event is recieved.
@@ -107,7 +107,7 @@ elk_event_t menu_handle_disc_load_1_3(ALLEGRO_EVENT * event)
             al_destroy_path(path);  
         }
     }
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_DISC_EJECT_0_2 event is recieved.
@@ -116,7 +116,7 @@ elk_event_t menu_handle_disc_eject_0_2(ALLEGRO_EVENT * event)
     // TODO: proper callbacks
     closedisc(0);
     elkConfig.disc.discname[0]=0;
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_DISC_EJECT_1_3 event is recieved.
@@ -125,12 +125,12 @@ elk_event_t menu_handle_disc_eject_1_3(ALLEGRO_EVENT * event)
     // TODO: proper callbacks
     closedisc(1);
     elkConfig.disc.discname2[0]=0;
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_DISC_WRITE_PROTECT_DEFAULT event is recieved.
 elk_event_t menu_handle_default_write_protect(ALLEGRO_EVENT * event)
 {
     elkConfig.disc.defaultwriteprot = !elkConfig.disc.defaultwriteprot;
-    return(0);
+    return(ELK_EVENT_NONE);
 }

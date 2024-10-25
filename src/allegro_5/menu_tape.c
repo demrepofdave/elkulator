@@ -45,8 +45,6 @@ ALLEGRO_MENU *create_tape_menu(void)
     ALLEGRO_MENU *menu                 = al_create_menu();
     ALLEGRO_MENU *sub_menu_tape_speed  = al_create_menu();
 
-    log_debug("create_tape_menu:menu %p\n", menu);
-    log_debug("create_tape_menu:sub_menu_tape_speed %p\n", sub_menu_tape_speed);
     append_menu_item(menu, "Load tape...", IDM_TAPE_LOAD,   0, menu_handle_load_tape);
     append_menu_separator(menu);
     append_menu_item(menu, "Rewind tape",  IDM_TAPE_REWIND, 0, menu_handle_rewind_tape);  // TODO: Does not appear to work at the moment.
@@ -73,7 +71,7 @@ elk_event_t menu_handle_load_tape(ALLEGRO_EVENT * event)
         const char * path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
         if(path_str)
         {
-            log_debug("menu_handle_load_tape: path_str='%s'\n", path_str);
+            log_debug("path_str='%s'", path_str);
             callback_handlers.handler_load_tape(path_str);
             if(tape_fn)
             {
@@ -83,11 +81,11 @@ elk_event_t menu_handle_load_tape(ALLEGRO_EVENT * event)
         } 
         else
         {
-            log_debug("menu_handle_load_tape: path_str is NULL\n");
+            log_debug("path_str is NULL");
             al_destroy_path(path);  
         }
     }
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 
@@ -95,23 +93,23 @@ elk_event_t menu_handle_load_tape(ALLEGRO_EVENT * event)
 elk_event_t menu_handle_rewind_tape(ALLEGRO_EVENT * event)
 {
     callback_handlers.rewind_tape();
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_FILE_LOAD_STATE event is recieved.
 elk_event_t menu_handle_tape_eject(ALLEGRO_EVENT * event)
 {
     callback_handlers.eject_tape();
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_TAPE_SPEED event is recieved.
 elk_event_t menu_handle_tape_speed(ALLEGRO_EVENT * event)
 {
-    log_debug("menu_handle_tape_speed: old = %d\n", elkConfig.tape.speed);
+    log_debug("menu_handle_tape_speed: old = %d", elkConfig.tape.speed);
     elkConfig.tape.speed = radio_event_simple(event, elkConfig.tape.speed);
-    log_debug("menu_handle_tape_speed: new = %d\n", elkConfig.tape.speed);
-    return(0);
+    log_debug("menu_handle_tape_speed: new = %d", elkConfig.tape.speed);
+    return(ELK_EVENT_NONE);
 }
 
 

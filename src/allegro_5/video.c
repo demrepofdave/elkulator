@@ -248,7 +248,7 @@ void video_resize_elk_window(bool aspect_ratio)
     if(aspect_ratio)
     {
         int adjusted_width = ((main_window.actual_window.winsizex * 3) / 4) + 1;
-        log_debug("Adjusted width = %d\n", adjusted_width);
+        log_debug("Adjusted width = %d", adjusted_width);
         if(adjusted_width > main_window.actual_window.winsizey)
         {
             // Resize based on height
@@ -342,6 +342,16 @@ int video_get_desktop_color_depth()
     return(8); // TODO: probably won't need this in allegro5
 }
 
+uint32_t video_get_pixel_rgb(ALLEGRO_LOCKED_REGION * regionA, int y, int x)
+{
+    return(*((uint32_t *)((char *)regionA->data + regionA->pitch * y + x * regionA->pixel_size)));
+}
+
+void video_put_pixel_rgb(ALLEGRO_LOCKED_REGION * regionA, int y, int x, uint32_t rgb)
+{
+    *((uint32_t *)((char *)regionA->data + regionA->pitch * y + x * regionA->pixel_size)) = rgb;
+}
+
 void video_put_pixel(int y, int x, uint8_t color)
 {
     *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = elkpal[color];
@@ -381,6 +391,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
     int c;
 
     startblit();
+
     switch (drawMode)
     {
         case SCANLINES:
@@ -395,6 +406,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
             al_draw_scaled_bitmap(b16, 0,0,640,512,
                                        main_window.current_elk.startx, main_window.current_elk.starty,
                                        main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+            region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
             break;
 
         case LINEDBL:
@@ -403,6 +415,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
             al_draw_scaled_bitmap(b, 0,0,640,256, 
                                      main_window.current_elk.startx, main_window.current_elk.starty,
                                      main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+            region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
             break;
 /*
         case _2XSAI:
@@ -430,17 +443,24 @@ void video_blit_to_screen(int drawMode, int colDepth)
             //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
             al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
             //blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
-            break;
+            break;*/
 
         case PAL: // TODO: Not currently working (blank screen)
-            palfilter(b,b16,colDepth);
+            ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(b16, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+            al_set_target_bitmap(b16);
+            al_clear_to_color(al_map_rgb(0,0,0));
+            palfilter(region, destRegion, colDepth);
+
+            al_unlock_bitmap(b16);
+            al_unlock_bitmap(b);
             al_set_target_backbuffer(al_get_current_display());
-            //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
-            //blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
-            al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
-            break;*/
+            al_draw_scaled_bitmap(b16, 0,0,640,512, 
+                                     main_window.current_elk.startx, main_window.current_elk.starty,
+                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+            region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+            break;
     }
-    region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+
     al_flip_display();
     endblit();
 }

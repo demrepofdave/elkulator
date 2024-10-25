@@ -7,6 +7,7 @@
 typedef uint16_t elk_event_t;
 
 // Following allegro5 only.
+#define ELK_EVENT_NONE                   0x0000
 #define ELK_EVENT_EXIT                   0x0001
 #define ELK_EVENT_RESET                  0x0002
 #define ELK_EVENT_TIMER_TRIGGERED        0x0004

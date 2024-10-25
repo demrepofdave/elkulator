@@ -42,11 +42,11 @@ elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
 *******************************************************************************/
 
 static const char *settings_video_display_type[] = { "Scanlines",
-                                                     "Line doubling", NULL };
+                                                     "Line doubling",
 //                                                     "2xSai (disabled)",
 //                                                     "Scale2X (disabled)",
 //                                                     "Super Eagle (disabled)",
-//                                                     "PAL Filter (disabled)", NULL };
+                                                     "PAL Filter", NULL };
 
 static const char *settings_disc_drive_type_names[] = { "5.25",
                                                         "3.5", NULL };
@@ -174,7 +174,7 @@ elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
 {
     //elkConfig.display.drawmode = radio_event_simple(event, elkConfig.display.drawmode);
     elkConfig.display.drawmode = radio_event_simple(event, elkConfig.display.drawmode);
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_INTERNAL_SPEAKER event is recieved.
@@ -182,49 +182,49 @@ elk_event_t menu_handle_toggle_aspect_ratio(ALLEGRO_EVENT * event)
 {
     elkConfig.display.maintain_aspect_ratio=!elkConfig.display.maintain_aspect_ratio;
     video_resize_elk_window((elkConfig.display.maintain_aspect_ratio == 1));
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_INTERNAL_SPEAKER event is recieved.
 elk_event_t menu_handle_toggle_internal_sound(ALLEGRO_EVENT * event)
 {
     elkConfig.sound.sndint=!elkConfig.sound.sndint;
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_CSS_EXPANSION event is recieved.
 elk_event_t menu_handle_toggle_sound_css_expansion(ALLEGRO_EVENT * event)
 {
     elkConfig.sound.sndex=!elkConfig.sound.sndex;
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_DISC_DRIVE_NOISE event is recieved.
 elk_event_t menu_handle_toggle_sound_dd_noise(ALLEGRO_EVENT * event)
 {
     elkConfig.sound.sndddnoise=!elkConfig.sound.sndddnoise;
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_TAPE_NOISE event is recieved.
 elk_event_t menu_handle_toggle_sound_tape_noise(ALLEGRO_EVENT * event)
 {
     elkConfig.sound.sndtape=!elkConfig.sound.sndtape;
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_DISC_DRIVE_TYPE event is recieved.
 elk_event_t menu_handle_disc_drive_type(ALLEGRO_EVENT * event)
 {
     elkConfig.sound.ddtype = radio_event_simple(event, elkConfig.sound.ddtype);
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_DISC_DRIVE_VOLUME event is recieved.
 elk_event_t menu_handle_disc_drive_volume(ALLEGRO_EVENT * event)
 {
     elkConfig.sound.ddvol = radio_event_simple(event, elkConfig.sound.ddvol);
-    return(0);
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_MEMORY_MASTER_RAM_BOARD event is recieved.

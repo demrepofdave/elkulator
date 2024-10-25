@@ -66,5 +66,5 @@ elk_event_t menu_handle_screenshot(ALLEGRO_EVENT * event)
         }
     }
 
-    return(0);
+    return(ELK_EVENT_NONE);
 }
