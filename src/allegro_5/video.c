@@ -193,7 +193,6 @@ void video_init_part2()
     //ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
     //b = al_create_bitmap(640,616);
 
-    log_debug("display = %p", display);
     menu_init(display);
 
     if (!(timer = al_create_timer(0.02)))
@@ -209,6 +208,8 @@ void video_init_part2()
 
     al_install_mouse();
     event_register_event_source(al_get_mouse_event_source());
+
+    initpaltables();
 }
 
 // Called from main.c (initelk)
@@ -247,12 +248,12 @@ void video_resize_elk_window(bool aspect_ratio)
 
     if(aspect_ratio)
     {
-        int adjusted_width = ((main_window.actual_window.winsizex * 3) / 4) + 1;
+        int adjusted_width = ((main_window.actual_window.winsizex * 4) / 5) + 1;
         log_debug("Adjusted width = %d", adjusted_width);
         if(adjusted_width > main_window.actual_window.winsizey)
         {
             // Resize based on height
-            winsizeX = ((main_window.actual_window.winsizey *4) / 3) + 1;
+            winsizeX = ((main_window.actual_window.winsizey * 5) / 4) + 1;
             winsizeY = main_window.actual_window.winsizey;
             log_debug("w > h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
@@ -446,6 +447,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
             break;*/
 
         case PAL: // TODO: Not currently working (blank screen)
+        {
             ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(b16, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
             al_set_target_bitmap(b16);
             al_clear_to_color(al_map_rgb(0,0,0));
@@ -459,6 +461,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
                                      main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
             region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
             break;
+        }
     }
 
     al_flip_display();

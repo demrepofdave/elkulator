@@ -12,6 +12,7 @@
 #define uint16 unsigned short
 #define uint8 unsigned char
 
+
 uint32_t video_get_pixel_rgb(ALLEGRO_LOCKED_REGION * regionA, int y, int x);
 void video_put_pixel_rgb(ALLEGRO_LOCKED_REGION * regionA, int y, int x, uint32_t rgb);
 
@@ -21,6 +22,8 @@ void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int 
 
 // Other filer routines.
 void scale2x(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int width, int height);
+
+void initpaltables();
 void palfilter(ALLEGRO_LOCKED_REGION * regionSource, ALLEGRO_LOCKED_REGION * regionDest, int depth);
 
 void Super2xSaI_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height);

@@ -80,6 +80,8 @@ int soundlimit,soundon=1,soundcount,soundstat;
 uint8_t sndstreambuf[626];
 int sndstreamindex = 0;
 int sndstreamcount = 0;
+char scrshotname[260];
+char moviename[260];
 
 struct
 {
@@ -114,7 +116,7 @@ void initula()
         video_set_window_size(640,512,0,0);
         video_set_gfx_mode_windowed();
         video_init_part2();
-        initpaltables();
+        
         for (c=0;c<256;c++)
         {
                 ulalookup[c]=0;

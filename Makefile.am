@@ -66,7 +66,6 @@ elkulator_SOURCES = src/1770.c \
                     src/disc.c \
                     src/fdi2raw.c \
                     src/fdi.c \
-                    src/linux.c \
                     src/logger.c \
                     src/main.c \
                     src/mem.c \

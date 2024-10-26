@@ -17,6 +17,7 @@ void SuperEagle(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, in
 
 // Other filer routines.
 void scale2x(BITMAP * bitmapSource, BITMAP * bitmapDest, int width, int height);
+void initpaltables();
 void palfilter(BITMAP * bitmapSource, BITMAP * bitmapDest, int depth);
 
 void Super2xSaI_ex(uint8 *src, uint32 src_pitch, uint8 *unused, BITMAP *dest, uint32 width, uint32 height);

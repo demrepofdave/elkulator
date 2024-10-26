@@ -47,6 +47,7 @@ void video_init_part2()
     set_color_depth(8);
     b=create_bitmap(640,616);
     set_palette(elkpal);
+    initpaltables();
 }
 
 // Called from main.c (initelk)

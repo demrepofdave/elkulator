@@ -48,8 +48,6 @@ extern int resetit;
 
 extern char tapename[512];
 
-extern int infocus;
-
 void resetsound();
 
 void dumpregs();
@@ -139,9 +137,6 @@ extern int writeprot[2],fwriteprot[2];
 
 extern int motoron,fdctime,disctime;
 
-extern int wantloadstate,wantsavestate;
-extern char ssname[260];
-
 extern int usedrom6;
 
 extern uint8_t plus1stat;
@@ -151,7 +146,6 @@ extern uint8_t readc[65536],writec[65536],fetchc[65536];
 
 extern int debug,debugon;
 
-extern char scrshotname[260];
 extern char moviename[260];
 extern uint8_t sndstreambuf[626];
 extern int sndstreamptr;
@@ -168,12 +162,6 @@ extern int motorspin;
 #define MAX_PATH_FILENAME_BUFFER_SIZE 768
 
 extern char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
-
-void initHandlers();
-void initelk();
-void closeelk();
-void cleardrawit();
-void runelk();
 
 void redefinekeys();
 
@@ -229,8 +217,6 @@ uint8_t readfirstbyte();
 uint8_t readadc();
 void writeadc(uint8_t val);
 uint8_t getplus1stat();
-
-void initpaltables();
 
 void setquit();
 

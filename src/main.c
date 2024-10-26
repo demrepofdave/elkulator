@@ -21,6 +21,7 @@
 #include "common/keyboard.h"
 #include "common/fileutils.h"
 #include "common/sound.h"
+#include "common/event_handler.h"
 #undef printf
 int autoboot;
 FILE *rlog;
@@ -57,6 +58,15 @@ extern int serial_debug;
 char romnames[16][1024];
 
 callback_handlers_t callback_handlers;
+
+int quited=0;
+int infocus=1;
+
+char ssname[260];
+int fullscreen=0;
+
+extern int wantloadstate;
+extern int wantsavestate;
 
 void initHandlers()
 {
@@ -275,3 +285,72 @@ void closeelk()
         stopmovie();
         saveconfig();
 }
+
+
+void native_window_close_button_handler(void)
+{
+       quited = 1;
+}
+
+int main(int argc, char *argv[])
+{
+        int count = 0;
+        //init_config(); TODO: May need this not sure.
+        log_msg(__FUNCTION__, "Elkulator has started");
+        int ret = video_init_part1();
+        if (ret != 0)
+        {
+                fprintf(stderr, "Error %d initializing Allegro.\n", ret);
+                exit(-1);
+        }
+        initHandlers();
+        initelk(argc,argv);
+        video_register_close_button_handler(native_window_close_button_handler);
+        
+        log_config_vars();
+        #ifdef HAL_ALLEGRO_4 
+                        while (!quited)
+                {
+                        runelk();
+                        if (menu_pressed()) entergui();
+                }
+        #else       
+                video_start_timer();
+                elk_event_t elkEvent = 0;
+                while (!(elkEvent & ELK_EVENT_EXIT))
+                {
+                        elkEvent = event_await();
+                        //log_debug("elkEvent=%04x", elkEvent);
+                        if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
+                        {
+                                drawit++;
+                        }
+                        if(elkEvent & ELK_EVENT_RESET)
+                        {
+                                resetit = 1;
+                                log_config_vars();
+                        }
+
+                        runelk();
+
+                        // If tape is running and its speed is fast or really fast
+                        // We need to runelk another 19 times (or until tape is
+                        // stopped, this maintains the fast loading that allegro4
+                        // does as it runs the function every 1 millisecond with
+                        // drawing every normal 20ms).
+                        count = 19;
+                        while(count && tapeon && elkConfig.tape.speed)
+                        {
+                                runelk();
+                                count--;
+                        }
+                }
+        #endif // HAL_ALLEGRO_4
+        closeelk();
+        log_msg(__FUNCTION__, "Elkulator has ended");
+        return 0;
+}
+
+#ifdef HAL_ALLEGRO_4
+END_OF_MAIN();
+#endif // HAL_ALLEGRO_4
