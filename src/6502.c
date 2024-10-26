@@ -1,5 +1,10 @@
-/*Elkulator v1.0 by Sarah Walker
-  6502 emulation*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * 6502.c - Emulation of the Electron 6502 CPU.
+ * 
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,6 +14,9 @@
 #include "ula.h"
 #include "logger.h"
 #include "config_vars.h"
+#include "1770.h"
+#include "disc.h"
+#include "debugger.h"
 
 int timetolive;
 int ins=0;

@@ -1,16 +1,202 @@
-/*
- * Elkulator - An electron emulator originally written 
- *             by Sarah Walker
- *
- * debugger.c - Main debugger handling code
- * 
- */
-
+/*Elkulator v1.0 by Sarah Walker
+  Debugger*/
   
 int debug=0,debugon=0;
 int debug;
 int indebug=0;
 extern int fcount;
+
+#if 0
+#include <winalleg.h>
+#include <wingdi.h>
+#include <process.h>
+#include <string.h>
+#include <stdio.h>
+#include "elk.h"
+
+HANDLE debugthread,debugconsolethread;
+HWND dhwnd;
+int debugstarted=0;
+char DebugszClassName[ ] = "ElkDebugWnd";
+LRESULT CALLBACK DebugWindowProcedure (HWND, UINT, WPARAM, LPARAM);
+HINSTANCE hinst;
+uint8_t *usdat;
+
+void _debugthread(PVOID pvoid)
+{
+        MSG messages = {0};     /* Here messages to the application are saved */
+        WNDCLASSEX wincl;        /* Data structure for the windowclass */
+        
+        HDC hDC;
+        //PAINTSTRUCT ps;
+        int x;
+        int c = 0;
+        int d;
+        
+        usdat=malloc(256*256*4);
+        if (!debugstarted)
+        {
+        wincl.hInstance = hinst;
+        wincl.lpszClassName = DebugszClassName;
+        wincl.lpfnWndProc = DebugWindowProcedure;      /* This function is called by windows */
+        wincl.style = CS_DBLCLKS;                 /* Catch double-clicks */
+        wincl.cbSize = sizeof (WNDCLASSEX);
+
+        /* Use default icon and mouse-pointer */
+        wincl.hIcon = LoadIcon(hinst, "allegro_icon");
+        wincl.hIconSm = LoadIcon(hinst, "allegro_icon");
+        wincl.hCursor = LoadCursor (NULL, IDC_ARROW);
+        wincl.lpszMenuName = NULL;                 /* No menu */
+        wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
+        wincl.cbWndExtra = 0;                      /* structure or the window instance */
+        /* Use Windows's default color as the background of the window */
+        wincl.hbrBackground = (HBRUSH) COLOR_BACKGROUND;
+
+        /* Register the window class, and if it fails quit the program */
+        if (!RegisterClassEx(&wincl))
+        {
+                printf("Registerclass failed\n");
+                return;
+        }
+        }
+        dhwnd = CreateWindowEx (
+           0,                   /* Extended possibilites for variation */
+           DebugszClassName,         /* Classname */
+           "Memory viewer",       /* Title Text */
+           WS_OVERLAPPEDWINDOW, /* default window */
+           CW_USEDEFAULT,       /* Windows decides the position */
+           CW_USEDEFAULT,       /* where the window ends up on the screen */
+           256+(GetSystemMetrics(SM_CXFIXEDFRAME)*2),/* The programs width */
+           256+(GetSystemMetrics(SM_CYFIXEDFRAME)*2)+GetSystemMetrics(SM_CYCAPTION)+2,/* and height in pixels */
+           HWND_DESKTOP,        /* The window is a child-window to desktop */
+           NULL, /* No menu */
+           hinst,       /* Program Instance handler */
+           NULL                 /* No Window Creation data */
+           );
+           printf("Window create %08X\n",dhwnd);
+        ShowWindow (dhwnd, SW_SHOWNORMAL);
+
+                hDC = GetDC(dhwnd);
+
+    HDC memDC = CreateCompatibleDC ( hDC );
+    if (!memDC) printf("memDC failed!\n");
+    HBITMAP memBM = CreateCompatibleBitmap ( hDC, 256, 256 );
+    if (!memBM) printf("memBM failed!\n");
+    SelectObject ( memDC, memBM );
+    
+    BITMAPINFO lpbmi;
+    lpbmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+    lpbmi.bmiHeader.biWidth=256;
+    lpbmi.bmiHeader.biHeight=-256;
+    lpbmi.bmiHeader.biPlanes=1;
+    lpbmi.bmiHeader.biBitCount=32;
+    lpbmi.bmiHeader.biCompression=BI_RGB;
+    lpbmi.bmiHeader.biSizeImage=256*256*4;
+    lpbmi.bmiHeader.biClrUsed=0;
+        lpbmi.bmiHeader.biClrImportant=0;
+
+        debugstarted=1;
+        while (debugon)
+        {
+                Sleep(20);
+
+
+                c+=16;
+                d=0;
+                for (x=0;x<65536;x++)
+                {
+                        usdat[d++]=fetchc[x]*8;
+                        usdat[d++]=readc[x]*8;
+                        usdat[d++]=writec[x]*8;
+                        usdat[d++]=0;
+                        if (fetchc[x]) fetchc[x]--;
+                        if (readc[x]) readc[x]--;
+                        if (writec[x]) writec[x]--;
+                }
+
+                SetDIBitsToDevice(memDC,0,0,256,256,0,0,0,256,usdat,&lpbmi,DIB_RGB_COLORS);
+                BitBlt(hDC,0,0,256,256,memDC,0,0,SRCCOPY);
+                
+                if (PeekMessage(&messages,NULL,0,0,PM_REMOVE))
+                {
+                        /* Translate virtual-key messages into character messages */
+                        TranslateMessage(&messages);
+                        /* Send message to WindowProcedure */
+                        DispatchMessage(&messages);
+                }
+//                if (indebug) pollmainwindow();
+        }
+        free(usdat);
+}
+
+HANDLE consf,cinf;
+
+BOOL CtrlHandler(DWORD fdwCtrlType)
+{
+        setquit();
+        return TRUE;
+}
+
+char debugconsoleins[256];
+int gotstr=1;
+
+void startdebug()
+{
+        if (debug)
+        {
+                hinst=GetModuleHandle(NULL);
+                debugthread=(HANDLE)_beginthread(_debugthread,0,NULL);
+
+                AllocConsole();
+                SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler,TRUE);
+                consf=GetStdHandle(STD_OUTPUT_HANDLE);
+                cinf=GetStdHandle(STD_INPUT_HANDLE);
+        }
+//        AllocConsole();
+//        consf=GetStdHandle(STD_OUTPUT_HANDLE);
+//        cinf=GetStdHandle(STD_INPUT_HANDLE);
+//        WriteConsole(consf,"Hello",5,NULL,NULL);
+}
+
+void enddebug()
+{
+//        TerminateThread(debugconsolethread,0);
+//        TerminateThread(debugthread,0);
+//        if (usdat) free(usdat);
+        FreeConsole();
+        debug=debugon=0;
+}
+
+void killdebug()
+{
+        TerminateThread(debugthread,0);
+        if (usdat) free(usdat);
+}
+
+LRESULT CALLBACK DebugWindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+        switch (message)                  /* handle the messages */
+        {
+                case WM_CREATE:
+                return 0;
+                case WM_DESTROY:
+                PostQuitMessage (0);       /* send a WM_QUIT to the message queue */
+                break;
+                default:                      /* for messages that we don't deal with */
+                return DefWindowProc (hwnd, message, wParam, lParam);
+        }
+        return 0;
+}
+
+void debugout(char *s)
+{
+        startblit();
+        WriteConsole(consf,s,strlen(s),NULL,NULL);
+        endblit();
+        rpclog("%s",s);
+}
+
+#else
 
 #include <stdio.h>
 #include <string.h>
@@ -29,6 +215,8 @@ void debugout(char *s)
 void startdebug()
 {
 }
+
+#endif
 
 int debugopen=0;
 

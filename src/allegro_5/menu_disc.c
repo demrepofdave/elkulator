@@ -19,6 +19,7 @@
 #include "logger.h"
 // TODO: Remove below.
 #include "elk.h"
+#include "disc.h"
 
 elk_event_t menu_handle_disc_load_0_2 (ALLEGRO_EVENT * event);
 elk_event_t menu_handle_disc_load_1_3 (ALLEGRO_EVENT * event);

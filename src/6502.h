@@ -2,7 +2,7 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * ula.c - ULA and video emulation
+ * 6502.h - Emulation of the Electron 6502 CPU.
  * 
  */
 
@@ -47,5 +47,7 @@ void reset6502e();
 void exec6502();
 void load6502state(FILE *f);
 void save6502state(FILE *f);
+
+void dumpregs();
 
 #endif // _6502_H

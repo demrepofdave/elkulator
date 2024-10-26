@@ -17,6 +17,7 @@
 #include "config_vars.h"
 #include "config.h"
 #include "logger.h"
+#include "disc.h"
 
 /******************************************************************************
 * Preprocessor Macros

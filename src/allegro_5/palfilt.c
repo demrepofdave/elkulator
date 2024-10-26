@@ -1,12 +1,37 @@
 /*Elkulator v1.0 by Sarah Walker
   PAL filter*/
+
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * palfilt.c
+ * 
+ * Contains all functions to initialize and use the palfilter for
+ * electrn video output.
+ * 
+ * This is the allegro 5 implementation of the pal filter.
+ *
+ */
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
 #include <allegro5/allegro.h>
 #include "video_internal.h"
 #include "logger.h"
-//#include "elk.h"
+
+
+/******************************************************************************
+* Private Variable Definitions
+*******************************************************************************/
 
 al_fixed ACoef[2],ACoef2[3];
 al_fixed BCoef[2],BCoef2[3];
+
+/******************************************************************************
+* Private Function Definitions
+*******************************************************************************/
 
 void initcoef()
 {
@@ -65,6 +90,10 @@ static inline al_fixed firby(al_fixed NewSample)
 
 int rtable[8],gtable[8],btable[8];
 al_fixed ytable[8];
+
+/******************************************************************************
+* Public Function Definitions
+*******************************************************************************/
 
 void initpaltables()
 {

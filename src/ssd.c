@@ -2,6 +2,7 @@
   SSD/DSD disc handling*/
 #include <stdio.h>
 #include "elk.h"
+#include "disc.h"
 
 int ssddelay=0;
 FILE *ssdf[2];

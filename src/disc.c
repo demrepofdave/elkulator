@@ -1,5 +1,10 @@
-/*Elkulator v1.0 by Sarah Walker
-  Disc support (also some tape)*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * disc.h - Disc support (also some tape)
+ * 
+ */  
   
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +12,10 @@
 #include "logger.h"
 #include "common/fileutils.h"
 #include "config_vars.h"
+#include "adf.h"
+#include "csw.h"
+#include "disc.h"
+#include "fdi.h"
 
 void (*fdccallback)();
 void (*fdcdata)(uint8_t dat);

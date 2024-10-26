@@ -13,9 +13,11 @@
 #include "elk.h"
 #include "mem.h"
 #include "6502.h"
+#include "1770.h"
 #include "ula.h"
 #include "config_vars.h"
 #include "common/keyboard.h"
+#include "debugger.h"
 
 static const char * roms = "roms";   // Name of directory containing rom files
 

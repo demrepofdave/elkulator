@@ -1,12 +1,23 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * fdc.c - FDI disc support.
+ *         Interfaces with fdi2raw.c
+ * 
+ */
+
 /*Elkulator v1.0 by Sarah Walker
-  FDI disc support
-  Interfaces with fdi2raw.c*/
+  
+  */
   
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include "elk.h"
 #include "fdi2raw.h"
+#include "disc.h"
+#include "fdi.h"
 
 FILE *fdif[2];
 FDI *fdih[2];

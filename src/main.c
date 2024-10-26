@@ -22,7 +22,10 @@
 #include "common/fileutils.h"
 #include "common/sound.h"
 #include "common/event_handler.h"
-#undef printf
+#include "1770.h"
+#include "disc.h"
+#include "debugger.h"
+
 int autoboot;
 FILE *rlog;
 void rpclog(char *format, ...)

@@ -21,6 +21,7 @@
 #include "common/sound.h"
 #include "common/video.h"
 #include "logger.h"
+#include "csw.h"
 
 #define HALFSIZE   (elkConfig.display.drawmode==_2XSAI || elkConfig.display.drawmode==SCALE2X || elkConfig.display.drawmode==EAGLE)
 #define LINEDOUBLE (elkConfig.display.drawmode==SCANLINES || elkConfig.display.drawmode==PAL)
@@ -431,7 +432,6 @@ void tapenextbyte()
 
 int fasttapebreak;
 int pauseit=0;
-extern int cswena;
 int bitcount;
 void polltape()
 {
