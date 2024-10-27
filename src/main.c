@@ -24,11 +24,11 @@
 #include "tapenoise.h"
 #include "ula.h"
 
-#include "common/event_handler.h"
-#include "common/fileutils.h"
-#include "common/sound.h"
-#include "common/keyboard.h"
-#include "common/video.h"
+#include "host_abstraction_layer/event_handler.h"
+#include "host_abstraction_layer/fileutils.h"
+#include "host_abstraction_layer/sound.h"
+#include "host_abstraction_layer/keyboard.h"
+#include "host_abstraction_layer/video.h"
 
 int autoboot;
 FILE *rlog;

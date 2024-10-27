@@ -8,7 +8,7 @@
 #include "6502.h"
 #include "ula.h"
 #include "mem.h"
-#include "common/video.h"
+#include "host_abstraction_layer/video.h"
 #include "config_vars.h"
 #include "debugger.h"
 #include "disc.h"

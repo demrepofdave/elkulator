@@ -1,7 +1,7 @@
 #include <allegro5/allegro.h>
-#include "common/keyboard.h"
+#include "host_abstraction_layer/keyboard.h"
 #include "elk.h"
-#include "common/event_handler.h"
+#include "host_abstraction_layer/event_handler.h"
 #include "logger.h"
 
 

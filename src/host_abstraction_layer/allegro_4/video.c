@@ -6,7 +6,7 @@
 // This is the allegro4 implementation of the abstraction layer.
 
 #include <allegro.h>
-#include "common/video.h"
+#include "host_abstraction_layer/video.h"
 #include "video_internal.h"
 
 BITMAP *b = NULL;    // Main bitmap used before blitting to window screen.

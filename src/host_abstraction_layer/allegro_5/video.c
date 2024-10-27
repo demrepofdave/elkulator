@@ -28,8 +28,8 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_primitives.h>
-#include "common/video.h"
-#include "allegro_5/menu_internal.h"
+#include "host_abstraction_layer/video.h"
+#include "host_abstraction_layer/allegro_5//menu_internal.h"
 #include "logger.h"
 #include "video_internal.h"
 #include "event_handler_internal.h"

@@ -13,12 +13,12 @@
 *******************************************************************************/
 #include <stdint.h>
 #include <allegro5/allegro_native_dialog.h>
-#include "common/video.h"
+#include "host_abstraction_layer/video.h"
 #include "menu_internal.h"
 #include "logger.h"
 #include "callback_handlers.h"
 #include "config_vars.h"
-#include "common/event_handler.h"
+#include "host_abstraction_layer/event_handler.h"
 #include "event_handler_internal.h"
 
 

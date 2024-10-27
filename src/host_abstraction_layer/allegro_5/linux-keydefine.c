@@ -3,7 +3,7 @@
 
 #include <allegro5/allegro.h>
 #include "elk.h"
-#include "common/keyboard.h"
+#include "host_abstraction_layer/keyboard.h"
 
 extern int keylookup[128];
 

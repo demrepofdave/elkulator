@@ -12,7 +12,7 @@
 #include "elk.h"
 #include "ula.h"
 #include "config_vars.h"
-#include "common/video.h"
+#include "host_abstraction_layer/video.h"
 #include "csw.h"
 #include "uef.h"
 #include "6502.h"

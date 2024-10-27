@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include "elk.h"
 #include "config_vars.h"
-#include "common/samples.h"
+#include "host_abstraction_layer/samples.h"
 
 static const char * ddnoise = "ddnoise"; // Name of directory containing wav files to emulate tape noise
 

@@ -1,4 +1,4 @@
-#include "common/keyboard.h"
+#include "host_abstraction_layer/keyboard.h"
 #include "elk.h"
 #include <allegro.h>
 

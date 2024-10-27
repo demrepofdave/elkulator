@@ -15,8 +15,8 @@
 #include <allegro5/allegro_native_dialog.h>
 #include "config_vars.h"
 #include "menu_internal.h"
-#include "common/event_handler.h"
-#include "common/video.h"
+#include "host_abstraction_layer/event_handler.h"
+#include "host_abstraction_layer/video.h"
 
 elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_toggle_aspect_ratio(ALLEGRO_EVENT * event);

@@ -2,7 +2,7 @@
 #define _VIDEO_INTERNAL_H
 
 #include <allegro5/allegro.h>
-#include "common/video.h"
+#include "host_abstraction_layer/video.h"
 
 
 // Private functions to be places in hal only header.

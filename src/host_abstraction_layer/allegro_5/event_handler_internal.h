@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <allegro5/allegro.h>
-#include "common/event_handler.h"
+#include "host_abstraction_layer/event_handler.h"
 
 typedef elk_event_t (*callback_event_handler_t)(ALLEGRO_EVENT *event);
 

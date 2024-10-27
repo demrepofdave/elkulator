@@ -11,8 +11,8 @@
 #include <unistd.h>
 #include "elk.h"
 #include "config_vars.h"
-#include "common/samples.h"
-#include "common/sound.h"
+#include "host_abstraction_layer/samples.h"
+#include "host_abstraction_layer/sound.h"
 #include "1770.h"
 #include "tapenoise.h"
 

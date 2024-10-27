@@ -10,7 +10,7 @@
 #include <string.h>
 #include "elk.h"
 #include "logger.h"
-#include "common/fileutils.h"
+#include "host_abstraction_layer/fileutils.h"
 #include "config_vars.h"
 #include "adf.h"
 #include "csw.h"

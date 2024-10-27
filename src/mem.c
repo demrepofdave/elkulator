@@ -16,7 +16,7 @@
 #include "1770.h"
 #include "ula.h"
 #include "config_vars.h"
-#include "common/keyboard.h"
+#include "host_abstraction_layer/keyboard.h"
 #include "debugger.h"
 
 static const char * roms = "roms";   // Name of directory containing rom files
