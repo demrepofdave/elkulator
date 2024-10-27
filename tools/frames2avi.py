@@ -20,8 +20,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import commands, os, stat, struct, sys, zlib
-import Image
+import subprocess, os, stat, struct, sys, zlib
+from PIL import Image
 
 class AVIWriter:
 
@@ -41,14 +41,14 @@ class AVIWriter:
     
     def begin_header(self):
     
-        self.f.write("RIFF")
+        self.f.write(b"RIFF")
         self.f.write(struct.pack("<I", 0))
         
-        self.f.write("AVI ")
+        self.f.write(b"AVI ")
     
     def begin_list(self, name):
     
-        self.f.write("LIST")
+        self.f.write(b"LIST")
         self.addresses.append(self.f.tell())
         self.write_int(0)
         self.f.write(name)
@@ -74,7 +74,7 @@ class AVIWriter:
         # Apparently we have to ensure that each chunk is padded out to a two-
         # byte boundary.
         while self.f.tell() % 2 != 0:
-            self.f.write("\x00")
+            self.f.write(b"\x00")
     
     def end_header(self):
     
@@ -84,8 +84,8 @@ class AVIWriter:
         
             remaining = 2048 - offset
             if remaining >= 8:
-                self.begin_chunk("JUNK")
-                self.f.write("\x00" * (remaining - 8))
+                self.begin_chunk(b"JUNK")
+                self.f.write(b"\x00" * (remaining - 8))
                 self.end_chunk()
             
             offset = self.f.tell() % 0x800
@@ -130,7 +130,7 @@ def find_option(args, label, number = 0):
         return True
     
     if len(values) < number:
-        raise ArgumentError, "Not enough values for argument '%s': %s" % (label, repr(values))
+        raise ArgumentError("Not enough values for argument '%s': %s" % (label, repr(values)))
     
     if number == 1:
         values = values[0]
@@ -155,7 +155,7 @@ if __name__ == "__main__":
         width, height = 640, 512
         d, dim = find_option(args, "-d", 1)
         if d:
-            width, height = map(int, dim.split("x"))
+            width, height = list(map(int, dim.split("x")))
     
         first, last = 0, None
         t, span = find_option(args, "-t", 1)
@@ -193,9 +193,9 @@ if __name__ == "__main__":
     avi = AVIWriter(avi_file)
     
     avi.begin_header()
-    avi.begin_list("hdrl")      # hdrl
+    avi.begin_list(b"hdrl")      # hdrl
     
-    avi.begin_chunk("avih")       # avih
+    avi.begin_chunk(b"avih")       # avih
     avi.write_int(int(1e6/50))      # time per frame (in microseconds)
     avi.write_int(0)
     avi.write_int(0)
@@ -213,11 +213,11 @@ if __name__ == "__main__":
     avi.write_int(0)
     avi.end_chunk()
     
-    avi.begin_list("strl")        # strl
-    avi.begin_chunk("strh")         # strh
-    avi.write_str("vids")             # (stream type)
-    avi.write_str("MPNG")             # (stream handler)
-    #avi.write_str("bmp ")            # (stream handler)
+    avi.begin_list(b"strl")        # strl
+    avi.begin_chunk(b"strh")         # strh
+    avi.write_str(b"vids")             # (stream type)
+    avi.write_str(b"MPNG")             # (stream handler)
+    #avi.write_str(b"bmp ")            # (stream handler)
     avi.write_int(0)                  # flags
     avi.write_int(0)                  # priority and language
     avi.write_int(0)                  # initial frame
@@ -232,12 +232,12 @@ if __name__ == "__main__":
     avi.write_int(0)                  # frame
     avi.write_int(0)                  # frame
     avi.end_chunk()
-    avi.begin_chunk("strf")         # strf
+    avi.begin_chunk(b"strf")         # strf
     avi.write_int(0)
     avi.write_int(0)
     avi.write_int(0)
     avi.write_int(0x00180001)       # 1 bit plane, 24 bits per pixel
-    avi.write_str("MPNG")
+    avi.write_str(b"MPNG")
     #avi.write_str("bmp ")
     avi.write_int(0)
     avi.write_int(0)
@@ -247,9 +247,9 @@ if __name__ == "__main__":
     avi.end_chunk()                 #
     avi.end_list()                # strl
     
-    avi.begin_list("strl")        # strl
-    avi.begin_chunk("strh")         # strh
-    avi.write_str("auds")             # (stream type)
+    avi.begin_list(b"strl")        # strl
+    avi.begin_chunk(b"strh")         # strh
+    avi.write_str(b"auds")             # (stream type)
     avi.write_int(0)
     avi.write_int(0)                  # flags
     avi.write_int(0)                  # priority and language
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     avi.write_int(0)                  # frame
     avi.write_int(0)                  # frame
     avi.end_chunk()
-    avi.begin_chunk("strf")         # strf
+    avi.begin_chunk(b"strf")         # strf
     avi.write_int(0x00010001)         # format (PCM), channels
     avi.write_int(31250)
     avi.write_int(31250)
@@ -276,7 +276,7 @@ if __name__ == "__main__":
     avi.end_list()              # hdrl
     avi.end_header()
     
-    avi.begin_list("movi")      # movi
+    avi.begin_list(b"movi")      # movi
     
     frame = 0
     if width < 160 or height < 256:
@@ -310,27 +310,29 @@ if __name__ == "__main__":
         if compressed:
             data = zlib.decompress(data)
         
-        avi.begin_list("rec ")    # rec
+        avi.begin_list(b"rec ")    # rec
         
-        im = Image.fromstring("P", (640, 256), data)
-        im.putpalette("\x00\x00\x00"
-                      "\xff\x00\x00"
-                      "\x00\xff\x00"
-                      "\xff\xff\x00"
-                      "\x00\x00\xff"
-                      "\xff\x00\xff"
-                      "\x00\xff\xff"
-                      "\xff\xff\xff")
+        im = Image.frombytes("P", (640, 256), data)
+        bmp_palette = [ 0,0,0, 
+                        255,0,0,
+                        0,255,0,
+                        255, 255,0,
+                        0,0,255,
+                        255,0,255,
+                        0,255,255,
+                        255,255,255 ]
+
+        im.putpalette(bmp_palette)
         if width != 640 or height != 256:
             im = im.resize((width, height), resize_mode)
         
-        avi.begin_chunk("01wb")     # 01wb
+        avi.begin_chunk(b"01wb")     # 01wb
         audio_data = f.read(625)
-        audio_data = audio_data.replace("\x7f", "\x61\x0f").replace("\x00", "\x00\x00")
+        audio_data = audio_data.replace(b"\x7f", b"\x61\x0f").replace(b"\x00", b"\x00\x00")
         avi.f.write(audio_data)
         avi.end_chunk()
         
-        avi.begin_chunk("00dc")     # 00dc
+        avi.begin_chunk(b"00dc")     # 00dc
         #im.save(avi.f, "BMP")
         im.save(avi.f, "PNG")
         avi.end_chunk()             # 00dc
@@ -356,18 +358,18 @@ if __name__ == "__main__":
         avi.write_int(frames)
     
     avi.close()
-    print
-    print "Ways to process the output file:"
-    print
+    print()
+    print("Ways to process the output file:")
+    print()
     #print "mencoder %s -o %s -ovc lavc -oac lavc -lavcopts vcodec=mpeg4:acodec=libmp3lame -srate 44100" % (avi_file, avi_file.replace(".avi", ".mp4"))
-    avi_file = commands.mkarg(avi_file)
+    #avi_file = subprocess.mkarg(avi_file)
     wav_file = avi_file.replace(".avi", ".wav")
     wav_44100_file = wav_file.replace(".wav", "-44100.wav")
     mp4_file = avi_file.replace(".avi", ".mp4")
-    print "ffmpeg -i %s -map 0:1 %s" % (avi_file, wav_file)
-    print "sox %s %s rate 44100" % (wav_file, wav_44100_file)
-    print "ffmpeg -i %s -i %s -map 0:0 -map 1:0 -strict experimental %s" % (avi_file, wav_44100_file, mp4_file)
-    print
-    print "ffmpeg -i %s %s" % (avi_file, avi_file.replace(".avi", ".webm"))
+    print("ffmpeg -i %s -map 0:1 %s" % (avi_file, wav_file))
+    print("sox %s %s rate 44100" % (wav_file, wav_44100_file))
+    print("ffmpeg -i %s -i %s -map 0:0 -map 1:0 -strict experimental %s" % (avi_file, wav_44100_file, mp4_file))
+    print()
+    print("ffmpeg -i %s %s" % (avi_file, avi_file.replace(".avi", ".webm")))
     
     sys.exit()
