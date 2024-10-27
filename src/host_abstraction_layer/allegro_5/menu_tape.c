@@ -28,7 +28,11 @@ elk_event_t menu_handle_tape_speed(ALLEGRO_EVENT * event);
 * Private Variable Definitions
 *******************************************************************************/
 
-static const char *tape_speed_names[] = { "Normal", "Fast", "Really Fast", NULL };
+#define TAPE_SPEED_NAMES_MAX  4
+static const char *tape_speed_names[TAPE_SPEED_NAMES_MAX] = { "Normal", 
+                                                              "Fast", 
+                                                              "Really Fast", 
+                                                              NULL };
 
 
 /******************************************************************************
@@ -106,9 +110,8 @@ elk_event_t menu_handle_tape_eject(ALLEGRO_EVENT * event)
 // Called when IDM_TAPE_SPEED event is recieved.
 elk_event_t menu_handle_tape_speed(ALLEGRO_EVENT * event)
 {
-    log_debug("menu_handle_tape_speed: old = %d", elkConfig.tape.speed);
-    elkConfig.tape.speed = radio_event_simple(event, elkConfig.tape.speed);
-    log_debug("menu_handle_tape_speed: new = %d", elkConfig.tape.speed);
+    elkConfig.tape.speed = menu_get_num(event);
+    update_radio_set(event, TAPE_SPEED_NAMES_MAX - 1);
     return(ELK_EVENT_NONE);
 }
 

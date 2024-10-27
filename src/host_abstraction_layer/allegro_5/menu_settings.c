@@ -13,8 +13,11 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
+
 #include "config_vars.h"
+#include "logger.h"
 #include "menu_internal.h"
+
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/video.h"
 
@@ -41,23 +44,36 @@ elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
 * Private Variable Definitions
 *******************************************************************************/
 
-static const char *settings_video_display_type[] = { "Scanlines",
+#define VIDEO_DISPLAY_TYPE_MAX   4
+static const char *settings_video_display_type[VIDEO_DISPLAY_TYPE_MAX] = { "Scanlines",
                                                      "Line doubling",
 //                                                     "2xSai (disabled)",
 //                                                     "Scale2X (disabled)",
 //                                                     "Super Eagle (disabled)",
                                                      "PAL Filter", NULL };
 
-static const char *settings_disc_drive_type_names[] = { "5.25",
+#define DISC_DRIVE_TYPE_MAX  3
+
+static const char *settings_disc_drive_type_names[DISC_DRIVE_TYPE_MAX] = { "5.25",
                                                         "3.5", NULL };
 
-static const char *settings_disc_drive_volume_names[] = { "33%",
+#define DISC_DRIVE_VOL_TYPE_MAX  4
+static const char *settings_disc_drive_volume_names[DISC_DRIVE_VOL_TYPE_MAX] = { "33%",
                                                         "66%",
                                                         "100%", NULL };
 
-static const char *settings_master_ramboard_names[] = { "Slogger/Jafa Master RAM board - Off",
-                                                        "Slogger/Jafa Master RAM board - Turbo",
-                                                        "Slogger/Jafa Master RAM board - Shadow", NULL };
+#define RAMBOARD_ITEM_STANDARD_ELK           0
+#define RAMBOARD_ITEM_ELECTUUR_SLOGGER_TURBO 1
+#define RAMBOARD_MRB_TURBO                   2
+#define RAMBOARD_MRB_SHADOW                  3
+
+#define RAMBOARD_NAMES_MAX 5
+
+static const char *settings_ramboard_names[RAMBOARD_NAMES_MAX] = {
+                                 "Standard Electron",
+                                 "Elektuur/Slogger turbo board",
+                                 "Slogger/Jafa Master RAM board - Turbo",
+                                 "Slogger/Jafa Master RAM board - Shadow", NULL };
 
 /******************************************************************************
 * Private Function Definitions
@@ -112,10 +128,21 @@ static ALLEGRO_MENU *create_settings_memory_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
 
-    add_checkbox_item(menu, "Elektuur/Slogger turbo board",  IDM_SETTINGS_MEMORY_TURBO,            elkConfig.expansion.turbo, menu_handle_memory_turbo_toggle);
-    append_menu_separator(menu);
+    //add_checkbox_item(menu, "Elektuur/Slogger turbo board",  IDM_SETTINGS_MEMORY_TURBO,            elkConfig.expansion.turbo, menu_handle_memory_turbo_toggle);
+    //append_menu_separator(menu);
 
-    add_radio_set(menu, settings_master_ramboard_names, IDM_SETTINGS_MEMORY_MRB_MODE, elkConfig.expansion.mrbmode, menu_handle_master_ram_board_mode);
+    // Calculate starting setting for next menu item.
+    uint8_t item = RAMBOARD_ITEM_STANDARD_ELK; // Default to standard electron
+    if(elkConfig.expansion.turbo)
+    {
+        item = RAMBOARD_ITEM_ELECTUUR_SLOGGER_TURBO; // Elektuur/Slogger turbo board
+    }
+    else if(elkConfig.expansion.mrb && elkConfig.expansion.mrbmode > 0)
+    {
+        item = elkConfig.expansion.mrbmode + 1; // Master RAM board active.
+    }
+
+    add_radio_set(menu, settings_ramboard_names, IDM_SETTINGS_MEMORY_MRB_MODE, item, menu_handle_master_ram_board_mode);
 
     append_menu_separator(menu);
 
@@ -172,8 +199,9 @@ ALLEGRO_MENU *create_settings_menu(void)
 // Called when IDM_SETTINGS_VIDEO_DISPLAY event is recieved.
 elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
 {
-    //elkConfig.display.drawmode = radio_event_simple(event, elkConfig.display.drawmode);
-    elkConfig.display.drawmode = radio_event_simple(event, elkConfig.display.drawmode);
+    ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
+    elkConfig.display.drawmode = menu_get_num(event);
+    update_radio_set(event, VIDEO_DISPLAY_TYPE_MAX - 1);
     return(ELK_EVENT_NONE);
 }
 
@@ -216,14 +244,16 @@ elk_event_t menu_handle_toggle_sound_tape_noise(ALLEGRO_EVENT * event)
 // Called when IDM_SETTINGS_SOUND_DISC_DRIVE_TYPE event is recieved.
 elk_event_t menu_handle_disc_drive_type(ALLEGRO_EVENT * event)
 {
-    elkConfig.sound.ddtype = radio_event_simple(event, elkConfig.sound.ddtype);
+    elkConfig.sound.ddtype = menu_get_num(event);
+    update_radio_set(event, DISC_DRIVE_TYPE_MAX - 1);
     return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_DISC_DRIVE_VOLUME event is recieved.
 elk_event_t menu_handle_disc_drive_volume(ALLEGRO_EVENT * event)
 {
-    elkConfig.sound.ddvol = radio_event_simple(event, elkConfig.sound.ddvol);
+    elkConfig.sound.ddvol = menu_get_num(event);
+    update_radio_set(event, DISC_DRIVE_VOL_TYPE_MAX - 1);
     return(ELK_EVENT_NONE);
 }
 
@@ -233,7 +263,6 @@ elk_event_t menu_handle_master_ram_board_enable(ALLEGRO_EVENT * event)
     elkConfig.expansion.mrb = !elkConfig.expansion.mrb;
     return(ELK_EVENT_RESET);
 }
-
 
 // Called when IDM_SETTINGS_MEMORY_TURBO event is recieved.
 elk_event_t menu_handle_memory_turbo_toggle(ALLEGRO_EVENT * event)
@@ -254,20 +283,39 @@ elk_event_t menu_handle_memory_turbo_toggle(ALLEGRO_EVENT * event)
 elk_event_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event)
 {
     ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
-    elkConfig.expansion.mrbmode = (radio_event_simple(event, elkConfig.expansion.mrbmode));
-    if(elkConfig.expansion.mrbmode > 0)
+    int item = menu_get_num(event);
+    update_radio_set(event, RAMBOARD_NAMES_MAX - 1);
+
+    switch(item)
     {
-        elkConfig.expansion.mrb = 1;
+        case RAMBOARD_ITEM_STANDARD_ELK:
+            elkConfig.expansion.turbo   = 0;
+            elkConfig.expansion.mrb     = 0;
+            elkConfig.expansion.mrbmode = 0;
+            break;
+
+        case RAMBOARD_ITEM_ELECTUUR_SLOGGER_TURBO:
+            elkConfig.expansion.turbo   = 1;
+            elkConfig.expansion.mrb     = 0;
+            elkConfig.expansion.mrbmode = 0;
+            break;
+
+        case RAMBOARD_MRB_TURBO:
+            elkConfig.expansion.turbo   = 0;
+            elkConfig.expansion.mrb     = 1;
+            elkConfig.expansion.mrbmode = 1;
+            break;
+
+        case RAMBOARD_MRB_SHADOW:
+            elkConfig.expansion.turbo   = 0;
+            elkConfig.expansion.mrb     = 1;
+            elkConfig.expansion.mrbmode = 2;
+            break;
+
+        default:
+            break;
     }
-    else
-    {
-        elkConfig.expansion.mrb = 0;
-    }
-    if(elkConfig.expansion.turbo > 0)
-    {
-        elkConfig.expansion.turbo = 0;
-        uncheck_menu_item(menu, IDM_SETTINGS_MEMORY_TURBO);
-    }
+
     return(ELK_EVENT_RESET);
 }
 

@@ -1,5 +1,5 @@
-#ifndef __INC_GUI_ALLEGRO_H
-#define __INC_GUI_ALLEGRO_H
+#ifndef __MENU_INTERNAL_H
+#define __MENU_INTERNAL_H
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
@@ -105,22 +105,6 @@ typedef enum {
     IDM_WAVE,
     IDM_DISC_TYPE,
     IDM_DISC_VOL,
-#ifdef HAVE_JACK_JACK_H
-    IDM_MIDI_M4000_JACK,
-    IDM_MIDI_M2000_OUT2_JACK,
-    IDM_MIDI_M2000_OUT1_JACK,
-    IDM_MIDI_M2000_OUT3_JACK,
-#endif
-#ifdef HAVE_ALSA_ASOUNDLIB_H
-    IDM_MIDI_M4000_ASEQ,
-    IDM_MIDI_M4000_ARAW,
-    IDM_MIDI_M2000_OUT1_ASEQ,
-    IDM_MIDI_M2000_OUT1_ARAW,
-    IDM_MIDI_M2000_OUT2_ASEQ,
-    IDM_MIDI_M2000_OUT2_ARAW,
-    IDM_MIDI_M2000_OUT3_ASEQ,
-    IDM_MIDI_M2000_OUT3_ARAW,
-#endif
     IDM_KEY_REDEFINE,
     IDM_KEY_AS,
     IDM_KEY_LOGICAL,
@@ -148,12 +132,13 @@ void disable_menu_item(ALLEGRO_MENU *menu, int id);
 void check_menu_item_id_num(ALLEGRO_MENU *menu, int id, int num);
 void uncheck_menu_item(ALLEGRO_MENU *menu, int id);
 void uncheck_menu_item_id_num(ALLEGRO_MENU *menu, int id, int num);
+int  menu_get_num(ALLEGRO_EVENT *event);
 bool append_menu_item(ALLEGRO_MENU *menu, const char * title, uint16_t id, int flags, callback_event_handler_t menu_handler_function);
 void append_menu_separator(ALLEGRO_MENU *menu);
 
 bool register_menu_event_handler(int id, callback_event_handler_t menu_handler);
 
-int radio_event_simple(ALLEGRO_EVENT *event, int current);
+void update_radio_set(ALLEGRO_EVENT *event, int max_items);
 ALLEGRO_PATH * menu_load_gui(ALLEGRO_EVENT *event, const char * title, const char * patterns, ALLEGRO_PATH * starting_path);
 ALLEGRO_PATH * menu_save_gui(ALLEGRO_EVENT *event, const char * title, const char * patterns, ALLEGRO_PATH * starting_path);
 
@@ -173,4 +158,4 @@ extern void menu_destroy(ALLEGRO_DISPLAY *display);
 
 elk_event_t  menu_handle_event(ALLEGRO_EVENT *event);
 
-#endif
+#endif // __MENU_INTERNAL_H

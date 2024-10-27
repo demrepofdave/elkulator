@@ -78,7 +78,7 @@ static inline menu_id_t menu_get_id(ALLEGRO_EVENT *event)
     return event->user.data1 & 0xff;
 }
 
-static inline int menu_get_num(ALLEGRO_EVENT *event)
+int menu_get_num(ALLEGRO_EVENT *event)
 {
     return event->user.data1 >> 8;
 }
@@ -116,47 +116,24 @@ void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int c
     }
 }
 
-static int menu_cmp(const void *va, const void *vb)
+void update_radio_set(ALLEGRO_EVENT *event, int max_items)
 {
-    menu_map_t *a = (menu_map_t *)va;
-    menu_map_t *b = (menu_map_t *)vb;
-    return strcasecmp(a->label, b->label);
-}
-
-static void add_sorted_set(ALLEGRO_MENU *parent, menu_map_t *map, size_t items, uint16_t id, int cur_value)
-{
-    int i, ino;
-
-    qsort(map, items, sizeof(menu_map_t), menu_cmp);
-    for (i = 0; i < items; i++) {
-        ino = map[i].itemno;
-        add_checkbox_item(parent, map[i].label, menu_id_num(id, ino), ino == cur_value, NULL);
+    ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
+    int id = menu_get_id(event);
+    int num = menu_get_num(event);
+    log_debug("id = %08x, num = %08x, max_item=%08x", id, num, max_items);
+    int count = 0;
+    for(count = 0; count < max_items; count++)
+    {
+        if(count == num)
+        {
+            check_menu_item_id_num(menu, id, count);
+        }
+        else
+        {
+            uncheck_menu_item_id_num(menu, id, count);
+        }
     }
-}
-
-int radio_event_simple(ALLEGRO_EVENT *event, int current)
-{
-    int id = menu_get_id(event);
-    int num = menu_get_num(event);
-    ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
-
-    log_debug("radio_event_simple:menu %p id=%d, num=%d, current=%d data1=%lx", menu, id, num, current, event->user.data1);
-
-    al_set_menu_item_flags(menu, menu_id_num(id, current), ALLEGRO_MENU_ITEM_CHECKBOX);
-    return num;
-}
-
-static int radio_event_with_deselect(ALLEGRO_EVENT *event, int current)
-{
-    int id = menu_get_id(event);
-    int num = menu_get_num(event);
-    ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
-
-    if (num == current)
-        num = -1;
-    else
-        al_set_menu_item_flags(menu, menu_id_num(id, current), ALLEGRO_MENU_ITEM_CHECKBOX);
-    return num;
 }
 
 bool append_menu_item(ALLEGRO_MENU *menu, const char * title, uint16_t id, int flags, callback_event_handler_t menu_handler_function)
@@ -180,7 +157,7 @@ void check_menu_item_id_num(ALLEGRO_MENU *menu, int id, int num)
     if(menu)
     {
         int flags = al_get_menu_item_flags(menu, menu_id_num(id, num));
-        log_debug("Pre Menu item ,%d,%d, flags %d", id, num, flags);
+        log_debug("Pre Menu item %04x,%04x, flags %d", id, num, flags);
         if(!(flags & ALLEGRO_MENU_ITEM_CHECKED))
         {
             // If set, we untoggle
@@ -188,7 +165,7 @@ void check_menu_item_id_num(ALLEGRO_MENU *menu, int id, int num)
             log_debug("checked!");
         }
         // Post verification check
-        log_debug("Pre Menu item ,%d,%d, post flags %d", id, num, flags);
+        log_debug("Pre Menu item ,%04x,%04x, post flags %d", id, num, flags);
     }
 }
 
@@ -197,7 +174,7 @@ void uncheck_menu_item(ALLEGRO_MENU *menu, int id)
     if(menu)
     {
         int flags = al_get_menu_item_flags(menu, id);
-        log_debug("Pre Menu item %d, flags %d", id, flags);
+        log_debug("Pre Menu item %04x, flags %d", id, flags);
         if(flags & ALLEGRO_MENU_ITEM_CHECKED)
         {
             // If set, we untoggle
@@ -206,26 +183,15 @@ void uncheck_menu_item(ALLEGRO_MENU *menu, int id)
         }
         // Post verification check
         flags = al_get_menu_item_flags(menu, id);
-        log_debug("Pre Menu item %d, post flags %d", id, flags);
+        log_debug("Pre Menu item %04x, post flags %d", id, flags);
     }
 }
 
 void uncheck_menu_item_id_num(ALLEGRO_MENU *menu, int id, int num)
 {
-    if(menu)
-    {
-        int flags = al_get_menu_item_flags(menu, menu_id_num(id, num));
-        log_debug("Pre Menu item ,%d, flags %d", id, flags);
-        if(flags & ALLEGRO_MENU_ITEM_CHECKED)
-        {
-            // If set, we untoggle
-            al_set_menu_item_flags(menu, menu_id_num(id, num), ALLEGRO_MENU_ITEM_CHECKBOX);
-            log_debug("unchecked!");
-        }
-        // Post verification check
-        flags = al_get_menu_item_flags(menu, menu_id_num(id, num));
-        log_debug("Pre Menu item ,%d,%d, post flags %d", id, num, flags);
-    }
+    int flags = al_get_menu_item_flags(menu, menu_id_num(id, num));
+    log_debug("Pre Menu item %04x,%04x, flags %d", id, num, flags);
+    uncheck_menu_item(menu, menu_id_num(id, num));
 }
 
 // TODO: Does not seem to work for the moment.

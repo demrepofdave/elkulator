@@ -8,15 +8,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "elk.h"
+
+#include "1770.h"
 #include "6502.h"
+#include "config_vars.h"
+#include "debugger.h"
+#include "disc.h"
+#include "elk.h"
+#include "logger.h"
 #include "mem.h"
 #include "ula.h"
-#include "logger.h"
-#include "config_vars.h"
-#include "1770.h"
-#include "disc.h"
-#include "debugger.h"
 
 int timetolive;
 int ins=0;

@@ -6,16 +6,15 @@
  * 
  */
 
-/*Elkulator v1.0 by Sarah Walker
-  1770 FDC emulation*/
 #include <stdio.h>
 #include <stdlib.h>
-#include "elk.h"
-#include "6502.h"
-#include "mem.h"
+
 #include "1770.h"
-#include "disc.h"
 #include "6502.h"
+#include "disc.h"
+#include "elk.h"
+#include "mem.h"
+
 
 #define WD1770 1
 
