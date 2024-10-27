@@ -27,6 +27,7 @@ extern int fullscreen;
 extern int quited;
 int windx=640,windy=512;
 extern int dcol;
+extern char ssname[260];
 
 MENU filemenu[6];
 MENU discmenu[8];
