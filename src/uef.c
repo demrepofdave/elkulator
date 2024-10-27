@@ -1,8 +1,11 @@
-extern int pauseit;
-extern int output;
-static int reallyfasttapebreak;
-/*Elkulator v1.0 by Sarah Walker*/
-/*UEF handling*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * uef.h - UEF Tape format support
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <zlib.h>
@@ -11,8 +14,12 @@ static int reallyfasttapebreak;
 #include "config_vars.h"
 #include "common/video.h"
 #include "csw.h"
+#include "uef.h"
+#include "6502.h"
 
 #define INT_HIGHTONE 0x40
+
+static int reallyfasttapebreak;
 
 static int tapelcount,tapellatch,pps;
 int intone=0;

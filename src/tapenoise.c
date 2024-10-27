@@ -1,5 +1,10 @@
-/*Elkulator v1.0 by Sarah Walker
-  Tape noise (not very good)*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * tapenoise.c - Tape noise (not very good)
+ * 
+ */
 
 #include <stdio.h>
 #include <math.h>

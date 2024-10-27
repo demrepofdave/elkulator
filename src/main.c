@@ -9,22 +9,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "elk.h"
+
+#include "1770.h"
 #include "6502.h"
-#include "mem.h"
-#include "ula.h"
+#include "callback_handlers.h"
 #include "config.h"
 #include "config_vars.h"
-#include "callback_handlers.h"
+#include "disc.h"
+#include "ddnoise.h"
+#include "debugger.h"
+#include "elk.h"
 #include "logger.h"
-#include "common/video.h"
-#include "common/keyboard.h"
+#include "mem.h"
+#include "tapenoise.h"
+#include "ula.h"
+
+#include "common/event_handler.h"
 #include "common/fileutils.h"
 #include "common/sound.h"
-#include "common/event_handler.h"
-#include "1770.h"
-#include "disc.h"
-#include "debugger.h"
+#include "common/keyboard.h"
+#include "common/video.h"
 
 int autoboot;
 FILE *rlog;

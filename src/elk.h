@@ -35,10 +35,6 @@ extern int keylookup[128];
 #endif
 
 void polltape();
-void polluef();
-
-void openuef(const char *fn);
-void closeuef();
 
 extern int resetit;
 
@@ -46,21 +42,7 @@ extern char tapename[512];
 
 void resetsound();
 
-extern int mrbmapped;
-
-void error(const char *format, ...);
 //void rpclog(const char *format, ...);
-
-void ssd_reset();
-void ssd_load(int drive, char *fn);
-void ssd_close(int drive);
-void dsd_load(int drive, char *fn);
-void ssd_seek(int drive, int track);
-void ssd_readsector(int drive, int sector, int track, int side, int density);
-void ssd_writesector(int drive, int sector, int track, int side, int density);
-void ssd_readaddress(int drive, int sector, int side, int density);
-void ssd_format(int drive, int sector, int side, int density);
-void ssd_poll();
 
 void setejecttext(int drive, char *fn);
 
@@ -105,16 +87,6 @@ void reallyfasttapepoll();
 void initsound();
 void writesound(uint8_t data);
 void logvols();
-
-void loaddiscsamps();
-void mixddnoise();
-void closeddnoise();
-void ddnoise_seek(int len);
-
-void maketapenoise();
-void adddatnoise(uint8_t dat);
-void addhightone();
-void mixtapenoise(int16_t *tapebuffer);
 
 void loadstate();
 void savestate();

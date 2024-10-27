@@ -16,6 +16,9 @@
 #include "csw.h"
 #include "disc.h"
 #include "fdi.h"
+#include "uef.h"
+#include "ssd.h"
+#include "ddnoise.h"
 
 void (*fdccallback)();
 void (*fdcdata)(uint8_t dat);

@@ -26,7 +26,6 @@ int FASTHIGH2=0;
 //#define FASTLOW (elkConfig.expansion.turbo || (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode && mrbmapped))
 #define FASTHIGH (FASTHIGH2 && ((pc&0xE000)!=0xC000))
 
-extern int output;
 int mrbmapped=0;
 uint8_t rombanks[16][16384];
 uint8_t rombank_enabled[16];

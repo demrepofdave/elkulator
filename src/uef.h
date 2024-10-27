@@ -2,42 +2,35 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * mem.h - Memory handling
+ * uef.h - UEF Tape format support
  * 
  */
 
-#ifndef _MEM_H
-#define _MEM_H
+#ifndef _UEF_H
+#define _UEF_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
 #include <stdint.h>
-#include <stdio.h>
+
+
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
 
 
 /******************************************************************************
 * Variable externs
 *******************************************************************************/
-extern int usedrom6;
-extern int mrbmapped;
-extern uint8_t ram[32768];
 
 
 /******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
-uint8_t readmem(uint16_t addr);
-void writemem(uint16_t addr, uint8_t val);
 
-void loadroms();
-void loadrom_n(int, char *fn);
-void resetmem();
-void dumpram();
-void loadcart(const char *filename);
-void loadcart2(const char *filename);
-void unloadcart();
-void loadmemstate(FILE *f);
-void savememstate(FILE *f);
+void openuef (const char *fn);
+void closeuef();
+void polluef ();
 
-#endif // _MEM_H
+#endif // _UEF_H

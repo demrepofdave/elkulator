@@ -15,10 +15,10 @@
 #include "mem.h"
 #include "1770.h"
 #include "disc.h"
+#include "6502.h"
 
 #define WD1770 1
 
-extern int output;
 #ifndef ABS
 #define ABS(x) (((x)>0)?(x):-(x))
 #endif

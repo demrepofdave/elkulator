@@ -13,6 +13,7 @@
 #include "debugger.h"
 #include "disc.h"
 #include "csw.h"
+#include "uef.h"
 
 #undef printf
 

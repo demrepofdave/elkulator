@@ -1,8 +1,15 @@
-/*Elkulator v1.0 by Sarah Walker
-  SSD/DSD disc handling*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * ssd.c - SSD/DSD disc handling
+ * 
+ */
+
 #include <stdio.h>
 #include "elk.h"
 #include "disc.h"
+#include "ssd.h"
 
 int ssddelay=0;
 FILE *ssdf[2];

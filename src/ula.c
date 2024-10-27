@@ -22,6 +22,8 @@
 #include "common/video.h"
 #include "logger.h"
 #include "csw.h"
+#include "uef.h"
+#include "tapenoise.h"
 
 #define HALFSIZE   (elkConfig.display.drawmode==_2XSAI || elkConfig.display.drawmode==SCALE2X || elkConfig.display.drawmode==EAGLE)
 #define LINEDOUBLE (elkConfig.display.drawmode==SCANLINES || elkConfig.display.drawmode==PAL)
