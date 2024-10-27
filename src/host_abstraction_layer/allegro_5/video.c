@@ -500,11 +500,14 @@ void video_capture_screenshot(int drawMode, int colDepth)
             SuperEagle(b162,b16,0,0,0,0,320,256);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
-
+*/
         case PAL:
-            palfilter(b,b16,colDepth);
-            blit(b16,bm_screenshot,0,0,0,0,640,512);
-            break; */
+            // NOTE: No need to run palfilt here as it will already
+            //       have run as part of screen building, so all
+            //       we need is already in BITMAP b16
+            al_set_target_bitmap(bm_screenshot);
+            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0);
+            break;
     }
 }
 
