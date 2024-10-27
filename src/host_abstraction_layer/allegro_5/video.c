@@ -56,7 +56,8 @@ ALLEGRO_BITMAP *b162          = NULL; // Intermediate bitmap 2
 ALLEGRO_BITMAP *vidb          = NULL; // Windows bitmap
 ALLEGRO_BITMAP *vp1           = NULL;  // Windows bitmap 1?
 ALLEGRO_BITMAP *vp2           = NULL;  // Windows bitmap 2?
-ALLEGRO_BITMAP *bm_screenshot = NULL; // USed for screenshots.
+ALLEGRO_BITMAP *bm_screenshot = NULL; // Used for screenshots.
+ALLEGRO_BITMAP *moviebitmap   = NULL; // Used for capturing movies.
 
 static ALLEGRO_DISPLAY *display;
 
@@ -152,6 +153,7 @@ int video_init_part1()
     al_set_target_bitmap(b16);
     al_clear_to_color(black);
 
+    moviebitmap = al_create_bitmap(640,256);
     //colblack = 0xff000000;
     //colwhite = 0xffffffff;
     // border_col = al_map_rgb(0, 0, 0);
@@ -523,6 +525,18 @@ void video_destroy_screenshot()
         al_destroy_bitmap(bm_screenshot);
         bm_screenshot = NULL;
     }
+}
+
+void video_render_frame_for_movie()
+{
+    al_set_target_bitmap(moviebitmap);
+    al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,256, 0);
+}
+
+uint8_t * video_get_moviebitmap_data()
+{
+    return(0);
+    //return(moviebitmap->dat);
 }
                                                         
 void video_clearall()

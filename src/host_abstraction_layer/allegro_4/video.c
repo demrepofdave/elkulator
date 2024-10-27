@@ -16,6 +16,7 @@ BITMAP *vidb = NULL; // Windows bitmap
 BITMAP *vp1 = NULL;  // Windows bitmap 1?
 BITMAP *vp2 = NULL;  // Windows bitmap 2?
 BITMAP *bm_screenshot = NULL; // USed for screenshots.
+BITMAP *moviebitmap   = NULL; // Used for capturing movies.
 
 PALETTE elkpal =
 {
@@ -42,6 +43,7 @@ void video_init_part2()
 {
     b16=create_bitmap(800*2,600);
     b162=create_bitmap(640,256);
+    moviebitmap=create_bitmap_ex(8, 640, 256);
     clear(b16);
     Init_2xSaI(desktop_color_depth());
     set_color_depth(8);
@@ -258,6 +260,16 @@ void video_destroy_screenshot()
         destroy_bitmap(bm_screenshot);
         bm_screenshot = NULL;
     }
+}
+
+void video_render_frame_for_movie()
+{
+    blit(b,moviebitmap,0,0,0,0,640,256);
+}
+
+uint8_t * video_get_moviebitmap_data()
+{
+    return(moviebitmap->dat);
 }
                                                         
 void video_clearall()

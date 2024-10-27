@@ -29,6 +29,8 @@ typedef struct
 
     // Misc menu callback handlers
     callback_filename_t handle_screenshot;
+    callback_filename_t handle_startmovie;
+    callback_void_t     handle_stopmovie;
 
 } callback_handlers_t;
 

@@ -100,6 +100,9 @@ void video_capture_screenshot(int drawMode, int colDepth);
 int  video_save_bmp(const char * filename);
 void video_destroy_screenshot();
 
+void video_render_frame_for_movie();
+uint8_t * video_get_moviebitmap_data(); // TODO: Assume char *?
+
 void video_clearall();
 
 void video_shutdown();

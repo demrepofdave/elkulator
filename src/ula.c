@@ -977,7 +977,6 @@ void savescrshot(const char * filename)
         }
 }
 
-// TODO: Disable for now.
 void dosavescrshot()
 {
         log_debug("name='%s'", scrshotname);
@@ -987,26 +986,31 @@ void dosavescrshot()
         wantsavescrshot=0;
 }
 
-void startmovie()
+void startmovie(const char * filename)
 {
+    log_debug("startmovie(%s)", filename);
     stopmovie();
 
-    wantmovieframe = 1;
-    moviefile = fopen(moviename, "wb");
-    if (moviefile == NULL)
-        return;
+    if(filename)
+    {
+        wantmovieframe = 1;
+        moviefile = fopen(filename, "wb");
+        if (moviefile == NULL)
+        {
+            return;
+        }
 
-    //moviebitmap=create_bitmap_ex(8, 640, 256);
-    sndstreamindex = 0;
-    sndstreamcount = 0;
+        sndstreamindex = 0;
+        sndstreamcount = 0;
+    }
 }
 
 void stopmovie()
 {
     wantmovieframe = 0;
-    if (moviefile != NULL) {
+    if (moviefile != NULL) 
+    {
         fclose(moviefile);
-        //destroy_bitmap(moviebitmap);
         moviefile = NULL;
     }
 }
@@ -1015,72 +1019,74 @@ void stopmovie()
 
 int deflate_bitmap(int level)
 {
-//    unsigned int have;
-//    z_stream strm;
-//    unsigned char in[DEFLATE_CHUNK_SIZE];
-//    unsigned char out[DEFLATE_CHUNK_SIZE];
+    unsigned int have;
+    z_stream strm;
+    unsigned char in[DEFLATE_CHUNK_SIZE];
+    unsigned char out[DEFLATE_CHUNK_SIZE];
 
     /* Allocate the deflate state. */
-//    strm.zalloc = Z_NULL;
-//    strm.zfree = Z_NULL;
-//    strm.opaque = Z_NULL;
-//    if (deflateInit(&strm, level) != Z_OK)
-//        return Z_ERRNO;
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    if (deflateInit(&strm, level) != Z_OK)
+        return Z_ERRNO;
 
     /* Compress the bitmap buffer. */
-//    strm.avail_in = 640*256;
-//    strm.next_in = moviebitmap->dat;
+    strm.avail_in = 640*256;
+    strm.next_in = video_get_moviebitmap_data();
 
     /* Run deflate() on the bitmap buffer, finishing the compression. */
-//    strm.avail_out = DEFLATE_CHUNK_SIZE;
-//    strm.next_out = out;
-//    if (deflate(&strm, Z_FINISH) == Z_STREAM_ERROR)
-//        return Z_ERRNO;
+    strm.avail_out = DEFLATE_CHUNK_SIZE;
+    strm.next_out = out;
+    if (deflate(&strm, Z_FINISH) == Z_STREAM_ERROR)
+        return Z_ERRNO;
 
     /* Write the length of the data. */
-//    have = DEFLATE_CHUNK_SIZE - strm.avail_out;
-//    fwrite(&have, sizeof(unsigned int), 1, moviefile);
+    have = DEFLATE_CHUNK_SIZE - strm.avail_out;
+    fwrite(&have, sizeof(unsigned int), 1, moviefile);
 
-//    if (fwrite(out, 1, have, moviefile) != have || ferror(moviefile)) {
-//        deflateEnd(&strm);
-//        return Z_ERRNO;
-//    }
+    if (fwrite(out, 1, have, moviefile) != have || ferror(moviefile)) {
+        deflateEnd(&strm);
+        return Z_ERRNO;
+    }
 
     /* clean up and return */
-//    deflateEnd(&strm);
+    deflateEnd(&strm);
     return Z_OK;
 }
 
-// TODO: disable for now
 void saveframe()
 {
     if (moviefile == NULL)
         return;
 
-//    int start;
-//    if (sndstreamcount == 624) {
+    log_debug("Save frame");
+    int start;
+    if (sndstreamcount == 624) {
         /* Take the last 625 samples. */
-//        start = (sndstreamindex + 1) % sizeof(sndstreambuf);
-//    } else if (sndstreamcount == 626) {
+        start = (sndstreamindex + 1) % sizeof(sndstreambuf);
+    } else if (sndstreamcount == 626) {
         /* Take the first 625 samples from the 626 obtained and leave the last
            one for the next frame. */
-//        start = sndstreamindex;
-//    }
+        start = sndstreamindex;
+    }
 
-//    blit(b,moviebitmap,0,0,0,0,640,256);
+    video_render_frame_for_movie();
 
-//    if (deflate_bitmap(6) != Z_OK) {
-//        stopmovie();
-//        return;
-//    }
+    if (deflate_bitmap(6) != Z_OK) 
+    {
+        log_debug("Deflate failed");
+        stopmovie();
+        return;
+    }
 
-//    int remaining = sizeof(sndstreambuf) - start;
-//    if (remaining >= 625)
-//        fwrite(&sndstreambuf[start], 1, 625, moviefile);
-//    else {
-//        fwrite(&sndstreambuf[start], 1, remaining, moviefile);
-//        fwrite(sndstreambuf, 1, 625 - remaining, moviefile);
-//    }
+    int remaining = sizeof(sndstreambuf) - start;
+    if (remaining >= 625)
+        fwrite(&sndstreambuf[start], 1, 625, moviefile);
+    else {
+        fwrite(&sndstreambuf[start], 1, remaining, moviefile);
+        fwrite(sndstreambuf, 1, 625 - remaining, moviefile);
+    }
 
     sndstreamcount = 0;
 }
