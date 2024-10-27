@@ -17,6 +17,7 @@
 #include "config_vars.h"
 #include "config.h"
 #include "logger.h"
+#include "disc.h"
 
 /******************************************************************************
 * Preprocessor Macros
@@ -167,6 +168,7 @@ void loadconfig()
         elkConfig.sound.sndtape = 0;
         
         elkConfig.display.videoresize = getintcfg("win_resize",0);
+        elkConfig.display.maintain_aspect_ratio = getintcfg("win_aspectratio", 1);
         
         elkConfig.expansion.firstbyte = getintcfg("joy_firstbyte",0);
         elkConfig.expansion.joffset   = getintcfg("joy_offset",0);
@@ -223,6 +225,7 @@ void saveconfig()
         writeintcfg("sound_tape", elkConfig.sound.sndtape);
 
         writeintcfg("win_resize",elkConfig.display.videoresize);
+        writeintcfg("win_aspectratio", elkConfig.display.maintain_aspect_ratio);
         
         writeintcfg("joy_firstbyte", elkConfig.expansion.firstbyte);
         writeintcfg("joy_offset",    elkConfig.expansion.joffset);

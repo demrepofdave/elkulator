@@ -77,6 +77,7 @@ typedef struct
 {
     uint8_t drawmode;
     uint8_t videoresize;
+    uint8_t maintain_aspect_ratio;
 } display_config_t;
 
 typedef struct 

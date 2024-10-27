@@ -2,42 +2,38 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * mem.h - Memory handling
+ * debugger.h - Main debugger handling code
  * 
  */
 
-#ifndef _MEM_H
-#define _MEM_H
+#ifndef _DEBUGGER_H
+#define _DEBUGGER_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
 #include <stdint.h>
-#include <stdio.h>
+
+
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
 
 
 /******************************************************************************
 * Variable externs
 *******************************************************************************/
-extern int usedrom6;
-extern int mrbmapped;
-extern uint8_t ram[32768];
+extern int debug;
+extern int debugon;
 
 
 /******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
-uint8_t readmem(uint16_t addr);
-void writemem(uint16_t addr, uint8_t val);
+void dodebugger();
+void debugread (uint16_t addr);
+void debugwrite(uint16_t addr, uint8_t val);
+void startdebug();
+void enddebug  ();
 
-void loadroms();
-void loadrom_n(int, char *fn);
-void resetmem();
-void dumpram();
-void loadcart(const char *filename);
-void loadcart2(const char *filename);
-void unloadcart();
-void loadmemstate(FILE *f);
-void savememstate(FILE *f);
-
-#endif // _MEM_H
+#endif // _DEBUGGER_H

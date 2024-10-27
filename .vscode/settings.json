@@ -20,6 +20,10 @@
         "menu_internal.h": "c",
         "zlib.h": "c",
         "stdio.h": "c",
-        "logger.h": "c"
+        "logger.h": "c",
+        "ula.h": "c",
+        "event_handler_internal.h": "c",
+        "stdlib.h": "c",
+        "adf.h": "c"
     }
 }

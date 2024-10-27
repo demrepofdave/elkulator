@@ -1,5 +1,11 @@
-/*Elkulator v1.0 by Sarah Walker*/
-/*CSW handling*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * csw.c - CSW handling
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <zlib.h>

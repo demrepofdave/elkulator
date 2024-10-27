@@ -1,12 +1,23 @@
-/*Elkulator v1.0 by Sarah Walker
-  1770 FDC emulation*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * 1770.c - 1700 FDC Emulation
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "elk.h"
+
+#include "1770.h"
 #include "6502.h"
+#include "disc.h"
+#include "elk.h"
 #include "mem.h"
 
-extern int output;
+
+#define WD1770 1
+
 #ifndef ABS
 #define ABS(x) (((x)>0)?(x):-(x))
 #endif

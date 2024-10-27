@@ -2,42 +2,33 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * mem.h - Memory handling
+ * 1770.h - 1700 FDC Emulation
  * 
  */
 
-#ifndef _MEM_H
-#define _MEM_H
+#ifndef _1700_H
+#define _1700_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
 #include <stdint.h>
-#include <stdio.h>
-
 
 /******************************************************************************
 * Variable externs
 *******************************************************************************/
-extern int usedrom6;
-extern int mrbmapped;
-extern uint8_t ram[32768];
-
+extern int motoron;
+extern int fdctime;
+extern int disctime;
+extern int motorspin;
 
 /******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
-uint8_t readmem(uint16_t addr);
-void writemem(uint16_t addr, uint8_t val);
 
-void loadroms();
-void loadrom_n(int, char *fn);
-void resetmem();
-void dumpram();
-void loadcart(const char *filename);
-void loadcart2(const char *filename);
-void unloadcart();
-void loadmemstate(FILE *f);
-void savememstate(FILE *f);
+void    reset1770();
+uint8_t read1770 (uint16_t addr);
+void    write1770(uint16_t addr, uint8_t val);
 
-#endif // _MEM_H
+
+#endif // _1700_H

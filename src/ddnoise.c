@@ -1,15 +1,22 @@
-/*Elkulator v1.0 by Sarah Walker
-  Disc drive noise*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * ddnoise.c - Disc drive noise
+ * 
+ */
 
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include "elk.h"
 #include "config_vars.h"
-#include "common/samples.h"
-#include "common/sound.h"
+#include "host_abstraction_layer/samples.h"
+#include "host_abstraction_layer/sound.h"
+#include "1770.h"
+#include "tapenoise.h"
 
-static const char * ddnoise35 = "ddnoise/35";   // Name of directory containing wav files to emulate noise of 3.5 inch Disk Drive
+static const char * ddnoise35  = "ddnoise/35";   // Name of directory containing wav files to emulate noise of 3.5 inch Disk Drive
 static const char * ddnoise525 = "ddnoise/525"; // Name of directory containing wav files to emulate noise of 5.25 inch Disk Drive
 
 float ddnoise_mpos=0;

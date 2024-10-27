@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "elk.h"
-#include "common/sound.h"
+#include "host_abstraction_layer/sound.h"
 #include "config_vars.h"
 
 int sndinternal=1;

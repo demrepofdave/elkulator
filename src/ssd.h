@@ -2,63 +2,44 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * ula.h - ULA and video emulation
+ * ssd.h - SSD/DSD disc handling
  * 
  */
 
-#ifndef _ULA_H
-#define _ULA_H
+#ifndef _SSD_H
+#define _SSD_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
-
 #include <stdint.h>
-#include <stdio.h>
 
 
 /******************************************************************************
-* Typedefs and Enums
+* Typedefs
 *******************************************************************************/
-enum
-{
-        ULA_CONVENTIONAL = 0,
-        ULA_RAM_8BIT = 2,
-        ULA_RAM_8BIT_DUAL_ACCESS = 2,
-        ULA_RAM_8BIT_SINGLE_ACCESS = 3
-};
 
 
 /******************************************************************************
 * Variable externs
 *******************************************************************************/
-extern int ulacycles;
-extern int tapeon;
-extern int tapewrite;
-extern int pauseit;
+
 
 /******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
 
-void initula();
-void resetula();
-uint8_t readula(uint16_t addr);
-void writeula(uint16_t addr, uint8_t val);
+void ssd_reset();
+void ssd_load (int drive, char *fn);
+void ssd_close(int drive);
+void dsd_load (int drive, char *fn);
+void ssd_seek (int drive, int track);
 
-void yield();
-void waitforramsync();
-void intula(uint8_t num);
-void receive(uint8_t val);
+void ssd_readsector (int drive, int sector, int track, int side, int density);
+void ssd_writesector(int drive, int sector, int track, int side, int density);
+void ssd_readaddress(int drive, int sector, int side, int density);
+void ssd_format     (int drive, int sector, int side, int density);
 
-void enterfullscreen();
-void leavefullscreen();
+void ssd_poll();
 
-void savescrshot(const char * filename);
-void loadulastate(FILE *f);
-void saveulastate(FILE *f);
-
-void startmovie();
-void stopmovie();
-
-#endif // _ULA_H
+#endif // _SSD_H

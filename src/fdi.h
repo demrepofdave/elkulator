@@ -2,63 +2,44 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * ula.h - ULA and video emulation
+  * fdc.h - FDI disc support.
+ *         Interfaces with fdi2raw.c
  * 
  */
 
-#ifndef _ULA_H
-#define _ULA_H
+#ifndef _FDC_H
+#define _FDC_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
-
 #include <stdint.h>
-#include <stdio.h>
 
 
 /******************************************************************************
-* Typedefs and Enums
+* Typedefs
 *******************************************************************************/
-enum
-{
-        ULA_CONVENTIONAL = 0,
-        ULA_RAM_8BIT = 2,
-        ULA_RAM_8BIT_DUAL_ACCESS = 2,
-        ULA_RAM_8BIT_SINGLE_ACCESS = 3
-};
 
 
 /******************************************************************************
 * Variable externs
 *******************************************************************************/
-extern int ulacycles;
-extern int tapeon;
-extern int tapewrite;
-extern int pauseit;
+
+
 
 /******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
+void fdi_reset();
+void fdi_load (int drive, char *fn);
+void fdi_close(int drive);
+void fdi_seek (int drive, int track);
 
-void initula();
-void resetula();
-uint8_t readula(uint16_t addr);
-void writeula(uint16_t addr, uint8_t val);
+void fdi_readsector (int drive, int sector, int track, int side, int density);
+void fdi_writesector(int drive, int sector, int track, int side, int density);
+void fdi_readaddress(int drive, int sector, int side, int density);
+void fdi_format     (int drive, int sector, int side, int density);
 
-void yield();
-void waitforramsync();
-void intula(uint8_t num);
-void receive(uint8_t val);
+void fdi_poll();
 
-void enterfullscreen();
-void leavefullscreen();
-
-void savescrshot(const char * filename);
-void loadulastate(FILE *f);
-void saveulastate(FILE *f);
-
-void startmovie();
-void stopmovie();
-
-#endif // _ULA_H
+#endif // _FDC_H

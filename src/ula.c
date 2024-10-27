@@ -18,8 +18,12 @@
 #include "mem.h"
 #include "ula.h"
 #include "config_vars.h"
-#include "common/sound.h"
-#include "common/video.h"
+#include "host_abstraction_layer/sound.h"
+#include "host_abstraction_layer/video.h"
+#include "logger.h"
+#include "csw.h"
+#include "uef.h"
+#include "tapenoise.h"
 
 #define HALFSIZE   (elkConfig.display.drawmode==_2XSAI || elkConfig.display.drawmode==SCALE2X || elkConfig.display.drawmode==EAGLE)
 #define LINEDOUBLE (elkConfig.display.drawmode==SCANLINES || elkConfig.display.drawmode==PAL)
@@ -79,6 +83,8 @@ int soundlimit,soundon=1,soundcount,soundstat;
 uint8_t sndstreambuf[626];
 int sndstreamindex = 0;
 int sndstreamcount = 0;
+char scrshotname[260];
+char moviename[260];
 
 struct
 {
@@ -113,7 +119,7 @@ void initula()
         video_set_window_size(640,512,0,0);
         video_set_gfx_mode_windowed();
         video_init_part2();
-        initpaltables();
+        
         for (c=0;c<256;c++)
         {
                 ulalookup[c]=0;
@@ -428,7 +434,6 @@ void tapenextbyte()
 
 int fasttapebreak;
 int pauseit=0;
-extern int cswena;
 int bitcount;
 void polltape()
 {
@@ -963,14 +968,19 @@ void loadulastate(FILE *f)
         ulacycles|=getc(f)<<24;
 }
 
-void savescrshot()
+void savescrshot(const char * filename)
 {
-        wantsavescrshot=1;
+        if(filename)
+        {
+                strncpy(scrshotname, filename, 260);
+                wantsavescrshot=1;
+        }
 }
 
 // TODO: Disable for now.
 void dosavescrshot()
 {
+        log_debug("name='%s'", scrshotname);
         video_capture_screenshot(elkConfig.display.drawmode, coldepth);
         video_save_bmp(scrshotname);
         video_destroy_screenshot();

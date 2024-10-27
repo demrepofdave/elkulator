@@ -1,7 +1,14 @@
-/*Elkulator v1.0 by Sarah Walker
-  ADFS disc support (really all double-density formats)*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * adf.c - ADFS disc support (really all double-density formats
+ * 
+ */
 
 #include <stdio.h>
+#include "adf.h"
+#include "disc.h"
 #include "elk.h"
 
 int adfdelay=0;

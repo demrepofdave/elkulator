@@ -2,42 +2,35 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * mem.h - Memory handling
+ * ddnoise.h - Disc drive noise
  * 
  */
 
-#ifndef _MEM_H
-#define _MEM_H
+#ifndef _DDNOISE_H
+#define _DDNOISE_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
-#include <stdint.h>
-#include <stdio.h>
+
+
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
 
 
 /******************************************************************************
 * Variable externs
 *******************************************************************************/
-extern int usedrom6;
-extern int mrbmapped;
-extern uint8_t ram[32768];
 
 
 /******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
-uint8_t readmem(uint16_t addr);
-void writemem(uint16_t addr, uint8_t val);
 
-void loadroms();
-void loadrom_n(int, char *fn);
-void resetmem();
-void dumpram();
-void loadcart(const char *filename);
-void loadcart2(const char *filename);
-void unloadcart();
-void loadmemstate(FILE *f);
-void savememstate(FILE *f);
+void loaddiscsamps();
+void mixddnoise   ();
+void closeddnoise ();
+void ddnoise_seek (int len);
 
-#endif // _MEM_H
+#endif // _DDNOISE_H

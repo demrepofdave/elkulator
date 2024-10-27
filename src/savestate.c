@@ -7,6 +7,10 @@ Savestate handling*/
 #include "ula.h"
 #include "config_vars.h"
 
+
+int wantloadstate = 0;
+int wantsavestate = 0;
+
 void savestate()
 {
         wantsavestate=1;

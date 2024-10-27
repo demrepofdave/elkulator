@@ -1,12 +1,17 @@
-/*Elkulator v1.0 by Sarah Walker
-  Tape noise (not very good)*/
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * tapenoise.c - Tape noise (not very good)
+ * 
+ */
 
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
 #include "elk.h"
 #include "config_vars.h"
-#include "common/samples.h"
+#include "host_abstraction_layer/samples.h"
 
 static const char * ddnoise = "ddnoise"; // Name of directory containing wav files to emulate tape noise
 

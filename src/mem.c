@@ -13,9 +13,11 @@
 #include "elk.h"
 #include "mem.h"
 #include "6502.h"
+#include "1770.h"
 #include "ula.h"
 #include "config_vars.h"
-#include "common/keyboard.h"
+#include "host_abstraction_layer/keyboard.h"
+#include "debugger.h"
 
 static const char * roms = "roms";   // Name of directory containing rom files
 
@@ -24,7 +26,6 @@ int FASTHIGH2=0;
 //#define FASTLOW (elkConfig.expansion.turbo || (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode && mrbmapped))
 #define FASTHIGH (FASTHIGH2 && ((pc&0xE000)!=0xC000))
 
-extern int output;
 int mrbmapped=0;
 uint8_t rombanks[16][16384];
 uint8_t rombank_enabled[16];
