@@ -10,6 +10,9 @@
 #include "mem.h"
 #include "common/video.h"
 #include "config_vars.h"
+#include "debugger.h"
+#include "disc.h"
+#include "csw.h"
 
 #undef printf
 
