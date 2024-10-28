@@ -529,6 +529,7 @@ void video_destroy_screenshot()
 
 void video_render_frame_for_movie()
 {
+    // TODO: Only works correctly with line-double filter.
     al_set_target_bitmap(moviebitmap);
     al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,256, 0);
 }

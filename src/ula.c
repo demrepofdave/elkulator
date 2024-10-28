@@ -1035,6 +1035,8 @@ int deflate_bitmap(int level)
     strm.avail_in = 640*256;
     strm.next_in = video_get_moviebitmap_data();
 
+    log_debug("Save frame %02x, %02x, %02x, %02x", *strm.next_in, *(strm.next_in+1), *(strm.next_in+2), *(strm.next_in+3));
+
     /* Run deflate() on the bitmap buffer, finishing the compression. */
     strm.avail_out = DEFLATE_CHUNK_SIZE;
     strm.next_out = out;
@@ -1060,7 +1062,6 @@ void saveframe()
     if (moviefile == NULL)
         return;
 
-    log_debug("Save frame");
     int start;
     if (sndstreamcount == 624) {
         /* Take the last 625 samples. */
