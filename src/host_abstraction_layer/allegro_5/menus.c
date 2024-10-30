@@ -315,9 +315,6 @@ void menu_destroy(ALLEGRO_DISPLAY *display)
     al_set_display_menu(display, NULL);
 }
 
-static const char all_dext[] = "*.ssd;*.dsd;*.img;*.adf;*.ads;*.adm;*.adl;*.sdd;*.ddd;*.fdi;*.imd;*.hfe;"
-                               "*.SSD;*.DSD;*.IMG;*.ADF;*.ADS;*.ADM;*.ADL;*.SDD;*.DDD;*.FDI;*.IMD;*.HFE";
-
 elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
 {
     elk_event_t elkEvent = 0;

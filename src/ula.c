@@ -25,9 +25,6 @@
 #include "uef.h"
 #include "tapenoise.h"
 
-#define HALFSIZE   (elkConfig.display.drawmode==_2XSAI || elkConfig.display.drawmode==SCALE2X || elkConfig.display.drawmode==EAGLE)
-#define LINEDOUBLE (elkConfig.display.drawmode==SCANLINES || elkConfig.display.drawmode==PAL)
-
 #define ELECTRON_MODES_MAX     8
 
 #define TWO_COLOUR_MASK     0x80
@@ -37,23 +34,21 @@
 typedef struct
 {
     int modescs;
-    uint16_t modelens;
-    int modeend;
+    uint16_t modelens;   // Length of screen memory for this mode in bytes.
+    int modeend;         // scanline upon which mode ends.
     uint8_t colour_mask;
-    //int mode_type;
 } mode_info_t;
 
 
-
-//                                          modescs, modelens, modeend, mode type, mode colour mask
-mode_info_t modeInfo[ELECTRON_MODES_MAX] = { { 8, 0x5000, 256, TWO_COLOUR_MASK     },  // MODE 0
-                                             { 8, 0x5000, 256, FOUR_COLOUR_MASK    },  // MODE 1 
-                                             { 8, 0x5000, 256, SIXTEEN_COLOUR_MASK },  // MODE 2
-                                             {10, 0x4000, 250, TWO_COLOUR_MASK     },  // MODE 3
-                                             { 8, 0x2800, 256, TWO_COLOUR_MASK     },  // MODE 4
-                                             { 8, 0x2800, 256, FOUR_COLOUR_MASK    },  // MODE 5
-                                             { 10,0x2000, 250, TWO_COLOUR_MASK     },  // MODE 6
-                                             { 10,0x2000, 250, TWO_COLOUR_MASK     } };// MODE 6 (7 on BBC micro but teletext is not support so same as mode 6).
+//                                        modescs, modelens, modeend, mode colour mask
+mode_info_t modeInfo[ELECTRON_MODES_MAX] = { {  8,   0x5000,     256, TWO_COLOUR_MASK     },  // MODE 0
+                                             {  8,   0x5000,     256, FOUR_COLOUR_MASK    },  // MODE 1 
+                                             {  8,   0x5000,     256, SIXTEEN_COLOUR_MASK },  // MODE 2
+                                             { 10,   0x4000,     250, TWO_COLOUR_MASK     },  // MODE 3
+                                             {  8,   0x2800,     256, TWO_COLOUR_MASK     },  // MODE 4
+                                             {  8,   0x2800,     256, FOUR_COLOUR_MASK    },  // MODE 5
+                                             { 10,   0x2000,     250, TWO_COLOUR_MASK     },  // MODE 6
+                                             { 10,   0x2000,     250, TWO_COLOUR_MASK     } };// MODE 6 (7 on BBC micro but teletext is not support so same as mode 6).
 
 
 void dosavescrshot();
@@ -527,37 +522,10 @@ void reallyfasttapepoll()
         }
 }
 
-//int modescs[8]={8,8,8,10,8,8,10,10};
-//uint16_t modelens[8]={0x5000,0x5000,0x5000,0x4000,0x2800,0x2800,0x2000,0x2000};
-//int modeend[8]={256,256,256,250,256,256,250,250};
-
 int nextulapoll;
-int numlines=0;
 int wantsavescrshot=0;
 int wantmovieframe=0;
 FILE *moviefile;
-
-// Allegro4 build requires the ula to still be tightly bounded (for now).
-// This adjustment is not done for allegro5 build.
-void allegro4_linedouble_adjust_begin()
-{
-#ifdef HAL_ALLEGRO_4
-        if (LINEDOUBLE)
-        {
-                ula.y<<=1; 
-        }
-#endif
-}
-
-void allegro4_linedouble_adjust_end()
-{
-#ifdef HAL_ALLEGRO_4
-        if (LINEDOUBLE)
-        {
-                ula.y>>=1;
-        } 
-#endif
-}
 
 void yield()
 {
@@ -567,20 +535,35 @@ void yield()
         int col;
         int oldcycles;
 //        if (nextulapoll) printf("Beginning poll %i ",ula.x);
+
+        // How the following loop works.
+        // We run for as many CPU cycles as it takes for the ULA to keep in 
+        // sync with the CPU (however many cycles the CPU took with the previous
+        // 6502 opcode).
+
+        // The following happens depending on where we are on the the screen.
+
+        // y runs from 0 to 312 or 313, only from 0 to 2xx are we plotting pixels.
+        // x runs from 0 to 1024, only from 0 to 640 is are we plotting pixels
+        // on the real CRTC.
         while (ulacycles<cycles)
         {
                 oldcycles=ulacycles;
+
+                // Do this while x is below 640 and display is on and we are
+                // drawing.
                 while (ula.x<640 && ula.dispon && ula.draw && (ulacycles<cycles))
                 {
+                        // What we plot depends on how many pixels per row we have
+                        // (either 8 or 10), if we are on line 9 or 10, we must
+                        // be in mode 0,3, or 6, so we continue to plot the two
+                        // black scanlines in between character rows.
                         if (ula.sc&8)
                         {
-                                allegro4_linedouble_adjust_begin();
                                 for (x=0;x<8;x++)
                                 {
                                     video_put_pixel(ula.y, (ula.x+x), 0);
-                                    // b->line[ula.y][ula.x+x]=0;
                                 }
-                                allegro4_linedouble_adjust_end();
                         }
                         else if (!(ula.x&8) || !(ula.mode&4))
                         {
@@ -600,144 +583,89 @@ void yield()
 
                                 temp=ram[tempaddr];
 
-                                allegro4_linedouble_adjust_begin();
-
-                                if (HALFSIZE)
+                                switch (ula.mode)
                                 {
-                                        switch (ula.mode)
+                                        case 0:
+                                        case 3:
+                                        for (x=0;x<8;x++)
                                         {
-                                                case 0: case 3:
-                                                for (x=0;x<8;x++)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
-                                                case 1:
-                                                for (x=0;x<8;x+=2)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
-                                                case 2:
-                                                for (x=0;x<8;x+=4)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
-                                                        video_put_pixel(ula.y, ((ula.x+x+2)>>1), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
-                                                case 4: case 6: case 7:
-                                                for (x=0;x<16;x+=2)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
-                                                case 5:
-                                                for (x=0;x<16;x+=4)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, ((ula.x+x)>>1), pal[col]);
-                                                        video_put_pixel(ula.y, ((ula.x+x+2)>>1), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
+                                                col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
+                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                temp<<=1;
                                         }
-                                }
-                                else
-                                {
-                                        switch (ula.mode)
+                                        break;
+                                        case 1:
+                                        for (x=0;x<8;x+=2)
                                         {
-                                                case 0:
-                                                case 3:
-                                                for (x=0;x<8;x++)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
-                                                case 1:
-                                                for (x=0;x<8;x+=2)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
-                                                case 2:
-                                                for (x=0;x<8;x+=4)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x+2), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x+3), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
-                                                case 4:
-                                                case 6:
-                                                case 7: 
-                                                for (x=0;x<16;x+=2)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
-                                                case 5:
-                                                for (x=0;x<16;x+=4)
-                                                {
-                                                        col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                        video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x+2), pal[col]);
-                                                        video_put_pixel(ula.y, (ula.x+x+3), pal[col]);
-                                                        temp<<=1;
-                                                }
-                                                break;
+                                                col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
+                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
+                                                temp<<=1;
                                         }
+                                        break;
+                                        case 2:
+                                        for (x=0;x<8;x+=4)
+                                        {
+                                                col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
+                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x+2), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x+3), pal[col]);
+                                                temp<<=1;
+                                        }
+                                        break;
+                                        case 4:
+                                        case 6:
+                                        case 7: 
+                                        for (x=0;x<16;x+=2)
+                                        {
+                                                col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
+                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
+                                                temp<<=1;
+                                        }
+                                        break;
+                                        case 5:
+                                        for (x=0;x<16;x+=4)
+                                        {
+                                                col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
+                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x+2), pal[col]);
+                                                video_put_pixel(ula.y, (ula.x+x+3), pal[col]);
+                                                temp<<=1;
+                                        }
+                                        break;
                                 }
-                                allegro4_linedouble_adjust_end();
                         }
                         ula.x+=8;
                         ulacycles++;
                 }
+
+                // Another alternative.  We should be drawing but display has been
+                // turned off by the OS, so simply draw black pixels instead.
                 while (ula.x<640 && ula.y<256 && !ula.dispon && ula.draw && (ulacycles<cycles))
                 {
-//                        if (!ula.x) rpclog("Blank line %i\n",ula.y);
-                        allegro4_linedouble_adjust_begin();
+                        // Display is disabled, but we are drawing a line, so
+                        // make this blank.,
                         for (x=0;x<8;x++)
                         {
                             video_put_pixel(ula.y, (ula.x+x), 0);
-                            //b->line[ula.y][ula.x+x]=0;
                         }
-                        allegro4_linedouble_adjust_end();
                         ula.x+=8;
                         ulacycles++;
                 }
-/*                if (ula.x==640 && ula.y==99)
-                {
-                        ula.isr|=INT_RTC;
-                        updateulaints();
-                }*/
+
+                // If we have caught up with the CPU we do the following.
                 if (ulacycles==oldcycles)
                 {
                         ula.x+=8;
-                        numlines+=8;
+
+                        // If we are right at the end of the CRTC gun...
                         if (ula.x==1024)
                         {
-                                /*Sound handling*/
+                                /* Sound handling - but only if the tape isn't operating */
                                 if (!tapeon || !elkConfig.tape.speed)
                                 {
                                         for (c=0;c<2;c++)
@@ -769,6 +697,7 @@ void yield()
                                     sndstreamcount++;
                                 }
                                 
+                                // Reset to start of next line.
                                 ula.x=0;
                                 ula.y++;
                                 if (ula.dispon)
@@ -776,6 +705,9 @@ void yield()
                                         ula.sc++;
                                         if (ula.sc==modeInfo[ula.mode].modescs)
                                         {
+                                                // Finished plotting a character row (with any
+                                                // additional lines for mode 0,3,6), reset to next
+                                                // row and increment ula screen memory address.
                                                 ula.sc=0;
                                                 ula.addr+=((ula.mode&4)?320:640);
                                                 /*This does seem odd, that the ULA would fix up
@@ -783,31 +715,32 @@ void yield()
                                                   graphic problems if this is not done*/
                                                 if (ula.addr&0x8000)
                                                 {
+                                                    // Wrap around to start of screen memory if
+                                                    // are address goes above 0x8000 (into ROM).
                                                     ula.addr-=modeInfo[ula.mode].modelens;
                                                 }
                                                 ula.addrback=ula.addr;
                                         }
                                         ula.addr=ula.addrback;
                                 }
+
+                                // y=99, at the start of this line we generate the RTC interrupt.
                                 if (ula.y==99)
                                 {
                                         ula.isr|=INT_RTC;
                                         updateulaints();
                                 }
-                                c=modeInfo[ula.mode].modeend;
-//                                if (ula.oddeven) c++;
-                                if (ula.y==c)
+
+                                if (ula.y == modeInfo[ula.mode].modeend)
                                 {
+                                        // VSync
                                         ula.dispon=0;
                                         ula.isr|=INT_VBL;
                                         updateulaints();
-//                                        rpclog("Vsync\n");
                                 }
                                 if (ula.y==258) ula.dispon=0;
                                 if (ula.y==((ula.oddeven)?313:312) || ula.y>=313)
                                 {
-//                                        printf("Numlines %i\n",numlines/1024);
-                                        numlines=0;
                                         ula.y=0;
                                         ula.oddeven^=1;
                                         ula.dispon=1;

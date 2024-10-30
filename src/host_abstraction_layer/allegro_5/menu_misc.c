@@ -105,4 +105,5 @@ elk_event_t menu_handle_startmovie(ALLEGRO_EVENT * event)
 elk_event_t menu_handle_stopmovie (ALLEGRO_EVENT * event)
 {
     callback_handlers.handle_stopmovie();
+    return(ELK_EVENT_NONE);
 }

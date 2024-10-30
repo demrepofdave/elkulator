@@ -199,7 +199,6 @@ ALLEGRO_MENU *create_settings_menu(void)
 // Called when IDM_SETTINGS_VIDEO_DISPLAY event is recieved.
 elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
 {
-    ALLEGRO_MENU *menu = (ALLEGRO_MENU *)(event->user.data3);
     elkConfig.display.drawmode = menu_get_num(event);
     update_radio_set(event, VIDEO_DISPLAY_TYPE_MAX - 1);
     return(ELK_EVENT_NONE);
@@ -210,7 +209,7 @@ elk_event_t menu_handle_toggle_aspect_ratio(ALLEGRO_EVENT * event)
 {
     elkConfig.display.maintain_aspect_ratio=!elkConfig.display.maintain_aspect_ratio;
     video_resize_elk_window((elkConfig.display.maintain_aspect_ratio == 1));
-    return(ELK_EVENT_NONE);
+return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_INTERNAL_SPEAKER event is recieved.
@@ -282,7 +281,6 @@ elk_event_t menu_handle_memory_turbo_toggle(ALLEGRO_EVENT * event)
 // Called when IDM_SETTINGS_MEMORY_MRB_MODE event is recieved.
 elk_event_t menu_handle_master_ram_board_mode(ALLEGRO_EVENT * event)
 {
-    ALLEGRO_MENU * menu = (ALLEGRO_MENU *)(event->user.data3);
     int item = menu_get_num(event);
     update_radio_set(event, RAMBOARD_NAMES_MAX - 1);
 

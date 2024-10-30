@@ -108,21 +108,26 @@ void initpaltables()
     initcoef();
 }
 
-//  0xFFrrGGbb
 
-void palfilter(ALLEGRO_LOCKED_REGION * regionSource, ALLEGRO_LOCKED_REGION * regionDest, int depth)
+void palfilter(ALLEGRO_BITMAP * destBitmap)
 {
     int x,y;
     uint32_t c;
     int r,g,b;
-    int index;
+    char * region_data = NULL;
 
+    log_time_mark("palfilt - begin");
     al_fixed constr=al_ftofix(-0.509f);
     al_fixed constb=al_ftofix(0.194);
     al_fixed paly,palry,palby;
 
+    ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+    log_time_mark("palfilt - locked");
+
     for (y=0;y<512;y++)
     {
+        region_data = (char *)destRegion->data + (destRegion->pitch * y);
+
         yx[2]=yx[1]=yx[0]=0;
         yy[2]=yy[1]=yy[0]=0;
         rx[0]=ry[0]=rx[1]=ry[1]=0;
@@ -130,14 +135,12 @@ void palfilter(ALLEGRO_LOCKED_REGION * regionSource, ALLEGRO_LOCKED_REGION * reg
 //                iir(0,1);
         for (x=0;x<640;x++)
         {
-            c = video_get_pixel_rgb(regionSource, y >> 1,x);
-            r = ((c >> 16) & 0xff); 
-            g = ((c >>  8) & 0xff);
-            b = (c & 0xff);
-            // TODO: Convert back to old table format for now.
-            index = 0 + (r==255?1:0) + (g==255?2:0) + (b==255?4:0);
+            c = video_get_pixel(y >> 1, x);
+            r = (c & 1)?255:0; 
+            g = (c & 2)?255:0; 
+            b = (c & 4)?255:0;
 
-            paly=ytable[index];
+            paly=ytable[c];
             palry=al_itofix(r)-paly;
             palby=al_itofix(b)-paly;
 
@@ -158,8 +161,17 @@ void palfilter(ALLEGRO_LOCKED_REGION * regionSource, ALLEGRO_LOCKED_REGION * reg
             if (g<0)   g=0;
             if (b>255) b=255;
             if (b<0)   b=0;
-            c = 0xFF000000 | (r << 16) | (g << 8) | b;
-            video_put_pixel_rgb(regionDest, y, x, c);
+            c = 0xff000000 | (r << 16) | (g << 8) | b;
+
+            // Plot to the correct pixel
+            *((uint32_t *)((char *)region_data)) = c;
+
+            region_data += destRegion->pixel_size;
+            //video_put_pixel_rgb(destRegion, y, x, c);
         }
     }
+    log_time_mark("palfilt - loopend");
+    al_unlock_bitmap(destBitmap);
+    log_time_mark("palfilt - unlock and end");
+    log_time_display();
 }

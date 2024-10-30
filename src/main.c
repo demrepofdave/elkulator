@@ -96,7 +96,6 @@ void initHandlers()
 void initelk(int argc, char *argv[])
 {
         int c;
-        char *p;
         int tapenext=0;
         int discnext=0;
         int romnext=-2;
@@ -252,6 +251,9 @@ int runelkframe=0;
 void runelk()
 {
         int c;
+        log_time_mark("=== Timer tick ===");
+        log_time_display();
+        log_timer_begin("=== Runelk ===");
         if (drawit || (tapeon && elkConfig.tape.speed))
         {
                 if (drawit) drawit--;
@@ -287,6 +289,7 @@ void runelk()
         }
         else
            video_rest(1);
+        log_time_mark("=== Runelk end ===");
 }
 
 void closeelk()

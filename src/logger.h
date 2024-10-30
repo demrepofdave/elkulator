@@ -9,5 +9,7 @@
 #define log_debug(f_, ...) log_msg(__FUNCTION__,(f_), ##__VA_ARGS__) // TODO: stdout? to file?
 
 void log_msg(const char * function, char *format, ...);
-
+void log_timer_begin();
+void log_time_mark(const char *msg);
+void log_time_display();
 #endif // _LOGGER_H
