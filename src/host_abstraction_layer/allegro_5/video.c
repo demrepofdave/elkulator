@@ -74,7 +74,7 @@ elk_pallete_t elkpal[8] =
     0xffffff00,
     0xff0000ff,
     0xffff00ff,
-    0xffffff00,
+    0xff00ffff,
     0xffffffff
 };
 
@@ -156,9 +156,6 @@ int video_init_part1()
     al_clear_to_color(black);
 
     moviebitmap = al_create_bitmap(640,256);
-    //colblack = 0xff000000;
-    //colwhite = 0xffffffff;
-    // border_col = al_map_rgb(0, 0, 0);
 
     b = al_create_bitmap(640, 616);
     al_set_target_bitmap(b);
