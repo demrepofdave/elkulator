@@ -179,19 +179,36 @@ void blit_normal(BITMAP * destBitmap)
     int y = 0;
     int x = 0;
     int color = 0;
-    char * region_data = NULL;
     
-    //ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+    // Here we create B from the memory data we have assembled.
+    for(y=0; y<256; y++)
+    {
+        for(x=0; x<640; x++)
+        {
+            color = *(movie_frame_data + (y * 640) + x);
+            destBitmap->line[y*2][x] = color;
+            destBitmap->line[y*2+1][x] = color;
+        }
+    }
+}
+
+void blit_scanlines(BITMAP * destBitmap)
+{
+    int y = 0;
+    int x = 0;
+    int color = 0;
+
+    clear(destBitmap);
 
     // Here we create B from the memory data we have assembled.
     for(y=0; y<256; y++)
     {
         for(x=0; x<640; x++)
         {
-            destBitmap->line[y][x] = color;
+            color = *(movie_frame_data + (y * 640) + x);
+            destBitmap->line[y*2][x] = color;
         }
     }
-//    al_unlock_bitmap(destBitmap);
 }
 
 void video_blit_to_screen(int drawMode, int colDepth)
@@ -201,17 +218,13 @@ void video_blit_to_screen(int drawMode, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
-            blit_normal(b);
+            blit_scanlines(b);
             blit(b,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case LINEDBL:
             blit_normal(b);
-            for (c=0;c<512;c++)
-            {
-                blit(b,b16,0,c>>1,0,c,640,1);
-            }
-            blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
+            blit(b,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case _2XSAI:
