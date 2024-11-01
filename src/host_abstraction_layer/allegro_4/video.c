@@ -8,6 +8,7 @@
 #include <allegro.h>
 #include "host_abstraction_layer/video.h"
 #include "video_internal.h"
+#include "logger.h"
 
 BITMAP *b = NULL;    // Main bitmap used before blitting to window screen.
 BITMAP *b16 = NULL;  // Intermediate bitmap 1
@@ -31,6 +32,9 @@ PALETTE elkpal =
 };
 
 window_config_t main_window;
+
+uint8_t movie_frame_data[640*256];
+
 
 // Called from linux.c (main)
 int video_init_part1()
@@ -116,20 +120,41 @@ int video_get_desktop_color_depth()
     return(desktop_color_depth());
 }
 
+uint32_t video_get_pixel(int y, int x)
+{
+    return *(movie_frame_data + (y * 640) + x);
+}
+
 // TODO: Depricated.
 void video_put_pixel(int y, int x, uint8_t color)
 {
-    b->line[y][x]=color;
+    if(x >= 640 || y >= 256)
+    {
+        log_debug("Overflow %d, %d", x, y);
+    }
+    else
+    {
+        *(movie_frame_data + (y * 640) + x) = color;
+    }
 }
 
 void video_put_pixel_line(int y, int x, int width, uint8_t color)
 {
-    int count = 0;
-    for(count = 0; count < width; count++)
+    int count = width;
+
+    if((x + width) >= 640 || y >= 256)
     {
-        b->line[y][x + count]=color;
+        log_debug("Overflow %d, %d", x, y);
+    }
+    else
+    {
+        while (count--) 
+        {
+            *(movie_frame_data + (y * 640) + x + count) = color;
+        }
     }
 }
+
 
 #ifdef WIN32
 CRITICAL_SECTION cs;
@@ -149,6 +174,26 @@ void endblit()
     #endif
 }
 
+void blit_normal(BITMAP * destBitmap)
+{
+    int y = 0;
+    int x = 0;
+    int color = 0;
+    char * region_data = NULL;
+    
+    //ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+
+    // Here we create B from the memory data we have assembled.
+    for(y=0; y<256; y++)
+    {
+        for(x=0; x<640; x++)
+        {
+            destBitmap->line[y][x] = color;
+        }
+    }
+//    al_unlock_bitmap(destBitmap);
+}
+
 void video_blit_to_screen(int drawMode, int colDepth)
 {
     int c;
@@ -156,48 +201,42 @@ void video_blit_to_screen(int drawMode, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
+            blit_normal(b);
             blit(b,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case LINEDBL:
-            #ifdef WIN32
-                blit(b,vidb,0,0,0,0,640,256);
-                if (elkConfig.display.videoresize)
-                {
-                    stretch_blit(vidb,screen,0,0,640,256,0,0,winsizex,winsizey);
-                } 
-                else             
-                {
-                    stretch_blit(vidb,screen,0,0,640,256,(winsizex-640)/2,(winsizey-512)/2,640,512);
-                }
-            #else
-                for (c=0;c<512;c++)
-                {
-                    blit(b,b16,0,c>>1,0,c,640,1);
-                }
-                blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
-            #endif
+            blit_normal(b);
+            for (c=0;c<512;c++)
+            {
+                blit(b,b16,0,c>>1,0,c,640,1);
+            }
+            blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case _2XSAI:
+            blit_normal(b);
             blit(b,b162,0,0,0,0,640,256);
             Super2xSaI(b162,b16,0,0,0,0,320,256);
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case SCALE2X:
+            blit_normal(b);
             blit(b,b162,0,0,0,0,640,256);
             scale2x(b162,b16,320,256);
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case EAGLE:
+            blit_normal(b);
             blit(b,b162,0,0,0,0,640,256);
             SuperEagle(b162,b16,0,0,0,0,320,256);
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case PAL: // TODO: Not currently working (blank screen)
+            blit_normal(b);
             palfilter(b,b16,colDepth);
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
@@ -269,9 +308,9 @@ void video_render_frame_for_movie()
 
 uint8_t * video_get_moviebitmap_data()
 {
-    return(moviebitmap->dat);
+    return(movie_frame_data);
 }
-                                                        
+
 void video_clearall()
 {
     clear(b);

@@ -351,11 +351,6 @@ uint32_t video_get_pixel(int y, int x)
     return *(movie_frame_data + (y * 640) + x);
 }
 
-void video_put_pixel_rgb(ALLEGRO_LOCKED_REGION * regionA, int y, int x, uint32_t rgb)
-{
-    *((uint32_t *)((char *)regionA->data + regionA->pitch * y + x * regionA->pixel_size)) = rgb;
-}
-
 void video_put_pixel(int y, int x, uint8_t color)
 {
     if(x >= 640 || y >= 256)
@@ -366,7 +361,6 @@ void video_put_pixel(int y, int x, uint8_t color)
     {
         *(movie_frame_data + (y * 640) + x) = color;
     }
-
 }
 
 void video_put_pixel_line(int y, int x, int width, uint8_t color)

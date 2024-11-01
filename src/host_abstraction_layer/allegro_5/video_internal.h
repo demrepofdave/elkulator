@@ -14,7 +14,6 @@
 
 
 uint32_t video_get_pixel(int y, int x);
-void video_put_pixel_rgb(ALLEGRO_LOCKED_REGION * regionA, int y, int x, uint32_t rgb);
 
 int Init_2xSaI(int depth);
 void Super2xSaI(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);

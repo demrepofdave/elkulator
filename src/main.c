@@ -104,7 +104,8 @@ void initelk(int argc, char *argv[])
         int serialdebugnext=0;
         fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
         #ifdef HAL_ALLEGRO_4
-            p = fileutils_get_filename(exedir);
+            // TODO: Tidy-up.
+            char *p = fileutils_get_filename(exedir);
             p[0] = 0;
         #endif
         elkConfig.disc.discname[0]  = 0;
