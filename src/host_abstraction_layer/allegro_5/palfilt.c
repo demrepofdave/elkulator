@@ -160,9 +160,9 @@ void palfilter(ALLEGRO_BITMAP * destBitmap)
             palry = firry(palry);
             palby = firby(palby);
 
-            red = palry+paly; 
-            green = palby+paly; 
-            blue = (constr * palry) - (constb * palby) + paly;
+            red   = palry+paly; 
+            blue  = palby+paly; 
+            green = (constr * palry) - (constb * palby) + paly;
 
             if (red>255) red=255;
             if (red<0)   red=0;
