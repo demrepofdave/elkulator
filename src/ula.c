@@ -36,19 +36,20 @@ typedef struct
     int modescs;
     uint16_t modelens;   // Length of screen memory for this mode in bytes.
     int modeend;         // scanline upon which mode ends.
+    int modepixellength; // Length in mode 0 pixels of current mode pixels - TODO: Better description.
     uint8_t colour_mask;
 } mode_info_t;
 
 
-//                                        modescs, modelens, modeend, mode colour mask
-mode_info_t modeInfo[ELECTRON_MODES_MAX] = { {  8,   0x5000,     256, TWO_COLOUR_MASK     },  // MODE 0
-                                             {  8,   0x5000,     256, FOUR_COLOUR_MASK    },  // MODE 1 
-                                             {  8,   0x5000,     256, SIXTEEN_COLOUR_MASK },  // MODE 2
-                                             { 10,   0x4000,     250, TWO_COLOUR_MASK     },  // MODE 3
-                                             {  8,   0x2800,     256, TWO_COLOUR_MASK     },  // MODE 4
-                                             {  8,   0x2800,     256, FOUR_COLOUR_MASK    },  // MODE 5
-                                             { 10,   0x2000,     250, TWO_COLOUR_MASK     },  // MODE 6
-                                             { 10,   0x2000,     250, TWO_COLOUR_MASK     } };// MODE 6 (7 on BBC micro but teletext is not support so same as mode 6).
+//                                        modescs, modelens, modeend, pixlen, mode colour mask
+mode_info_t modeInfo[ELECTRON_MODES_MAX] = { {  8,   0x5000,     256, 1,      TWO_COLOUR_MASK     },  // MODE 0
+                                             {  8,   0x5000,     256, 2,      FOUR_COLOUR_MASK    },  // MODE 1 
+                                             {  8,   0x5000,     256, 4,      SIXTEEN_COLOUR_MASK },  // MODE 2
+                                             { 10,   0x4000,     250, 1,      TWO_COLOUR_MASK     },  // MODE 3
+                                             {  8,   0x2800,     256, 2,      TWO_COLOUR_MASK     },  // MODE 4
+                                             {  8,   0x2800,     256, 4,      FOUR_COLOUR_MASK    },  // MODE 5
+                                             { 10,   0x2000,     250, 2,      TWO_COLOUR_MASK     },  // MODE 6
+                                             { 10,   0x2000,     250, 2,      TWO_COLOUR_MASK     } };// MODE 6 (7 on BBC micro but teletext is not support so same as mode 6).
 
 
 void dosavescrshot();
@@ -80,6 +81,8 @@ int sndstreamindex = 0;
 int sndstreamcount = 0;
 char scrshotname[260];
 char moviename[260];
+uint8_t electron_screen[640*256];
+
 
 struct
 {
@@ -157,6 +160,35 @@ void leavefullscreen()
         video_set_gfx_mode_windowed();
 //        #endif
         video_set_depth_and_elk_palette();
+}
+
+void put_pixel(int y, int x, uint8_t color)
+{
+    if(x >= 640 || y >= 256)
+    {
+        log_debug("Overflow %d, %d", x, y);
+    }
+    else
+    {
+        *(electron_screen + (y * 640) + x) = color;
+    }
+}
+
+void put_pixel_line(int y, int x, int width, uint8_t color)
+{
+    int count = width;
+
+    if((x + width) > 640 || y >= 256)
+    {
+        log_debug("Overflow %d, %d", x, y);
+    }
+    else
+    {
+        while (count--) 
+        {
+            *(electron_screen + (y * 640) + x + count) = color;
+        }
+    }
 }
 
 void resetula()
@@ -562,7 +594,7 @@ void yield()
                         {
                                 for (x=0;x<8;x++)
                                 {
-                                    video_put_pixel(ula.y, (ula.x+x), 0);
+                                    put_pixel(ula.y, (ula.x+x), 0);
                                 }
                         }
                         else if (!(ula.x&8) || !(ula.mode&4))
@@ -590,7 +622,7 @@ void yield()
                                         for (x=0;x<8;x++)
                                         {
                                                 col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
+                                                put_pixel_line(ula.y, (ula.x+x), modeInfo[ula.mode].modepixellength, pal[col]);
                                                 temp<<=1;
                                         }
                                         break;
@@ -598,9 +630,7 @@ void yield()
                                         for (x=0;x<8;x+=2)
                                         {
                                                 col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
+                                                put_pixel_line(ula.y, (ula.x+x), modeInfo[ula.mode].modepixellength, pal[col]);
                                                 temp<<=1;
                                         }
                                         break;
@@ -608,10 +638,7 @@ void yield()
                                         for (x=0;x<8;x+=4)
                                         {
                                                 col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x+2), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x+3), pal[col]);
+                                                put_pixel_line(ula.y, (ula.x+x), modeInfo[ula.mode].modepixellength, pal[col]);
                                                 temp<<=1;
                                         }
                                         break;
@@ -621,8 +648,7 @@ void yield()
                                         for (x=0;x<16;x+=2)
                                         {
                                                 col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
+                                                put_pixel_line(ula.y, (ula.x+x), modeInfo[ula.mode].modepixellength, pal[col]);
                                                 temp<<=1;
                                         }
                                         break;
@@ -630,10 +656,7 @@ void yield()
                                         for (x=0;x<16;x+=4)
                                         {
                                                 col=ulalookup[ temp & modeInfo[ula.mode].colour_mask ];
-                                                video_put_pixel(ula.y, (ula.x+x), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x+1), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x+2), pal[col]);
-                                                video_put_pixel(ula.y, (ula.x+x+3), pal[col]);
+                                                put_pixel_line(ula.y, (ula.x+x), modeInfo[ula.mode].modepixellength, pal[col]);
                                                 temp<<=1;
                                         }
                                         break;
@@ -651,7 +674,7 @@ void yield()
                         // make this blank.,
                         for (x=0;x<8;x++)
                         {
-                            video_put_pixel(ula.y, (ula.x+x), 0);
+                            put_pixel(ula.y, (ula.x+x), 0);
                         }
                         ula.x+=8;
                         ulacycles++;
@@ -751,7 +774,7 @@ void yield()
                                         
                                         if (ula.draw)
                                         {
-                                                video_blit_to_screen(elkConfig.display.drawmode, coldepth);
+                                                video_blit_to_screen(elkConfig.display.drawmode, electron_screen, coldepth);
                                                 //startblit()
                                                 if (wantsavescrshot) dosavescrshot();
                                                 if (wantmovieframe) saveframe();
@@ -914,7 +937,7 @@ void dosavescrshot()
 {
         log_debug("name='%s'", scrshotname);
         video_capture_screenshot(elkConfig.display.drawmode, coldepth);
-        video_save_bmp(scrshotname);
+        video_save_screenshot_bmp(scrshotname);
         video_destroy_screenshot();
         wantsavescrshot=0;
 }
@@ -966,7 +989,7 @@ int deflate_bitmap(int level)
 
     /* Compress the bitmap buffer. */
     strm.avail_in = 640*256;
-    strm.next_in = video_get_moviebitmap_data();
+    strm.next_in = electron_screen;
 
     log_debug("Save frame %02x, %02x, %02x, %02x", *strm.next_in, *(strm.next_in+1), *(strm.next_in+2), *(strm.next_in+3));
 
@@ -1004,8 +1027,6 @@ void saveframe()
            one for the next frame. */
         start = sndstreamindex;
     }
-
-    video_render_frame_for_movie();
 
     if (deflate_bitmap(6) != Z_OK) 
     {

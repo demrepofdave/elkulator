@@ -33,9 +33,6 @@ PALETTE elkpal =
 
 window_config_t main_window;
 
-uint8_t movie_frame_data[640*256];
-
-
 // Called from linux.c (main)
 int video_init_part1()
 {
@@ -120,41 +117,6 @@ int video_get_desktop_color_depth()
     return(desktop_color_depth());
 }
 
-uint32_t video_get_pixel(int y, int x)
-{
-    return *(movie_frame_data + (y * 640) + x);
-}
-
-// TODO: Depricated.
-void video_put_pixel(int y, int x, uint8_t color)
-{
-    if(x >= 640 || y >= 256)
-    {
-        log_debug("Overflow %d, %d", x, y);
-    }
-    else
-    {
-        *(movie_frame_data + (y * 640) + x) = color;
-    }
-}
-
-void video_put_pixel_line(int y, int x, int width, uint8_t color)
-{
-    int count = width;
-
-    if((x + width) >= 640 || y >= 256)
-    {
-        log_debug("Overflow %d, %d", x, y);
-    }
-    else
-    {
-        while (count--) 
-        {
-            *(movie_frame_data + (y * 640) + x + count) = color;
-        }
-    }
-}
-
 
 #ifdef WIN32
 CRITICAL_SECTION cs;
@@ -174,7 +136,7 @@ void endblit()
     #endif
 }
 
-void blit_normal(BITMAP * destBitmap)
+void blit_normal(BITMAP * destBitmap, char * elk_screen_data)
 {
     int y = 0;
     int x = 0;
@@ -185,14 +147,14 @@ void blit_normal(BITMAP * destBitmap)
     {
         for(x=0; x<640; x++)
         {
-            color = *(movie_frame_data + (y * 640) + x);
+            color = *(elk_screen_data + (y * 640) + x);
             destBitmap->line[y*2][x] = color;
             destBitmap->line[y*2+1][x] = color;
         }
     }
 }
 
-void blit_scanlines(BITMAP * destBitmap)
+void blit_scanlines(BITMAP * destBitmap, char * elk_screen_data)
 {
     int y = 0;
     int x = 0;
@@ -205,51 +167,51 @@ void blit_scanlines(BITMAP * destBitmap)
     {
         for(x=0; x<640; x++)
         {
-            color = *(movie_frame_data + (y * 640) + x);
+            color = *(elk_screen_data + (y * 640) + x);
             destBitmap->line[y*2][x] = color;
         }
     }
 }
 
-void video_blit_to_screen(int drawMode, int colDepth)
+void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
 {
     int c;
     startblit();
     switch (drawMode)
     {
         case SCANLINES:
-            blit_scanlines(b);
+            blit_scanlines(b, elk_screen_data);
             blit(b,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case LINEDBL:
-            blit_normal(b);
+            blit_normal(b, elk_screen_data);
             blit(b,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case _2XSAI:
-            blit_normal(b);
+            blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             Super2xSaI(b162,b16,0,0,0,0,320,256);
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case SCALE2X:
-            blit_normal(b);
+            blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             scale2x(b162,b16,320,256);
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case EAGLE:
-            blit_normal(b);
+            blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             SuperEagle(b162,b16,0,0,0,0,320,256);
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
 
         case PAL: // TODO: Not currently working (blank screen)
-            blit_normal(b);
+            blit_normal(b, elk_screen_data);
             palfilter(b,b16,colDepth);
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
@@ -264,36 +226,38 @@ void video_capture_screenshot(int drawMode, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
+            blit_scanlines(b, elk_screen_data);
             blit(b,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case LINEDBL:
-            #ifdef WIN32
-                stretch_blit(vidb,tb,0,0,640,256,0,0,640,512);
-            #else
-                blit(b16,bm_screenshot,0,0,0,0,640,512);
-            #endif
+            blit_normal(b, elk_screen_data);
+            blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case _2XSAI:
+            blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             Super2xSaI(b162,b16,0,0,0,0,320,256);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case SCALE2X:
+            blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             scale2x(b162,b16,320,256);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case EAGLE:
+            blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             SuperEagle(b162,b16,0,0,0,0,320,256);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case PAL:
+            blit_normal(b, elk_screen_data);
             palfilter(b,b16,colDepth);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
@@ -301,7 +265,7 @@ void video_capture_screenshot(int drawMode, int colDepth)
     set_color_depth(8);
 }
 
-int video_save_bmp(const char * filename)
+int video_save_screenshot_bmp(const char * filename)
 {
     return(save_bmp(filename, bm_screenshot, NULL));
 }
@@ -312,16 +276,6 @@ void video_destroy_screenshot()
         destroy_bitmap(bm_screenshot);
         bm_screenshot = NULL;
     }
-}
-
-void video_render_frame_for_movie()
-{
-    blit(b,moviebitmap,0,0,0,0,640,256);
-}
-
-uint8_t * video_get_moviebitmap_data()
-{
-    return(movie_frame_data);
 }
 
 void video_clearall()

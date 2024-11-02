@@ -80,8 +80,6 @@ elk_pallete_t elkpal[8] =
 
 window_config_t main_window;
 
-uint8_t movie_frame_data[640*256];
-
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
@@ -346,40 +344,6 @@ int video_get_desktop_color_depth()
     return(8); // TODO: probably won't need this in allegro5
 }
 
-uint32_t video_get_pixel(int y, int x)
-{
-    return *(movie_frame_data + (y * 640) + x);
-}
-
-void video_put_pixel(int y, int x, uint8_t color)
-{
-    if(x >= 640 || y >= 256)
-    {
-        log_debug("Overflow %d, %d", x, y);
-    }
-    else
-    {
-        *(movie_frame_data + (y * 640) + x) = color;
-    }
-}
-
-void video_put_pixel_line(int y, int x, int width, uint8_t color)
-{
-    int count = width;
-
-    if((x + width) >= 640 || y >= 256)
-    {
-        log_debug("Overflow %d, %d", x, y);
-    }
-    else
-    {
-        while (count--) 
-        {
-            *(movie_frame_data + (y * 640) + x + count) = color;
-        }
-    }
-}
-
 //#ifdef WIN32
 //CRITICAL_SECTION cs;
 //#endif
@@ -398,7 +362,7 @@ void endblit()
 //    #endif
 }
 
-void blit_normal(ALLEGRO_BITMAP * destBitmap)
+void blit_normal(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
 {
     int y = 0;
     int x = 0;
@@ -413,7 +377,7 @@ void blit_normal(ALLEGRO_BITMAP * destBitmap)
         region_data = (char *)destRegion->data + (destRegion->pitch * y);
         for(x=0; x<640; x++)
         {
-            color = *(movie_frame_data + (y * 640) + x);
+            color = *(elk_screen_data + (y * 640) + x);
             *((uint32_t *)((char *)region_data)) = elkpal[color];
             region_data += destRegion->pixel_size;
         }
@@ -421,7 +385,7 @@ void blit_normal(ALLEGRO_BITMAP * destBitmap)
     al_unlock_bitmap(destBitmap);
 }
 
-void blit_scanlines(ALLEGRO_BITMAP * destBitmap)
+void blit_scanlines(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
 {
     int y = 0;
     int x = 0;
@@ -440,7 +404,7 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap)
         region_scan = (char *)destRegion->data + (destRegion->pitch * ((y * 2) + 1));
         for(x=0; x<640; x++)
         {
-            color = *(movie_frame_data + (y * 640) + x);
+            color = *(elk_screen_data + (y * 640) + x);
             *((uint32_t *)((char *)region_data)) = elkpal[color];
             *((uint32_t *)((char *)region_scan)) = 0xff000000;
             region_data += destRegion->pixel_size;
@@ -451,7 +415,7 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap)
 }
 
 
-void video_blit_to_screen(int drawMode, int colDepth)
+void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
 {
     //log_timer_begin();
     //log_time_mark("video_blit_to_screen - start");
@@ -461,7 +425,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
-            blit_scanlines(b16);
+            blit_scanlines(b16, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b16, 0,0,640,512,
                                        main_window.current_elk.startx, main_window.current_elk.starty,
@@ -469,7 +433,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
             break;
 
         case LINEDBL:
-            blit_normal(b);
+            blit_normal(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
                                      main_window.current_elk.startx, main_window.current_elk.starty,
@@ -505,7 +469,7 @@ void video_blit_to_screen(int drawMode, int colDepth)
 
         case PAL:
         {
-            palfilter(b16);
+            palfilter(b16, elk_screen_data);
             log_time_mark("video_blit_to_screen - pmid");
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b16, 0,0,640,512, 
@@ -559,7 +523,7 @@ void video_capture_screenshot(int drawMode, int colDepth)
     }
 }
 
-int video_save_bmp(const char * filename)
+int video_save_screenshot_bmp(const char * filename)
 {
     return(al_save_bitmap(filename, bm_screenshot));
 }
@@ -571,18 +535,6 @@ void video_destroy_screenshot()
         al_destroy_bitmap(bm_screenshot);
         bm_screenshot = NULL;
     }
-}
-
-void video_render_frame_for_movie()
-{
-    // TODO: Only works correctly with line-double filter.
-    al_set_target_bitmap(moviebitmap);
-    al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,256, 0);
-}
-
-uint8_t * video_get_moviebitmap_data()
-{
-    return(movie_frame_data);
 }
                                                         
 void video_clearall()

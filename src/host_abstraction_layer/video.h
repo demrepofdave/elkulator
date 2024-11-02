@@ -92,16 +92,10 @@ void video_set_depth_and_elk_palette();
 void video_set_desktop_color_depth();
 int  video_get_desktop_color_depth();
 
-void video_put_pixel(int y, int x, uint8_t color); // TODO: Depricated
-void video_put_pixel_line(int y, int x, int width, uint8_t color);
-
-void video_blit_to_screen(int drawMode, int colDepth);
+void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth);
 void video_capture_screenshot(int drawMode, int colDepth);
-int  video_save_bmp(const char * filename);
+int  video_save_screenshot_bmp(const char * filename);
 void video_destroy_screenshot();
-
-void video_render_frame_for_movie();
-uint8_t * video_get_moviebitmap_data(); // TODO: Assume char *?
 
 void video_clearall();
 

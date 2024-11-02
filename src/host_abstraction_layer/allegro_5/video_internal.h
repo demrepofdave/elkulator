@@ -13,8 +13,6 @@
 #define uint8 unsigned char
 
 
-uint32_t video_get_pixel(int y, int x);
-
 int Init_2xSaI(int depth);
 void Super2xSaI(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);
 void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);
@@ -23,7 +21,7 @@ void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int 
 void scale2x(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int width, int height);
 
 void initpaltables();
-void palfilter(ALLEGRO_BITMAP * destBitmap);
+void palfilter(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data);
 
 void Super2xSaI_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height);
 void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height);

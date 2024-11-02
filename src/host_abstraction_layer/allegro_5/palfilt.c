@@ -120,7 +120,7 @@ void initpaltables()
 }
 
 
-void palfilter(ALLEGRO_BITMAP * destBitmap)
+void palfilter(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
 {
     int x,y;
     uint32_t c;
@@ -141,7 +141,7 @@ void palfilter(ALLEGRO_BITMAP * destBitmap)
         bx[0]=by[0]=bx[1]=by[1]=0;
         for (x=0;x<640;x++)
         {
-            c = video_get_pixel(y >> 1, x);
+            c = *(elk_screen_data + ((y >> 1) * 640) + x);
 
             red = (c & 1)?255:0; 
             green = (c & 2)?255:0; 
