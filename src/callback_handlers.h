@@ -31,6 +31,7 @@ typedef struct
     callback_filename_t handle_screenshot;
     callback_filename_t handle_startmovie;
     callback_void_t     handle_stopmovie;
+    callback_void_t     handle_enable_debugger;
 
 } callback_handlers_t;
 

@@ -91,6 +91,7 @@ void initHandlers()
         callback_handlers.handle_screenshot = savescrshot;
         callback_handlers.handle_startmovie = startmovie;
         callback_handlers.handle_stopmovie = stopmovie;
+        callback_handlers.handle_enable_debugger= startdebug;
 }
 
 void initelk(int argc, char *argv[])

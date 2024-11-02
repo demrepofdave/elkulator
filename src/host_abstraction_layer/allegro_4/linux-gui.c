@@ -664,7 +664,6 @@ int gui_stopmovie()
 
 int gui_startdebugging()
 {
-    debug=debugon=1;
     startdebug();
     return D_O_K;
 }

@@ -21,6 +21,7 @@
 elk_event_t menu_handle_screenshot(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_startmovie(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_stopmovie (ALLEGRO_EVENT * event);
+elk_event_t menu_handle_enable_debugger (ALLEGRO_EVENT * event);
 
 /******************************************************************************
 * Private Function Definitions
@@ -34,10 +35,10 @@ elk_event_t menu_handle_stopmovie (ALLEGRO_EVENT * event);
 ALLEGRO_MENU *create_misc_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
-    append_menu_item(menu, "Save screenshot", IDM_SETTINGS_MISC_SCREENSHOT,  0, menu_handle_screenshot);
-    append_menu_item(menu, "Start movie",     IDM_SETTINGS_MISC_START_MOVIE, 0, menu_handle_startmovie);
-    append_menu_item(menu, "Stop movie",      IDM_SETTINGS_MISC_STOP_MOVIE,  0, menu_handle_stopmovie);
-    al_append_menu_item(menu, "Start debugging", IDM_SETTINGS_MISC_START_DEBUGGING, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+    append_menu_item(menu, "Save screenshot", IDM_SETTINGS_MISC_SCREENSHOT,      0, menu_handle_screenshot);
+    append_menu_item(menu, "Start movie",     IDM_SETTINGS_MISC_START_MOVIE,     0, menu_handle_startmovie);
+    append_menu_item(menu, "Stop movie",      IDM_SETTINGS_MISC_STOP_MOVIE,      0, menu_handle_stopmovie);
+    append_menu_item(menu, "Start debugging", IDM_SETTINGS_MISC_START_DEBUGGING, 0, menu_handle_enable_debugger);
     return menu;
 }
 
@@ -105,5 +106,12 @@ elk_event_t menu_handle_startmovie(ALLEGRO_EVENT * event)
 elk_event_t menu_handle_stopmovie (ALLEGRO_EVENT * event)
 {
     callback_handlers.handle_stopmovie();
+    return(ELK_EVENT_NONE);
+}
+
+// Called when IDM_SETTINGS_MISC_START_DEBUGGING event is recieved.
+elk_event_t menu_handle_enable_debugger (ALLEGRO_EVENT * event)
+{
+    callback_handlers.handle_enable_debugger();
     return(ELK_EVENT_NONE);
 }

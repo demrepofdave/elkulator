@@ -28,6 +28,7 @@ void debugout(char *s)
 
 void startdebug()
 {
+        debug=debugon=1;
 }
 
 int debugopen=0;
