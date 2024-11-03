@@ -129,7 +129,7 @@ void palfilter(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
     char * region_data = NULL;
 
     ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
-    log_time_mark("palfilt - locked");
+    //log_time_mark("palfilt - locked");
 
     for (y=0;y<512;y++)
     {
@@ -180,5 +180,5 @@ void palfilter(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
         }
     }
     al_unlock_bitmap(destBitmap);
-    log_time_mark("palfilt - unlock and end");
+    //log_time_mark("palfilt - unlock and end");
 }

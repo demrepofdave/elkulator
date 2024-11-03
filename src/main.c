@@ -250,12 +250,14 @@ int oldbreak=0;
 int resetit=0;
 int runelkframe=0;
 
+int timing_debug_stats = 0;
+
 void runelk()
-{
+{       
+        long timestamp_start = log_get_timestamp();
+        long timestamp_diff = 0;
         int c;
-        log_time_mark("=== Timer tick ===");
-        log_time_display();
-        log_timer_begin("=== Runelk ===");
+        //log_time_mark("=== runelk begin ===");
         if (drawit || (tapeon && elkConfig.tape.speed))
         {
                 if (drawit) drawit--;
@@ -291,7 +293,17 @@ void runelk()
         }
         else
            video_rest(1);
-        log_time_mark("=== Runelk end ===");
+
+        timestamp_diff = log_get_timestamp() - timestamp_start;
+        log_debug("runelk time taken = %ld", timestamp_diff);
+        //log_time_mark("=== runelk end   ===");
+        if(timing_debug_stats++ == 20)
+        {
+                //log_time_display();
+                //log_timer_begin("=== ignore ===");
+                timing_debug_stats = 0;
+        }
+
 }
 
 void closeelk()

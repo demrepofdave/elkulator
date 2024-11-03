@@ -470,7 +470,7 @@ void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
         case PAL:
         {
             palfilter(b16, elk_screen_data);
-            log_time_mark("video_blit_to_screen - pmid");
+            //log_time_mark("video_blit_to_screen - pmid");
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b16, 0,0,640,512, 
                                      main_window.current_elk.startx, main_window.current_elk.starty,

@@ -8,6 +8,16 @@
 
 #include "logger.h"
 
+typedef struct
+{
+    long timestamp;
+    char msg[128];
+} t_timeEntry;
+
+static t_timeEntry log_timing_list[1024];
+
+static int timeEntryIndex = 0;
+
 void log_msg(const char * function, char *format, ...)
 {
     char buf[1024];
@@ -30,19 +40,16 @@ void log_msg(const char * function, char *format, ...)
     vsprintf(buf, format, ap);
     va_end(ap);
     fprintf(stdout, "%s %-16s:%s\n", time_buf, function, buf);
-    //fputs(buf,rlog);
     fflush(stdout);
 }
 
-typedef struct
+long log_get_timestamp()
 {
-    long timestamp;
-    char msg[128];
-} t_timeEntry;
-
-static t_timeEntry log_timing_list[1024];
-
-static int timeEntryIndex = 0;
+    struct timeval tv;
+    struct timezone tz;
+    gettimeofday(&tv, &tz);
+    return ((tv.tv_sec % 100000) * 1000000) + tv.tv_usec;
+}
 
 void log_timer_begin(const char *msg)
 {
@@ -57,7 +64,7 @@ void log_time_mark(const char *msg)
     if(timeEntryIndex < 1024)
     {
         gettimeofday(&tv, &tz);
-        log_timing_list[timeEntryIndex].timestamp = ((tv.tv_sec % 100000) * 1000000) + tv.tv_usec;
+        log_timing_list[timeEntryIndex].timestamp = log_get_timestamp();
         strncpy(log_timing_list[timeEntryIndex].msg, msg, 127);
         timeEntryIndex++;
     }
