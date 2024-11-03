@@ -177,6 +177,7 @@ void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
 {
     int c;
     startblit();
+    video_set_desktop_color_depth();
     switch (drawMode)
     {
         case SCANLINES:
@@ -216,6 +217,7 @@ void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
             blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
             break;
     }
+    set_color_depth(8);
     endblit();
 }
 
