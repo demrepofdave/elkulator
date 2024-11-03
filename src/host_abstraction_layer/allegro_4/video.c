@@ -226,38 +226,38 @@ void video_capture_screenshot(int drawMode, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
-            blit_scanlines(b, elk_screen_data);
+            //blit_scanlines(b, elk_screen_data);
             blit(b,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case LINEDBL:
-            blit_normal(b, elk_screen_data);
+            //blit_normal(b, elk_screen_data);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case _2XSAI:
-            blit_normal(b, elk_screen_data);
+            //blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             Super2xSaI(b162,b16,0,0,0,0,320,256);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case SCALE2X:
-            blit_normal(b, elk_screen_data);
+            //blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             scale2x(b162,b16,320,256);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case EAGLE:
-            blit_normal(b, elk_screen_data);
+            //blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             SuperEagle(b162,b16,0,0,0,0,320,256);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case PAL:
-            blit_normal(b, elk_screen_data);
+            //blit_normal(b, elk_screen_data);
             palfilter(b,b16,colDepth);
             blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
