@@ -22,9 +22,15 @@
 int timetolive;
 int ins=0;
 int ulacycles;
-uint8_t a,x,y,s;
-uint16_t pc;
-CPUStatus p;
+
+/* Acorn Electron 6502 Registers*/
+uint8_t a;  /* Accumulator   */
+uint8_t x;  /* X Register    */
+uint8_t y;  /* Y Register    */
+uint8_t s;  /* Stack Pointer */
+
+uint16_t pc; /* Program Counter  */
+CPUStatus p; /* Status Registers */
 
 int cycles;
 int cyccount=1;
@@ -85,7 +91,9 @@ void setsbc(uint8_t temp)
         setzn(tempw&0xFF);
 }
 
-int realnmi,realirq;
+int realnmi; // When set, signifies the nmi routine is waiting to be triggered.
+int realirq;
+
 void doints()
 {
         yield();
@@ -184,8 +192,10 @@ uint8_t tempb;
                                 a=(al&0xF)|((ah&0xF)<<4);                 \
                         }
 
-int output=0;
-uint16_t oldpc2,oldpc;
+int output=0; /* the purpose of this variable appears to be depricated (no longer used)*/
+uint16_t oldpc2;
+uint16_t oldpc;
+
 void exec6502()
 {
         uint16_t addr,addr2;
@@ -1710,6 +1720,8 @@ void exec6502()
 //                        }
 //                }
                 yield();
+
+                /* If a non-maskable interrupt has occured, handle it */
                 if (realnmi)
                 {
                         realnmi=0;
@@ -1717,9 +1729,11 @@ void exec6502()
                         temp|=(p.i)?4:0;    temp|=(p.d)?8:0;
                         temp|=(p.v)?0x40:0; temp|=(p.n)?0x80:0;
                         temp|=0x30;
+                        /* Store current program counter and status register to stack */
                         writemem(0x100+s,pc>>8);   s--; cycles+=cyccount;
                         writemem(0x100+s,pc&0xFF); s--; cycles+=cyccount;
                         writemem(0x100+s,temp);    s--; cycles+=cyccount;
+                        /* Set interrupt flag and reset PC to address stored in the interrupt vector? */
                         pc=readmem(0xFFFA);             cycles+=cyccount;
                         pc|=(readmem(0xFFFB)<<8);       cycles+=cyccount;
                         p.i=1;

@@ -267,7 +267,7 @@ void runelk()
                 runelkframe=!runelkframe;
                 if (resetit)
                 {
-                        memset(ram,0,32768);
+                        memset(ram,0,SIZE_32K);
                         resetula();
                         #ifndef WIN32
                                 resetserial();
@@ -290,19 +290,15 @@ void runelk()
                         ddnoiseframes=0;
                         mixddnoise();
                 }
+                if(timing_debug_stats++ == 5)
+                {
+                    timestamp_diff = log_get_timestamp() - timestamp_start;
+                    log_debug("runelk time taken = %ld.%d ms", (timestamp_diff / 1000), (timestamp_diff % 1000));
+                    timing_debug_stats = 0;
+                }
         }
         else
            video_rest(1);
-
-        timestamp_diff = log_get_timestamp() - timestamp_start;
-        log_debug("runelk time taken = %ld", timestamp_diff);
-        //log_time_mark("=== runelk end   ===");
-        if(timing_debug_stats++ == 20)
-        {
-                //log_time_display();
-                //log_timer_begin("=== ignore ===");
-                timing_debug_stats = 0;
-        }
 
 }
 

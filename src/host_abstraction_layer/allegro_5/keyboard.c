@@ -4,7 +4,16 @@
 #include "host_abstraction_layer/event_handler.h"
 #include "logger.h"
 
-
+// Represents the internal mapping of the keyboard to memory locations
+// 0x9FFF to 0xBFFE.
+//
+// See page 218 of the Advanced User Guide for the Acorn Electron
+// for full details.
+//
+// Note the mappings are repeated twice as some Allegro distinguishes
+// between keys more than the electron.  For example Left Shift and Right shift
+// are mapped to the Electron shift key.
+//
 int keys[2][14][4]=
 {
         {
@@ -43,6 +52,26 @@ int keys[2][14][4]=
 
 bool key[ALLEGRO_KEY_MAX];
 
+// Allegro allows 128 keys to be used.
+//
+// This array contains a mapping for each and every one of them.
+//
+// Binary format for each entry is: edddcccc
+//    e = 1 - The allegro key is mapped to an electron key.
+//        0 - The allegro key is not mapped to an electron key (not in use)
+//    d = bit number for mapping the key to the electron key colum bitmap.
+//          - 000 = Mapped to bit 0
+//          - 001 = Mapped to bit 1
+//          - 010 = Mapped to bit 2
+//          - 011 = Mapped to bit 3
+//    c = The address bitmap mask for the key (tells us which Column address this key belongs to)
+//          - 0000 = Address bitmap shifted by 0 = 00000001 = When applied if matches to address for column 0 = BFFE
+//          - 0001 = Address bitmap shifted by 1 = 00000010 = When applied if matches to address for column 0 = BFFD
+//          - 0010 = Address bitmap shifted by 2 = 00000100 = When applied if matches to address for column 0 = BFFB
+//          - 0011 = Address bitmap shifted by 3 = 00001000 = When applied if matches to address for column 0 = BFF7
+//          - 0100 = Address bitmap shifted by 4 = 00010000 = When applied if matches to address for column 0 = BFEF
+//          ...
+//
 int keyl[ALLEGRO_KEY_MAX];
 
 int keylookup[ALLEGRO_KEY_MAX];
@@ -60,6 +89,11 @@ void keyboard_makelayout()
                 {
                         for (e=0;e<2;e++)
                         {
+                                // This creates a bitmap of 1dddcccc.
+                                // Top bit set means this entry is defined.
+                                // c = the column number wshich is used to create the address mask
+                                // d is bit number, used to correctly set the bit in the electrons memory address (if key is pressed)
+                                // For examples see above.
                                 keyl[keys[e][c][d]]=c|(d<<4)|0x80;
                         }
                 }
@@ -86,11 +120,9 @@ uint8_t keyboard_read(uint16_t addr)
         {
                 if (key[d]) // If host key is pressed.
                 {
-                    //log_debug("keyboard_read - key detected %d", d);
-                    //log_debug("keylookup[%d] is %d,", d, keylookup[d]);
                     if(keyl[keylookup[d]]&0x80 && !(addr&(1<<(keyl[keylookup[d]]&15))))
                     {
-                        temp|=1<<((keyl[keylookup[d]]&0x30)>>4);
+                        temp|=1<<((keyl[keylookup[d]]&0x30)>>4); // Set the bitmap for key to 1 in memory
                     }
                 }
         }

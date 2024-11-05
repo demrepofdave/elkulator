@@ -2,6 +2,17 @@
 #include "elk.h"
 #include <allegro.h>
 
+
+// Represents the internal mapping of the keyboard to memory locations
+// 0x9FFF to 0xBFFE.
+//
+// See page 218 of the Advanced User Guide for the Acorn Electron
+// for full details.
+//
+// Note the mappings are repeated twice as some Allegro distinguishes
+// between keys more than the electron.  For example Left Shift and Right shift
+// are mapped to the Electron shift key.
+//
 int keys[2][14][4]=
 {
         {
@@ -55,6 +66,11 @@ void keyboard_makelayout()
                 {
                         for (e=0;e<2;e++)
                         {
+                                // This creates a bitmap of 1dddcccc.
+                                // Top bit set means this entry is defined.
+                                // c = the column number wshich is used to create the address mask
+                                // d is bit number, used to correctly set the bit in the electrons memory address (if key is pressed)
+                                // For examples see above.
                                 keyl[keys[e][c][d]]=c|(d<<4)|0x80;
                         }
                 }

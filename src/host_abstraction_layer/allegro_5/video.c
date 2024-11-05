@@ -394,8 +394,6 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
     char * region_scan = NULL;
 
     ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
-    al_set_target_bitmap(destBitmap);
-    al_clear_to_color(al_map_rgb(0, 0, 0));
 
     // Here we create B from the memory data we have assembled.
     for(y=0; y<256; y++)
@@ -425,11 +423,11 @@ void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
-            blit_scanlines(b16, elk_screen_data);
+            blit_scanlines(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b16, 0,0,640,512,
-                                       main_window.current_elk.startx, main_window.current_elk.starty,
-                                       main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+            al_draw_scaled_bitmap(b, 0,0,640,512,
+                                     main_window.current_elk.startx, main_window.current_elk.starty,
+                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
             break;
 
         case LINEDBL:
@@ -469,10 +467,10 @@ void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
 
         case PAL:
         {
-            palfilter(b16, elk_screen_data);
+            palfilter(b, elk_screen_data);
             //log_time_mark("video_blit_to_screen - pmid");
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b16, 0,0,640,512, 
+            al_draw_scaled_bitmap(b, 0,0,640,512, 
                                      main_window.current_elk.startx, main_window.current_elk.starty,
                                      main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
             break;
@@ -492,14 +490,10 @@ void video_capture_screenshot(int drawMode, int colDepth)
     switch (drawMode)
     {
         case SCANLINES:
+        case LINEDBL:
         case PAL:
             al_set_target_bitmap(bm_screenshot);
-            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0);
-            break;
-
-        case LINEDBL:
-            al_set_target_bitmap(bm_screenshot);
-            al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,512, 0);
+            al_draw_scaled_bitmap(b, 0,0,640,512, 0,0,640,512, 0);
             break;
 
 /*        case _2XSAI:

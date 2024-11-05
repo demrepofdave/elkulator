@@ -24,6 +24,7 @@
         "ula.h": "c",
         "event_handler_internal.h": "c",
         "stdlib.h": "c",
-        "adf.h": "c"
+        "adf.h": "c",
+        "config.h": "c"
     }
 }

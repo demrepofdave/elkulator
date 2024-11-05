@@ -15,6 +15,8 @@
 /******************************************************************************
 * Include files
 *******************************************************************************/
+#include <stdbool.h>
+#include <stdint.h>
 
 /******************************************************************************
 * Preprocessor Macros
@@ -31,22 +33,22 @@
 
 typedef struct 
 {
-    uint8_t plus1;
-    uint8_t plus3;
+    bool plus1;
+    bool plus3;
     uint8_t firstbyte;
     int     joffset; // TODO: leaving as int for now as unsure of the range for this item.
-    uint8_t dfsena;
-    uint8_t adfsena;
+    bool dfsena;
+    bool adfsena;
     // Turbo and Shadow board configuration
-    uint8_t mrb;
+    bool mrb;
     uint8_t mrbmode;
-    uint8_t turbo;
+    bool    turbo;
     // Enhancements
     uint8_t ulamode;
-    uint8_t enable_jim;
+    bool enable_jim;
     // Cartridge expansions
-    uint8_t enable_mgc;
-    uint8_t enable_db_flash_cartridge;
+    bool enable_mgc;
+    bool enable_db_flash_cartridge;
 
 } expansion_config_t;
 
@@ -58,7 +60,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t defaultwriteprot;
+    bool defaultwriteprot;
     char discname[DISCNAME_CHARS_MAX];
     char discname2[DISCNAME_CHARS_MAX];
 } disc_config_t;

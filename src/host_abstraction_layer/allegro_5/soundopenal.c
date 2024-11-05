@@ -5,7 +5,7 @@
  * soundopenal.c
  * 
  * Sound abstration layer (OpenAL)
-/*
+ *
  * Allows actual sound libraries and sound used for the emulation
  * to be abstracted from the actual electron code
  * 
