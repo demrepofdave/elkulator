@@ -18,7 +18,7 @@ void Super2xSaI(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int 
 void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);
 
 // Other filer routines.
-void scale2x(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int width, int height);
+void scale2x(char * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int width, int height);
 
 void initpaltables();
 void palfilter(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data);

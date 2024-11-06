@@ -44,12 +44,12 @@ elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
 * Private Variable Definitions
 *******************************************************************************/
 
-#define VIDEO_DISPLAY_TYPE_MAX   4
+#define VIDEO_DISPLAY_TYPE_MAX   7
 static const char *settings_video_display_type[VIDEO_DISPLAY_TYPE_MAX] = { "Scanlines",
                                                      "Line doubling",
-//                                                     "2xSai (disabled)",
-//                                                     "Scale2X (disabled)",
-//                                                     "Super Eagle (disabled)",
+                                                     "2xSai (disabled)",
+                                                     "Scale2X",
+                                                     "Super Eagle (disabled)",
                                                      "PAL Filter", NULL };
 
 #define DISC_DRIVE_TYPE_MAX  3
