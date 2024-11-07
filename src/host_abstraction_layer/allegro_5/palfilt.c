@@ -148,8 +148,8 @@ void palfilter(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
             blue = (c & 4)?255:0;
 
             paly = ytable[c];
-            palry= red - paly; // This is going wrong.
-            palby= blue - paly; // This is going wrong.
+            palry= red - paly;
+            palby= blue - paly;
  
             paly=iir(paly);
 
