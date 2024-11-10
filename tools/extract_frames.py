@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os, stat, struct, sys, zlib
-import Image
+from PIL import Image
 
 class ArgumentError(Exception):
     pass
@@ -55,7 +55,7 @@ def find_option(args, label, number = 0):
         return True
     
     if len(values) < number:
-        raise ArgumentError, "Not enough values for argument '%s': %s" % (label, repr(values))
+        raise ArgumentError("Not enough values for argument '%s': %s" % (label, repr(values)))
     
     if number == 1:
         values = values[0]
@@ -79,7 +79,7 @@ if __name__ == "__main__":
         width, height = 640, 512
         d, dim = find_option(args, "-d", 1)
         if d:
-            width, height = map(int, dim.split("x"))
+            width, height = list(map(int, dim.split("x")))
     
         first, last = 0, None
         t, span = find_option(args, "-t", 1)
@@ -153,15 +153,17 @@ if __name__ == "__main__":
         if compressed:
             data = zlib.decompress(data)
         
-        im = Image.fromstring("P", (640, 256), data)
-        im.putpalette("\x00\x00\x00"
-                      "\xff\x00\x00"
-                      "\x00\xff\x00"
-                      "\xff\xff\x00"
-                      "\x00\x00\xff"
-                      "\xff\x00\xff"
-                      "\x00\xff\xff"
-                      "\xff\xff\xff")
+        im = Image.frombytes("P", (640, 256), data)
+        bmp_palette = [ 0,0,0, 
+                        255,0,0,
+                        0,255,0,
+                        255, 255,0,
+                        0,0,255,
+                        255,0,255,
+                        0,255,255,
+                        255,255,255 ]
+
+        im.putpalette(bmp_palette)
         im = im.resize((width, height), Image.NEAREST)
         im.save(os.path.join(output_dir, template % frame))
         frame += 1

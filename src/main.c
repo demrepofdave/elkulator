@@ -89,12 +89,14 @@ void initHandlers()
         callback_handlers.eject_tape  = handle_eject_tape;
         callback_handlers.rewind_tape = handle_rewind_tape;
         callback_handlers.handle_screenshot = savescrshot;
+        callback_handlers.handle_startmovie = startmovie;
+        callback_handlers.handle_stopmovie = stopmovie;
+        callback_handlers.handle_enable_debugger= startdebug;
 }
 
 void initelk(int argc, char *argv[])
 {
         int c;
-        char *p;
         int tapenext=0;
         int discnext=0;
         int romnext=-2;
@@ -103,7 +105,8 @@ void initelk(int argc, char *argv[])
         int serialdebugnext=0;
         fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
         #ifdef HAL_ALLEGRO_4
-            p = fileutils_get_filename(exedir);
+            // TODO: Tidy-up.
+            char *p = fileutils_get_filename(exedir);
             p[0] = 0;
         #endif
         elkConfig.disc.discname[0]  = 0;
@@ -247,9 +250,14 @@ int oldbreak=0;
 int resetit=0;
 int runelkframe=0;
 
+int timing_debug_stats = 0;
+
 void runelk()
-{
+{       
+        long timestamp_start = log_get_timestamp();
+        long timestamp_diff = 0;
         int c;
+        //log_time_mark("=== runelk begin ===");
         if (drawit || (tapeon && elkConfig.tape.speed))
         {
                 if (drawit) drawit--;
@@ -259,7 +267,7 @@ void runelk()
                 runelkframe=!runelkframe;
                 if (resetit)
                 {
-                        memset(ram,0,32768);
+                        memset(ram,0,SIZE_32K);
                         resetula();
                         #ifndef WIN32
                                 resetserial();
@@ -282,9 +290,16 @@ void runelk()
                         ddnoiseframes=0;
                         mixddnoise();
                 }
+                if(timing_debug_stats++ == 5)
+                {
+                    timestamp_diff = log_get_timestamp() - timestamp_start;
+                    log_debug("runelk time taken = %ld.%d ms", (timestamp_diff / 1000), (timestamp_diff % 1000));
+                    timing_debug_stats = 0;
+                }
         }
         else
            video_rest(1);
+
 }
 
 void closeelk()

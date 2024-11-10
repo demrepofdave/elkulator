@@ -52,15 +52,16 @@ typedef uint32_t elk_pallete_t;
 
 ALLEGRO_BITMAP *b             = NULL;    // Main bitmap used before blitting to window screen.
 ALLEGRO_BITMAP *b16           = NULL;  // Intermediate bitmap 1
-ALLEGRO_BITMAP *b162          = NULL; // Intermediate bitmap 2
-ALLEGRO_BITMAP *vidb          = NULL; // Windows bitmap
-ALLEGRO_BITMAP *vp1           = NULL;  // Windows bitmap 1?
-ALLEGRO_BITMAP *vp2           = NULL;  // Windows bitmap 2?
-ALLEGRO_BITMAP *bm_screenshot = NULL; // USed for screenshots.
+//ALLEGRO_BITMAP *b162          = NULL; // Intermediate bitmap 2
+//ALLEGRO_BITMAP *vidb          = NULL; // Windows bitmap
+//ALLEGRO_BITMAP *vp1           = NULL;  // Windows bitmap 1?
+//ALLEGRO_BITMAP *vp2           = NULL;  // Windows bitmap 2?
+ALLEGRO_BITMAP *bm_screenshot = NULL; // Used for screenshots.
+ALLEGRO_BITMAP *moviebitmap   = NULL; // Used for capturing movies.
 
 static ALLEGRO_DISPLAY *display;
 
-ALLEGRO_LOCKED_REGION *region = NULL; // Region lock on bitmap b (to allow writing of pixels)
+//ALLEGRO_LOCKED_REGION *region = NULL; // Region lock on bitmap b (to allow writing of pixels)
 
 static ALLEGRO_TIMER *timer;
 static ALLEGRO_EVENT_SOURCE evsrc;
@@ -73,7 +74,7 @@ elk_pallete_t elkpal[8] =
     0xffffff00,
     0xff0000ff,
     0xffff00ff,
-    0xffffff00,
+    0xff00ffff,
     0xffffffff
 };
 
@@ -147,19 +148,16 @@ int video_init_part1()
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP|ALLEGRO_NO_PRESERVE_TEXTURE);
 
     ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
-    b16 = al_create_bitmap(800*2,600);
-    b162= al_create_bitmap(640,256);
+    b16 = al_create_bitmap(1300,600);
+    //b162= al_create_bitmap(640,256);
     al_set_target_bitmap(b16);
     al_clear_to_color(black);
 
-    //colblack = 0xff000000;
-    //colwhite = 0xffffffff;
-    // border_col = al_map_rgb(0, 0, 0);
+    moviebitmap = al_create_bitmap(640,256);
 
     b = al_create_bitmap(640, 616);
     al_set_target_bitmap(b);
     al_clear_to_color(al_map_rgb(0, 0,0));
-    region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
 
     al_init_image_addon();
 
@@ -277,8 +275,11 @@ void video_resize_elk_window(bool aspect_ratio)
     video_apply_window_size();
 }
 
+static bool first_bits = true;
+
 void video_apply_window_size()
 {
+    first_bits = true;
     log_window_config("video_apply_window_size");
     ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
     al_draw_filled_rectangle(0,0, main_window.actual_window.winsizex, main_window.actual_window.winsizey, blue);
@@ -343,32 +344,6 @@ int video_get_desktop_color_depth()
     return(8); // TODO: probably won't need this in allegro5
 }
 
-uint32_t video_get_pixel_rgb(ALLEGRO_LOCKED_REGION * regionA, int y, int x)
-{
-    return(*((uint32_t *)((char *)regionA->data + regionA->pitch * y + x * regionA->pixel_size)));
-}
-
-void video_put_pixel_rgb(ALLEGRO_LOCKED_REGION * regionA, int y, int x, uint32_t rgb)
-{
-    *((uint32_t *)((char *)regionA->data + regionA->pitch * y + x * regionA->pixel_size)) = rgb;
-}
-
-void video_put_pixel(int y, int x, uint8_t color)
-{
-    *((uint32_t *)((char *)region->data + region->pitch * y + x * region->pixel_size)) = elkpal[color];
-}
-
-void video_put_pixel_line(int y, int x, int width, uint8_t color)
-{
-    int count = width;
-
-    char *ptr = (char *)region->data + region->pitch * y + x * region->pixel_size;
-    while (count--) {
-        *(uint32_t *)ptr = elkpal[color];
-        ptr += region->pixel_size;
-    }
-}
-
 //#ifdef WIN32
 //CRITICAL_SECTION cs;
 //#endif
@@ -387,79 +362,126 @@ void endblit()
 //    #endif
 }
 
-void video_blit_to_screen(int drawMode, int colDepth)
+void blit_normal(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
 {
-    int c;
+    int y = 0;
+    int x = 0;
+    int color = 0;
+    char * region_data = NULL;
+    
+    ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+
+    // Here we create B from the memory data we have assembled.
+    for(y=0; y<256; y++)
+    {
+        region_data = (char *)destRegion->data + (destRegion->pitch * y);
+        for(x=0; x<640; x++)
+        {
+            color = *(elk_screen_data + (y * 640) + x);
+            *((uint32_t *)((char *)region_data)) = elkpal[color];
+            region_data += destRegion->pixel_size;
+        }
+    }
+    al_unlock_bitmap(destBitmap);
+}
+
+void blit_scanlines(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
+{
+    int y = 0;
+    int x = 0;
+    int color = 0;
+    char * region_data = NULL;
+    char * region_scan = NULL;
+
+    ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+
+    // Here we create B from the memory data we have assembled.
+    for(y=0; y<256; y++)
+    {
+        region_data = (char *)destRegion->data + (destRegion->pitch * (y * 2));
+        region_scan = (char *)destRegion->data + (destRegion->pitch * ((y * 2) + 1));
+        for(x=0; x<640; x++)
+        {
+            color = *(elk_screen_data + (y * 640) + x);
+            *((uint32_t *)((char *)region_data)) = elkpal[color];
+            *((uint32_t *)((char *)region_scan)) = 0xff000000;
+            region_data += destRegion->pixel_size;
+            region_scan += destRegion->pixel_size;
+        }
+    }
+    al_unlock_bitmap(destBitmap);
+}
+
+
+void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
+{
+    //log_timer_begin();
+    //log_time_mark("video_blit_to_screen - start");
 
     startblit();
 
     switch (drawMode)
     {
         case SCANLINES:
-            al_unlock_bitmap(b);
-            al_set_target_bitmap(b16);
-            al_clear_to_color(al_map_rgb(0, 0,0));
-            for (int c = 0; c < 256; c++)
-            {
-                al_draw_bitmap_region(b, 0, c, 640, 1, 0, c << 1, 0);
-            }
+            blit_scanlines(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b16, 0,0,640,512,
-                                       main_window.current_elk.startx, main_window.current_elk.starty,
-                                       main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
-            region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+            al_draw_scaled_bitmap(b, 0,0,640,512,
+                                     main_window.current_elk.startx, main_window.current_elk.starty,
+                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
             break;
 
         case LINEDBL:
-            al_unlock_bitmap(b);
+            blit_normal(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
                                      main_window.current_elk.startx, main_window.current_elk.starty,
                                      main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
-            region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
             break;
-/*
-        case _2XSAI:
-            blit(b,b162,0,0,0,0,640,256);
-            Super2xSaI(b162,b16,0,0,0,0,320,256);
+
+        case _2XSAI:  // TODO: Get filter working for allegro5
+            blit_normal(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
+            al_draw_scaled_bitmap(b, 0,0,640,256, 
+                                     main_window.current_elk.startx, main_window.current_elk.starty,
+                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+            //blit(b,b162,0,0,0,0,640,256);
+            //Super2xSaI(elk_screen_data,b,0,0,0,0,640,256);
+            //al_set_target_backbuffer(al_get_current_display());
             //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
-            al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
+            //al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
             //blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
             break;
 
         case SCALE2X:
-            blit(b,b162,0,0,0,0,640,256);
-            scale2x(b162,b16,320,256);
+            scale2x(elk_screen_data, b16, 640,256);
             al_set_target_backbuffer(al_get_current_display());
+            al_draw_scaled_bitmap(b16, 0,0,1280,512, 
+                                     main_window.current_elk.startx, main_window.current_elk.starty,
+                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+            break;
+
+        case EAGLE: // TODO: Get filter working for allegro5
+            blit_normal(b, elk_screen_data);
+            al_set_target_backbuffer(al_get_current_display());
+            al_draw_scaled_bitmap(b, 0,0,640,256, 
+                                     main_window.current_elk.startx, main_window.current_elk.starty,
+                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+            //blit(b,b162,0,0,0,0,640,256);
+            //SuperEagle(b162,b16,0,0,0,0,320,256);
+            //al_set_target_backbuffer(al_get_current_display());
             //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
-            al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
+            //al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
             //blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
             break;
 
-        case EAGLE:
-            blit(b,b162,0,0,0,0,640,256);
-            SuperEagle(b162,b16,0,0,0,0,320,256);
-            al_set_target_backbuffer(al_get_current_display());
-            //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
-            al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
-            //blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
-            break;*/
-
-        case PAL: // TODO: Not currently working (blank screen)
+        case PAL:
         {
-            ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(b16, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
-            al_set_target_bitmap(b16);
-            al_clear_to_color(al_map_rgb(0,0,0));
-            palfilter(region, destRegion, colDepth);
-
-            al_unlock_bitmap(b16);
-            al_unlock_bitmap(b);
+            palfilter(b, elk_screen_data);
+            //log_time_mark("video_blit_to_screen - pmid");
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b16, 0,0,640,512, 
+            al_draw_scaled_bitmap(b, 0,0,640,512, 
                                      main_window.current_elk.startx, main_window.current_elk.starty,
                                      main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
-            region = al_lock_bitmap(b, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
             break;
         }
     }
@@ -471,47 +493,43 @@ void video_blit_to_screen(int drawMode, int colDepth)
 void video_capture_screenshot(int drawMode, int colDepth)
 {
     bm_screenshot = al_create_bitmap(640,512);
+    // NOTE: No need to run any filtering (e.g. palfilt) here as
+    //       these routines have already run as part of screen 
+    //       building, so all bitmaps are prepared.
     switch (drawMode)
     {
         case SCANLINES:
-            al_set_target_bitmap(bm_screenshot);
-            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0);
-            break;
-
         case LINEDBL:
+        case PAL:
             al_set_target_bitmap(bm_screenshot);
-            al_draw_scaled_bitmap(b, 0,0,640,256, 0,0,640,512, 0);
+            al_draw_scaled_bitmap(b, 0,0,640,512, 0,0,640,512, 0);
             break;
 
-/*        case _2XSAI:
-            blit(b,b162,0,0,0,0,640,256);
-            Super2xSaI(b162,b16,0,0,0,0,320,256);
-            blit(b16,bm_screenshot,0,0,0,0,640,512);
+        case _2XSAI:  // TODO: Get filter working for allegro5
+            al_set_target_bitmap(bm_screenshot);
+            al_draw_scaled_bitmap(b, 0,0,640,512, 0,0,640,512, 0);
+            //blit(b,b162,0,0,0,0,640,256);
+            //Super2xSaI(b162,b16,0,0,0,0,320,256);
+            //blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
 
         case SCALE2X:
-            blit(b,b162,0,0,0,0,640,256);
-            scale2x(b162,b16,320,256);
-            blit(b16,bm_screenshot,0,0,0,0,640,512);
+            al_set_target_bitmap(bm_screenshot);
+            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0); // TODO: Better resolution available.
             break;
 
-        case EAGLE:
-            blit(b,b162,0,0,0,0,640,256);
-            SuperEagle(b162,b16,0,0,0,0,320,256);
-            blit(b16,bm_screenshot,0,0,0,0,640,512);
-            break;
-*/
-        case PAL:
-            // NOTE: No need to run palfilt here as it will already
-            //       have run as part of screen building, so all
-            //       we need is already in BITMAP b16
+        case EAGLE:  // TODO: Get filter working for allegro5
             al_set_target_bitmap(bm_screenshot);
-            al_draw_scaled_bitmap(b16, 0,0,640,512, 0,0,640,512, 0);
+            al_draw_scaled_bitmap(b, 0,0,640,512, 0,0,640,512, 0);
+            //blit(b,b162,0,0,0,0,640,256);
+            //SuperEagle(b162,b16,0,0,0,0,320,256);
+            //blit(b16,bm_screenshot,0,0,0,0,640,512);
             break;
+
     }
 }
 
-int video_save_bmp(const char * filename)
+int video_save_screenshot_bmp(const char * filename)
 {
     return(al_save_bitmap(filename, bm_screenshot));
 }
@@ -532,8 +550,8 @@ void video_clearall()
     al_clear_to_color(black);
     al_set_target_bitmap(b16);
     al_clear_to_color(black);
-    al_set_target_bitmap(b162);
-    al_clear_to_color(black);
+    //al_set_target_bitmap(b162);
+    //al_clear_to_color(black);
     //al_set_target_bitmap(al_get_current_display()); // TODO: do we need this?
     //al_clear_to_color(black);
 }

@@ -81,7 +81,7 @@ void scale2x(BITMAP * bitmapSource, BITMAP * bitmapDest, int width, int height)
 			    	H = *(Uint16*)(srcpix + (MIN(height-1,looph+1)*srcpitch) + (2*loopw));
 
 				E0 = D == B && B != F && D != H ? D : E;
-    	    	    	    	E1 = B == F && B != D && F != H ? F : E;
+    	    	E1 = B == F && B != D && F != H ? F : E;
 				E2 = D == H && D != B && H != F ? D : E;
 				E3 = H == F && D != H && B != F ? F : E;
 

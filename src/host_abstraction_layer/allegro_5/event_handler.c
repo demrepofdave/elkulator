@@ -131,9 +131,8 @@ elk_event_t handle_event_timer_expiry(ALLEGRO_EVENT * event)
 uint32_t event_await()
 {
     ALLEGRO_EVENT event;
-    bool quitting = false;
-    bool timer_triggered = false;
     elk_event_t elkEvent = 0;
+
     while (!elkEvent) 
     {
         al_wait_for_event(queue, &event);

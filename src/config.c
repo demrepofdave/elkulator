@@ -97,14 +97,27 @@ int getintcfg(char *name, int def)
         return c;
 }
 
+bool getboolcfg(char *name, bool def)
+{
+        int c = getintcfg(name, (int)def);
+        return(c!=0?true:false);
+}
+
 void writestringcfg(char *name, char *s)
 {
         if (s[0]) fprintf(cfgfile,"%s = %s\n",name,s);
 }
+
 void writeintcfg(char *name, int i)
 {
         fprintf(cfgfile,"%s = %i\n",name,i);
 }
+
+void writeboolcfg(char *name, bool b)
+{
+        writeintcfg(name, (b!=true?0:1));
+}
+
 
 /******************************************************************************
 * Public Function Definitions
@@ -113,25 +126,23 @@ void writeintcfg(char *name, int i)
 void loadconfig()
 {
         char *s;
-        int c;
-        char s2[20];
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"rt");
 
-        elkConfig.tape.speed                 = getintcfg("tapespeed",0);
+        elkConfig.tape.speed            = getintcfg("tapespeed",0);
 
-        elkConfig.expansion.plus1            = getintcfg("plus1",0);
-        elkConfig.expansion.plus3            = getintcfg("plus3",0);
-        elkConfig.expansion.dfsena           = getintcfg("dfsena",0);
-        elkConfig.expansion.adfsena          = getintcfg("adfsena",0);
-        elkConfig.disc.defaultwriteprot = getintcfg("defaultwriteprotect",1);
+        elkConfig.expansion.plus1       = getboolcfg("plus1",   false);
+        elkConfig.expansion.plus3       = getboolcfg("plus3",   false);
+        elkConfig.expansion.dfsena      = getboolcfg("dfsena",  false);
+        elkConfig.expansion.adfsena     = getboolcfg("adfsena", false);
+        elkConfig.disc.defaultwriteprot = getboolcfg("defaultwriteprotect",true);
         
-        elkConfig.expansion.turbo      = getintcfg("turbo",0);
-        elkConfig.expansion.mrb        = getintcfg("mrb",0);
-        elkConfig.expansion.mrbmode    = getintcfg("mrbmode",0);
-        elkConfig.expansion.ulamode    = getintcfg("ulamode",0);
-        elkConfig.expansion.enable_jim = getintcfg("enable_jim",0);
+        elkConfig.expansion.turbo      = getboolcfg("turbo", false);
+        elkConfig.expansion.mrb        = getboolcfg("mrb", false);
+        elkConfig.expansion.mrbmode    = getintcfg ("mrbmode",0);
+        elkConfig.expansion.ulamode    = getintcfg ("ulamode",0);
+        elkConfig.expansion.enable_jim = getboolcfg("enable_jim", false);
 
         elkConfig.display.drawmode=getintcfg("filter",0);
         
@@ -175,6 +186,8 @@ void loadconfig()
 
         // Just use default keyboard for now for allegro5.
         #ifdef HAL_ALLEGRO_4
+        int c;
+        char s2[20];
         for (c=0;c<128;c++)
         {
                 sprintf(s2,"key_define_%03i",c);
@@ -183,8 +196,8 @@ void loadconfig()
         #endif
 
         /* Cartridge expansions */
-        elkConfig.expansion.enable_mgc                = getintcfg("enable_mgc", 0);
-        elkConfig.expansion.enable_db_flash_cartridge = getintcfg("enable_db_flash_cartridge", 0);
+        elkConfig.expansion.enable_mgc                = getboolcfg("enable_mgc", false);
+        elkConfig.expansion.enable_db_flash_cartridge = getboolcfg("enable_db_flash_cartridge", false);
 
         fclose(cfgfile);
 }
@@ -196,22 +209,22 @@ void saveconfig()
 
         cfgfile=fopen(fn,"wt");
 
-        writeintcfg("tapespeed", elkConfig.tape.speed);
-        writeintcfg("plus1",     elkConfig.expansion.plus1);
-        writeintcfg("plus3",     elkConfig.expansion.plus3);
-        writeintcfg("dfsena",    elkConfig.expansion.dfsena);
-        writeintcfg("adfsena",   elkConfig.expansion.adfsena);
+        writeintcfg ("tapespeed", elkConfig.tape.speed);
+        writeboolcfg("plus1",     elkConfig.expansion.plus1);
+        writeboolcfg("plus3",     elkConfig.expansion.plus3);
+        writeboolcfg("dfsena",    elkConfig.expansion.dfsena);
+        writeboolcfg("adfsena",   elkConfig.expansion.adfsena);
 
-        writeintcfg("defaultwriteprotect",elkConfig.disc.defaultwriteprot);
+        writeboolcfg("defaultwriteprotect",elkConfig.disc.defaultwriteprot);
         
         writestringcfg("discname_0",elkConfig.disc.discname);
         writestringcfg("discname_1",elkConfig.disc.discname2);
 
-        writeintcfg("turbo",      elkConfig.expansion.turbo);
-        writeintcfg("mrb",        elkConfig.expansion.mrb);
-        writeintcfg("mrbmode",    elkConfig.expansion.mrbmode);
-        writeintcfg("ulamode"    ,elkConfig.expansion.ulamode);
-        writeintcfg("enable_jim", elkConfig.expansion.enable_jim);
+        writeboolcfg("turbo",     elkConfig.expansion.turbo);
+        writeboolcfg("mrb",        elkConfig.expansion.mrb);
+        writeintcfg ("mrbmode",    elkConfig.expansion.mrbmode);
+        writeintcfg ("ulamode"    ,elkConfig.expansion.ulamode);
+        writeboolcfg("enable_jim", elkConfig.expansion.enable_jim);
         
         writeintcfg("filter",     elkConfig.display.drawmode);
         
@@ -242,8 +255,8 @@ void saveconfig()
         #endif
 
         /* Cartridge expansions */
-        writeintcfg("enable_mgc",                elkConfig.expansion.enable_mgc);
-        writeintcfg("enable_db_flash_cartridge", elkConfig.expansion.enable_db_flash_cartridge);
+        writeboolcfg("enable_mgc",                elkConfig.expansion.enable_mgc);
+        writeboolcfg("enable_db_flash_cartridge", elkConfig.expansion.enable_db_flash_cartridge);
 
         fclose(cfgfile);
 }

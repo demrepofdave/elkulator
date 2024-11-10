@@ -21,17 +21,23 @@
 
 static const char * roms = "roms";   // Name of directory containing rom files
 
-int FASTLOW=0;
-int FASTHIGH2=0;
+int FASTLOW=0;      // 0 = Normal RAM use with sync / 1 = Fast RAM2 use (turbo and mrb?).
+int FASTHIGH2=0;    // 0 = Normal, 1 = Fast? mrb & mrbmode==2.
 //#define FASTLOW (elkConfig.expansion.turbo || (elkConfig.expansion.mrb && elkConfig.expansion.mrbmode && mrbmapped))
 #define FASTHIGH (FASTHIGH2 && ((pc&0xE000)!=0xC000))
 
 int mrbmapped=0;
-uint8_t rombanks[16][16384];
+
+// // ROM area - All 16 banks of 16k ROM available.
+uint8_t rombanks[16][SIZE_16K];
 uint8_t rombank_enabled[16];
 
-uint8_t ram[32768],ram2[32768];
-uint8_t os[16384],mrbos[16384];
+// Main Ram area, either normal RAM, and master ram board ram (if configured)
+uint8_t ram[SIZE_32K],ram2[SIZE_32K];
+
+// Operating System Area, either normal OS 1.00 or Master Ram board OS 3.00
+uint8_t os[SIZE_16K],mrbos[SIZE_16K];
+
 /* Use pointers to refer to banks in the general rombanks array. */
 #define DFS_BANK 3
 #define PLUS1_BANK 12
@@ -45,11 +51,11 @@ uint8_t *plus1rom;
 uint8_t sndlatch;
 int snden=0;
 int usedrom6=0;
-uint8_t ram6[16384];
+uint8_t ram6[SIZE_16K];
 /* Banked cartridge support providing space for multiple ROMS, added for the
    Mega Games Cartridge */
 #define NUM_BANKS 256
-uint8_t cart0[NUM_BANKS * 16384],cart1[NUM_BANKS * 16384];
+uint8_t cart0[NUM_BANKS * SIZE_16K],cart1[NUM_BANKS * SIZE_16K];
 uint8_t banks[2];
 /* Banks accessible via the JIM page, controlled by the paging register at
    &fcff. */
@@ -57,23 +63,26 @@ uint8_t banks[2];
 uint8_t jim_ram[JIM_BANKS][256];
 int jim_page = 0;
 
-void loadrom(uint8_t dest[16384], char *name)
+/* Loads a rom file into a 16k Buffer*/
+void loadrom(uint8_t dest[SIZE_16K], char *name)
 {
     FILE *f = fopen(name, "rb");
     if (f == NULL) {
         fprintf(stderr, "Failed to load ROM file '%s'.\n", name);
         exit(1);
     }
-    fread(dest, 16384, 1, f);
+    fread(dest, SIZE_16K, 1, f);
     fclose(f);
 }
 
+/* Loads a rom file into a particular rom bank 16k Buffer */
 void loadrom_n(int bank, char *name)
 {
     loadrom(rombanks[bank], name);
     rombank_enabled[bank] = 1;
 }
 
+/* Main routine to load all ROMs and correctly setup rom pointers */
 void update_rom_config(void)
 {
     rombank_enabled[PLUS1_BANK] = elkConfig.expansion.plus1;
@@ -85,7 +94,7 @@ void update_rom_config(void)
 void loadroms()
 {
         for (int i = 0; i < 16; i++) {
-            memset(rombanks[i], 0, 16384);
+            memset(rombanks[i], 0, SIZE_16K);
             rombank_enabled[i] = 0;
         }
 
@@ -109,7 +118,7 @@ void loadroms()
         loadrom(os, "os");
         loadrom(mrbos, "os300.rom");
         loadrom(basic, "basic.rom");
-        memcpy(rombanks[0xb], basic, 16384);
+        memcpy(rombanks[0xb], basic, SIZE_16K);
         loadrom(adfs, "adfs.rom");
         loadrom(dfs, "dfs.rom");
         loadrom(sndrom, "sndrom");
@@ -121,7 +130,7 @@ void loadcart(const char *filename)
 {
         FILE *f=fopen(filename,"rb");
         if (!f) return;
-        fread(cart0,NUM_BANKS * 16384,1,f);
+        fread(cart0,NUM_BANKS * SIZE_16K,1,f);
         fclose(f);
 }
 
@@ -129,20 +138,20 @@ void loadcart2(const char *filename)
 {
         FILE *f=fopen(filename,"rb");
         if (!f) return;
-        fread(cart1,NUM_BANKS * 16384,1,f);
+        fread(cart1,NUM_BANKS * SIZE_16K,1,f);
         fclose(f);
 }
 
 void unloadcart()
 {
-        memset(cart0,0,NUM_BANKS * 16384);
-        memset(cart1,0,NUM_BANKS * 16384);
+        memset(cart0,0,NUM_BANKS * SIZE_16K);
+        memset(cart1,0,NUM_BANKS * SIZE_16K);
 }
 
 void dumpram()
 {
         FILE *f=fopen("ram.dmp","wb");
-        fwrite(ram,32768,1,f);
+        fwrite(ram,SIZE_32K,1,f);
         fclose(f);
 }
 
@@ -188,8 +197,8 @@ uint8_t readmem(uint16_t addr)
                         return keyboard_read(addr);
                 }
                 /* Treat cartridges specially for now. */
-                if (rombank==0) return cart0[(banks[0] * 16384) + (addr&0x3FFF)];
-                if (rombank==1) return cart1[(banks[1] * 16384) + (addr&0x3FFF)];
+                if (rombank==0) return cart0[(banks[0] * SIZE_16K) + (addr&0x3FFF)];
+                if (rombank==1) return cart1[(banks[1] * SIZE_16K) + (addr&0x3FFF)];
 
                 /* Handle other ROMs. */
                 if (rombank_enabled[rombank])
@@ -310,6 +319,8 @@ void writemem(uint16_t addr, uint8_t val)
                 }
                 snden=val&1;
         }
+
+        /* Master RAM board - RAM control */
         if (addr==0xFC7F && elkConfig.expansion.mrb)
         {
                 mrbmapped=!(val&0x80);
@@ -319,9 +330,13 @@ void writemem(uint16_t addr, uint8_t val)
 //                rpclog("Write MRB %02X %i %i %04X\n",val,FASTLOW,FASTHIGH2,pc);
 //                if (!val) output=1;
         }
+
+        /* ADC expansion - Only available if plus1 is enabled*/
         if (addr==0xFC70 && elkConfig.expansion.plus1) writeadc(val);
         #ifndef WIN32
+                /* 6850 ACIA Serial port - Only available if plus1 is enabled*/
                 if (addr>=0xFC60 && addr<=0xFC6F && elkConfig.expansion.plus1) return writeserial(addr, val);
+                /* Centronics Parallel Interface - Only available if plus1 is enabled*/
                 if (addr==0xFC71 && elkConfig.expansion.plus1) writeparallel(val);
         #endif // WIN32
         /* The Mega Games Cartridge uses FC00 to select pairs of 16K banks in
@@ -342,20 +357,22 @@ void writemem(uint16_t addr, uint8_t val)
         }
 }
 
+/* Appends memory to a specified file (based on configuration) */
 void savememstate(FILE *f)
 {
-        fwrite(ram,32768,1,f);
-        if (elkConfig.expansion.mrb) fwrite(ram2,32768,1,f);
-        if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fwrite(dfs,16384,1,f);
-        if (elkConfig.sound.sndex)  fwrite(sndrom,16384,1,f);
-        if (usedrom6) fwrite(ram6,16384,1,f);
+        fwrite(ram,SIZE_32K,1,f);
+        if (elkConfig.expansion.mrb) fwrite(ram2,SIZE_32K,1,f);
+        if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fwrite(dfs,SIZE_16K,1,f);
+        if (elkConfig.sound.sndex)  fwrite(sndrom,SIZE_16K,1,f);
+        if (usedrom6) fwrite(ram6,SIZE_16K,1,f);
 }
 
+/* Reads memory from a specified file (based on already read configuration) */
 void loadmemstate(FILE *f)
 {
-        fread(ram,32768,1,f);
-        if (elkConfig.expansion.mrb) fread(ram2,32768,1,f);
-        if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fread(dfs,16384,1,f);
-        if (elkConfig.sound.sndex)  fread(sndrom,16384,1,f);
-        if (usedrom6) fread(ram6,16384,1,f);
+        fread(ram,SIZE_32K,1,f);
+        if (elkConfig.expansion.mrb) fread(ram2,SIZE_32K,1,f);
+        if (elkConfig.expansion.plus3 && elkConfig.expansion.dfsena) fread(dfs,SIZE_16K,1,f);
+        if (elkConfig.sound.sndex)  fread(sndrom,SIZE_16K,1,f);
+        if (usedrom6) fread(ram6,SIZE_16K,1,f);
 }

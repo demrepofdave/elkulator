@@ -1,6 +1,3 @@
-/*Elkulator v1.0 by Sarah Walker
-  PAL filter*/
-
 /*
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
@@ -26,8 +23,9 @@
 * Private Variable Definitions
 *******************************************************************************/
 
-al_fixed ACoef[2],ACoef2[3];
-al_fixed BCoef[2],BCoef2[3];
+float ACoef[2],ACoef2[3];
+float BCoef[2],BCoef2[3];
+
 
 /******************************************************************************
 * Private Function Definitions
@@ -35,61 +33,71 @@ al_fixed BCoef[2],BCoef2[3];
 
 void initcoef()
 {
-    ACoef[0]=ACoef[1]=al_ftofix(0.13673463961326307000);
-    BCoef[0]=al_itofix(1);
-    BCoef[1]=al_ftofix(-0.72654252800536090000);
-    ACoef2[0]=al_ftofix(0.29289321881333563000);
-    ACoef2[1]=al_ftofix(0.58578643762667126000);
-    ACoef2[2]=al_ftofix(0.29289321881333563000);
-    BCoef2[2]=al_ftofix(0.17157287525380990000);
+    ACoef[0]  = 0.13673463961326307000;
+    ACoef[1]  = 0.13673463961326307000;
+    BCoef[0]  = 1;
+    BCoef[1]  = -0.72654252800536090000;
+    ACoef2[0] = 0.29289321881333563000;
+    ACoef2[1] = 0.58578643762667126000;
+    ACoef2[2] = 0.29289321881333563000;
+    BCoef2[2] = 0.17157287525380990000;
 }
 
 
 #define NCoef 2
 
-al_fixed yy[NCoef+2]; //output samples
-al_fixed yx[NCoef+2]; //input samples
+float yy[NCoef+2]; //output samples
+float yx[NCoef+2]; //input samples
 int ycount=0;
-static inline al_fixed iir(al_fixed NewSample)
+
+static inline float iir(float newsample)
 {
-    yx[ycount] = NewSample;
-    yy[ycount] = al_fixmul(ACoef2[0],yx[ycount]);
-    yy[ycount] += al_fixmul(ACoef2[1],yx[(ycount+1)&3]);// - BCoef2[1] * yy[(ycount+1)&3];
-    yy[ycount] += al_fixmul(ACoef2[2],yx[(ycount+2)&3]) - al_fixmul(BCoef2[2],yy[(ycount+2)&3]);
+    yx[ycount] = newsample;
+    yy[ycount] = ACoef2[0] * yx[ycount];
+    yy[ycount] += (ACoef2[1] * yx[(ycount+1)&3]);// - BCoef2[1] * yy[(ycount+1)&3];
+    yy[ycount] += (ACoef2[2] * yx[(ycount+2)&3]) - (BCoef2[2] * yy[(ycount+2)&3]);
+
     ycount=(ycount-1)&3;
+
     return yy[(ycount+1)&3];
 }
 
-al_fixed ry[2]; //output samples
-al_fixed rx[2]; //input samples
+const float constr = -0.509f;
+const float constb = 0.194;
+
+float ry[2]; //output samples
+float rx[2]; //input samples
 int rycount=0;
 
-static inline al_fixed firry(al_fixed NewSample)
+
+static inline float firry(float newsample)
 {
     //Calculate the new output
-    rx[rycount] = al_fixmul(ACoef[0],NewSample);
+    rx[rycount] = (ACoef[0] * newsample);
     ry[rycount] = rx[0]+rx[1];
-    ry[rycount] -= al_fixmul(BCoef[1],ry[rycount^1]);
+    ry[rycount] -= (BCoef[1] * ry[rycount^1]);
     rycount^=1;
     return ry[rycount^1];
 }
+float by[2]; //output samples
+float bx[2]; //input samples
+int f_bycount = 0;
 
-al_fixed by[2]; //output samples
-al_fixed bx[2]; //input samples
-int bycount=0;
-
-static inline al_fixed firby(al_fixed NewSample) 
+static inline float firby(float newsample) 
 {
     //Calculate the new output
-    bx[bycount] = al_fixmul(ACoef[0],NewSample);
-    by[bycount] = bx[0]+bx[1];
-    by[bycount] -= al_fixmul(BCoef[1],by[bycount^1]);
-    bycount^=1;
-    return by[bycount^1];
+    bx[f_bycount] = (ACoef[0] * newsample);
+    by[f_bycount] = bx[0]+bx[1];
+    by[f_bycount] -= (BCoef[1] * by[f_bycount^1]);
+    f_bycount^=1;
+
+    //log_cmp_float(__FUNCTION__, "by[bycount^1] = ", by[bycount^1], by[bycount^1]);
+
+    return by[f_bycount^1];
 }
 
-int rtable[8],gtable[8],btable[8];
-al_fixed ytable[8];
+float ytable[8]; // Convert to float alongside for now.
+
 
 /******************************************************************************
 * Public Function Definitions
@@ -98,68 +106,79 @@ al_fixed ytable[8];
 void initpaltables()
 {
     int c;
+    int red,green,blue;
+    // Init constants.
+
     for (c=0;c<8;c++)
     {
-        rtable[c]=(c&1)?255:0;
-        gtable[c]=(c&2)?255:0;
-        btable[c]=(c&4)?255:0;
-        ytable[c]=al_ftofix((rtable[c]*0.299f)+(gtable[c]*0.587)+(btable[c]*0.114));
+        red   = (c&1)?255:0;
+        green = (c&2)?255:0;
+        blue  = (c&4)?255:0;
+        ytable[c] = (red*0.299f)+(green*0.587)+(blue*0.114);
     }
     initcoef();
 }
 
-//  0xFFrrGGbb
 
-void palfilter(ALLEGRO_LOCKED_REGION * regionSource, ALLEGRO_LOCKED_REGION * regionDest, int depth)
+void palfilter(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
 {
     int x,y;
     uint32_t c;
-    int r,g,b;
-    int index;
+    float red,green,blue;
+    float paly, palry, palby;
+    char * region_data = NULL;
 
-    al_fixed constr=al_ftofix(-0.509f);
-    al_fixed constb=al_ftofix(0.194);
-    al_fixed paly,palry,palby;
+    ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+    //log_time_mark("palfilt - locked");
 
     for (y=0;y<512;y++)
     {
+        region_data = (char *)destRegion->data + (destRegion->pitch * y);
+
         yx[2]=yx[1]=yx[0]=0;
         yy[2]=yy[1]=yy[0]=0;
         rx[0]=ry[0]=rx[1]=ry[1]=0;
         bx[0]=by[0]=bx[1]=by[1]=0;
-//                iir(0,1);
         for (x=0;x<640;x++)
         {
-            c = video_get_pixel_rgb(regionSource, y >> 1,x);
-            r = ((c >> 16) & 0xff); 
-            g = ((c >>  8) & 0xff);
-            b = (c & 0xff);
-            // TODO: Convert back to old table format for now.
-            index = 0 + (r==255?1:0) + (g==255?2:0) + (b==255?4:0);
+            c = *(elk_screen_data + ((y >> 1) * 640) + x);
 
-            paly=ytable[index];
-            palry=al_itofix(r)-paly;
-            palby=al_itofix(b)-paly;
+            red = (c & 1)?255:0; 
+            green = (c & 2)?255:0; 
+            blue = (c & 4)?255:0;
 
+            paly = ytable[c];
+            palry= red - paly;
+            palby= blue - paly;
+ 
             paly=iir(paly);
-            if (paly>(255<<16)) paly=255<<16;
-            if (paly<0)   paly=0;
 
-            palry=firry(palry);
-            palby=firby(palby);
 
-            r=al_fixtoi(palry+paly);
-            b=al_fixtoi(palby+paly);
-            g=al_fixtoi((al_fixmul(constr,palry)-al_fixmul(constb,palby))+paly);
+            if (paly > 255) paly=255;
+            if (paly < 0)   paly=0;
 
-            if (r>255) r=255;
-            if (r<0)   r=0;
-            if (g>255) g=255;
-            if (g<0)   g=0;
-            if (b>255) b=255;
-            if (b<0)   b=0;
-            c = 0xFF000000 | (r << 16) | (g << 8) | b;
-            video_put_pixel_rgb(regionDest, y, x, c);
+            palry = firry(palry);
+            palby = firby(palby);
+
+            red   = palry+paly; 
+            blue  = palby+paly; 
+            green = (constr * palry) - (constb * palby) + paly;
+
+            if (red>255) red=255;
+            if (red<0)   red=0;
+            if (green>255) green=255;
+            if (green<0)   green=0;
+            if (blue>255) blue=255;
+            if (blue<0)   blue=0;
+
+            c = 0xff000000 | ((int)red << 16) | ((int)green << 8) | (int) blue;
+
+            // Plot to the correct pixel
+            *((uint32_t *)((char *)region_data)) = c;
+
+            region_data += destRegion->pixel_size;
         }
     }
+    al_unlock_bitmap(destBitmap);
+    //log_time_mark("palfilt - unlock and end");
 }

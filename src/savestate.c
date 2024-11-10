@@ -27,7 +27,7 @@ void dosavestate(const char * filename)
         putc('E',f); putc('L',f); putc('K',f); putc('S',f);
         putc('N',f); putc('A',f); putc('P',f); putc('1',f);
 
-        putc(elkConfig.expansion.turbo,f);
+        putc((int)elkConfig.expansion.turbo,f);
         putc(elkConfig.expansion.mrb,f);
         putc(elkConfig.expansion.mrbmode,f);
         putc(usedrom6,f);
@@ -56,18 +56,18 @@ void doloadstate(const char * filename)
         FILE *f=fopen(filename,"rb");
         for (c=0;c<8;c++) getc(f);
         
-        elkConfig.expansion.turbo   = getc(f);
-        elkConfig.expansion.mrb     = getc(f);
+        elkConfig.expansion.turbo   = (bool) getc(f);
+        elkConfig.expansion.mrb     = (bool) getc(f);
         elkConfig.expansion.mrbmode = getc(f);
         usedrom6=getc(f);
         
-        elkConfig.expansion.plus3   = getc(f);
-        elkConfig.expansion.adfsena = getc(f);
-        elkConfig.expansion.dfsena  = getc(f);
+        elkConfig.expansion.plus3   = (bool) getc(f);
+        elkConfig.expansion.adfsena = (bool) getc(f);
+        elkConfig.expansion.dfsena  = (bool) getc(f);
         getc(f);
         
         elkConfig.sound.sndex=getc(f);
-        elkConfig.expansion.plus1=getc(f);
+        elkConfig.expansion.plus1 = (bool) getc(f);
         elkConfig.expansion.firstbyte=getc(f);
         getc(f);
         

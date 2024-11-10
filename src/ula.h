@@ -58,7 +58,7 @@ void savescrshot(const char * filename);
 void loadulastate(FILE *f);
 void saveulastate(FILE *f);
 
-void startmovie();
+void startmovie(const char * filename);
 void stopmovie();
 
 #endif // _ULA_H

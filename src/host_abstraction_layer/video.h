@@ -34,13 +34,10 @@
 // Various defines for various type of display and display filters
 #define SCANLINES 0
 #define LINEDBL   1
-#define _2XSAI    5
+#define _2XSAI    2
 #define SCALE2X   3
 #define EAGLE     4
-//#define PAL       5 
-
-// TODO: For now..
-#define PAL       2
+#define PAL       5 
 
 /******************************************************************************
 * Typedefs
@@ -92,12 +89,9 @@ void video_set_depth_and_elk_palette();
 void video_set_desktop_color_depth();
 int  video_get_desktop_color_depth();
 
-void video_put_pixel(int y, int x, uint8_t color); // TODO: Depricated
-void video_put_pixel_line(int y, int x, int width, uint8_t color);
-
-void video_blit_to_screen(int drawMode, int colDepth);
+void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth);
 void video_capture_screenshot(int drawMode, int colDepth);
-int  video_save_bmp(const char * filename);
+int  video_save_screenshot_bmp(const char * filename);
 void video_destroy_screenshot();
 
 void video_clearall();

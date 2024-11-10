@@ -122,6 +122,7 @@ void palfilter(BITMAP * bitmapSource, BITMAP * bitmapDest, int depth)
                                 if (b<0)   b=0;
 
                                 ((uint32_t *)bitmapDest->line[y])[x]=makecol(r,g,b);
+                                ((uint32_t *)bitmapDest->line[y+1])[x]=makecol(r,g,b);
                         }
                 }
                 else

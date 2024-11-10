@@ -6,7 +6,7 @@
 
 uint8_t readfirstbyte()
 {
-        int c;
+//        int c;
         uint8_t temp=0xFF;
 //        if (!num_joysticks) num_joysticks++;
 //        if (joy[elkConfig.expansion.joffset%num_joysticks].stick[0].axis[1].pos<-32) temp&=~0x01;
