@@ -53,6 +53,10 @@ int keys[2][14][4]=
 
 bool key[ALLEGRO_KEY_MAX];
 
+int keylookup[ALLEGRO_KEY_MAX];
+
+bool keydefining = false;
+
 // Allegro allows 128 keys to be used.
 //
 // This array contains a mapping for each and every one of them.
@@ -79,7 +83,6 @@ void keyboard_makelayout()
 {
         int c,d,e;
         memset(keyl,0,sizeof(keyl));
-        keydefining = false;
 
         /* Establish a mapping from emulated key presses to keyboard matrix values. */
 
