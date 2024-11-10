@@ -1,5 +1,6 @@
 #include <allegro5/allegro.h>
 #include "host_abstraction_layer/keyboard.h"
+#include "keyboard_internal.h"
 #include "elk.h"
 #include "host_abstraction_layer/event_handler.h"
 #include "logger.h"
@@ -74,12 +75,11 @@ bool key[ALLEGRO_KEY_MAX];
 //
 int keyl[ALLEGRO_KEY_MAX];
 
-int keylookup[ALLEGRO_KEY_MAX];
-
 void keyboard_makelayout()
 {
         int c,d,e;
         memset(keyl,0,sizeof(keyl));
+        keydefining = false;
 
         /* Establish a mapping from emulated key presses to keyboard matrix values. */
 
@@ -199,13 +199,6 @@ void key_up_event(ALLEGRO_EVENT *event)
 //            if (shiftctrl && keylogical)
 //                set_logical_shift_ctrl_if_idle();
 //            keycode = map_keypad_intern(keycode, unichar);
-//            for (int act = 0; act < KEY_ACTION_MAX; act++) {
-//                log_debug("keyboard: checking key action %d:%s codes %d<>%d, alt %d<>%d", act, keyact_const[act].name, keycode, keyactions[act].keycode, hostalt, keyactions[act].altstate);
-//                if (keycode == keyactions[act].keycode && keyactions[act].altstate == hostalt) {
-//                    keyact_const[act].upfunc();
-//                    return;keylookup[keycode]
-//                }
-//            }
 //            if (keylogical)
 //                set_key_logical(keycode, unichar, false);
 //            else
@@ -226,13 +219,6 @@ void key_char_event(ALLEGRO_EVENT *event)
 //            keycode = ALLEGRO_KEY_CAPSLOCK;
 //        else if (keycode == ALLEGRO_KEY_S && keyas && !keylogical)
 //            keycode = ALLEGRO_KEY_LCTRL;
-//        for (int act = 0; act < KEY_ACTION_MAX; act++) {
-//            log_debug("keyboard: checking key action %d:%s codes %d<>%d, alt %d<>%d", act, keyact_const[act].name, keycode, keyactions[act].keycode, hostalt, keyactions[act].altstate);
-//            if (keycode == keyactions[act].keycode && keyactions[act].altstate == hostalt) {
-//                keyact_const[act].downfunc();
-//                return;
-//            }
-//        }
 //        if (keylogical)
 //            set_key_logical(keycode, unichar, true);
 //        else
@@ -245,23 +231,23 @@ void key_char_event(ALLEGRO_EVENT *event)
 elk_event_t keyboard_handle_event(ALLEGRO_EVENT *event)
 {
     elk_event_t elkEvent = 0;
-    switch(event->type) 
+    if (!keydefining)
     {
-        // Keyboard handling.
-        case ALLEGRO_EVENT_KEY_DOWN:
-//            if (!keydefining)
+        switch(event->type) 
+        {
+            // Keyboard handling.
+            case ALLEGRO_EVENT_KEY_DOWN:
                 key_down_event(event);
-            break;
+                break;
 
-        case ALLEGRO_EVENT_KEY_CHAR:
-//            if (!keydefining)
+            case ALLEGRO_EVENT_KEY_CHAR:
                 key_char_event(event);
-            break;
+                break;
 
-        case ALLEGRO_EVENT_KEY_UP:
-//           if (!keydefining)
+            case ALLEGRO_EVENT_KEY_UP:
                 key_up_event(event);
-            break;
+                break;
+        }
     }
     return elkEvent;
 }

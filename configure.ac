@@ -55,6 +55,7 @@ else
    AC_CHECK_LIB([allegro_acodec], [al_init_acodec_addon])
    AC_CHECK_LIB([allegro_audio], [al_install_audio])
    AC_CHECK_LIB([allegro_dialog], [al_init_native_dialog_addon])
+   AC_CHECK_LIB([allegro_fonts], [al_init_font_addon])
    AC_CHECK_LIB([allegro_image], [al_init_image_addon])
    AC_CHECK_LIB([allegro_primitives], [al_init_primitives_addon])
 fi

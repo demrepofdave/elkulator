@@ -54,7 +54,8 @@ elkulator_hal_src = src/host_abstraction_layer/allegro_5/adc.c  \
                     src/host_abstraction_layer/allegro_5/samples.c \
                     src/host_abstraction_layer/allegro_5/scale2x.c \
                     src/host_abstraction_layer/allegro_5/soundopenal.c \
-                    src/host_abstraction_layer/allegro_5/video.c
+                    src/host_abstraction_layer/allegro_5/video.c \
+                    src/host_abstraction_layer/allegro_5/keyboard_gui.c
 endif
 
 elkulator_SOURCES = src/1770.c \

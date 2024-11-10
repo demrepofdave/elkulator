@@ -30,9 +30,6 @@ void rpclog(char *format, ...);
 
 extern int rombank,intrombank;
 extern int extrom;
-#ifdef HAL_ALLEGRO_4
-extern int keylookup[128];
-#endif
 
 void polltape();
 
