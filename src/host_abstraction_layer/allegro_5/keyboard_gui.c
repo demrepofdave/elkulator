@@ -2,6 +2,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <limits.h>
 #include "keyboard_internal.h"
+#include "host_abstraction_layer/keyboard.h"
 #include "logger.h"
 
 typedef enum {
@@ -13,10 +14,9 @@ typedef enum {
 
 typedef struct {
     uint16_t x, y, w, h;
-    key_col_t col;
     char cap[12];
     char name[12];
-    uint8_t keycode;
+    elk_key_id elkkeyid;
 } key_cap_t;
 
 typedef struct {
@@ -34,71 +34,71 @@ typedef enum {
 #define ELK_NKEY 56
 
 static const key_cap_t kcaps_elk[ELK_NKEY] = {
-        /* x,y,w,h,        Colour,  key,  fullname, key code */
+        /* x,y,w,h,       key,  fullname,      elk hal keycode */
 
-        { 26,56,28,28,    COL_GREY,  "ESC",    "Escape",      0x70},
-        { 58,56,28,28,    COL_GREY,  "1",      "1",      0x30},
-        { 90,56,28,28,    COL_GREY,  "2",      "2",      0x31},
-        { 122,56,28,28,   COL_GREY,  "3",      "3",      0x11},
-        { 154,56,28,28,   COL_GREY,  "4",      "4",      0x12},
-        { 186,56,28,28,   COL_GREY,  "5",      "5",      0x13},
-        { 218,56,28,28,   COL_GREY,  "6",      "6",      0x34},
-        { 250,56,28,28,   COL_GREY,  "7",      "7",      0x24},
-        { 282,56,28,28,   COL_GREY,  "8",      "8",      0x15},
-        { 314,56,28,28,   COL_GREY,  "9",      "9",      0x26},
-        { 346,56,28,28,   COL_GREY,  "0",      "0",      0x27},
-        { 378,56,28,28,   COL_GREY,  "=",      "=",      0x17},
-        { 410,56,28,28,   COL_GREY,  "LFT",    "Left",    0x19},
-        { 442,56,28,28,   COL_GREY,  "RGT",    "Right",   0x79},
-        { 474,56,28,28,   COL_GREY,  "BRK",    "Break",   0xff},  // 15 keys - top row.
+        { 26,56,28,28,    "ESC",   "Escape",   ELK_KEY_ESCAPE    },
+        { 58,56,28,28,    "1",     "1",        ELK_KEY_1         },
+        { 90,56,28,28,    "2",     "2",        ELK_KEY_2         },
+        { 122,56,28,28,   "3",     "3",        ELK_KEY_3         },
+        { 154,56,28,28,   "4",     "4",        ELK_KEY_4         },
+        { 186,56,28,28,   "5",     "5",        ELK_KEY_5         },
+        { 218,56,28,28,   "6",     "6",        ELK_KEY_6         },
+        { 250,56,28,28,   "7",     "7",        ELK_KEY_7         },
+        { 282,56,28,28,   "8",     "8",        ELK_KEY_8         },
+        { 314,56,28,28,   "9",     "9",        ELK_KEY_9         },
+        { 346,56,28,28,   "0",     "0",        ELK_KEY_0         },
+        { 378,56,28,28,   "=",     "=",        ELK_KEY_EQUALS    },
+        { 410,56,28,28,   "LFT",   "Left",     ELK_KEY_LEFT      },
+        { 442,56,28,28,   "RGT",   "Right",    ELK_KEY_RIGHT     },
+        { 474,56,28,28,   "BRK",   "Break",    ELK_KEY_BREAK     },  // 15 keys - top row.
 
-        { 42,88,28,28,    COL_GREY,  "FN",     "Function",      0x60},
-        { 74,88,28,28,    COL_GREY,  "Q",      "Q",      0x10},
-        { 106,88,28,28,   COL_GREY,  "W",      "W",      0x21},
-        { 138,88,28,28,   COL_GREY,  "E",      "E",      0x22},
-        { 170,88,28,28,   COL_GREY,  "R",      "R",      0x33},
-        { 202,88,28,28,   COL_GREY,  "T",      "T",      0x23},
-        { 234,88,28,28,   COL_GREY,  "Y",      "Y",      0x44},
-        { 266,88,28,28,   COL_GREY,  "U",      "U",      0x35},
-        { 298,88,28,28,   COL_GREY,  "I",      "I",      0x25},
-        { 330,88,28,28,   COL_GREY,  "O",      "O",      0x36},
-        { 362,88,28,28,   COL_GREY,  "P",      "P",      0x37},
-        { 394,88,28,28,   COL_GREY,  "UP",     "Up",      0x39},
-        { 426,88,28,28,   COL_GREY,  "DWN",    "Down",    0x29},
-        { 458,88,28,28,   COL_GREY,  "CPY",    "Copy",    0x69}, // TODO: Reposition - BBC position. - 14 keys 2nd row
+        { 42,88,28,28,    "FN",    "Function", ELK_KEY_FUNCTION  },
+        { 74,88,28,28,    "Q",     "Q",        ELK_KEY_Q         },
+        { 106,88,28,28,   "W",     "W",        ELK_KEY_W         },
+        { 138,88,28,28,   "E",     "E",        ELK_KEY_E         },
+        { 170,88,28,28,   "R",     "R",        ELK_KEY_R         },
+        { 202,88,28,28,   "T",     "T",        ELK_KEY_T         },
+        { 234,88,28,28,   "Y",     "Y",        ELK_KEY_Y         },
+        { 266,88,28,28,   "U",     "U",        ELK_KEY_U         },
+        { 298,88,28,28,   "I",     "I",        ELK_KEY_I         },
+        { 330,88,28,28,   "O",     "O",        ELK_KEY_O         },
+        { 362,88,28,28,   "P",     "P",        ELK_KEY_P         },
+        { 394,88,28,28,   "UP",    "Up",       ELK_KEY_UP        },
+        { 426,88,28,28,   "DWN",   "Down",     ELK_KEY_DOWN      },
+        { 458,88,28,28,   "CPY",   "Copy",     ELK_KEY_COPY      }, // TODO: Reposition - BBC position. - 14 keys 2nd row
 
-        { 50,120,28,28,   COL_GREY,  "CTL",    "Ctrl",   0x01},
-        { 82,120,28,28,   COL_GREY,  "A",      "A",      0x41},
-        { 114,120,28,28,  COL_GREY,  "S",      "S",      0x51},
-        { 146,120,28,28,  COL_GREY,  "D",      "D",      0x32},
-        { 178,120,28,28,  COL_GREY,  "F",      "F",      0x43},
-        { 210,120,28,28,  COL_GREY,  "G",      "G",      0x53},
-        { 242,120,28,28,  COL_GREY,  "H",      "H",      0x54},
-        { 274,120,28,28,  COL_GREY,  "J",      "J",      0x45},
-        { 306,120,28,28,  COL_GREY,  "K",      "K",      0x46},
-        { 338,120,28,28,  COL_GREY,  "L",      "L",      0x56},
-        { 370,120,28,28,  COL_GREY,  ";",      ";",      0x57},
-        { 402,120,28,28,  COL_GREY,  ":",      ":",      0x48},
-        { 434,120,44,28,  COL_GREY,  "RET",    "Return",  0x49}, // 13 keys 3rd row
+        { 50,120,28,28,   "CTL",   "Ctrl",     ELK_KEY_CONTROL   },
+        { 82,120,28,28,   "A",     "A",        ELK_KEY_A         },
+        { 114,120,28,28,  "S",     "S",        ELK_KEY_S         },
+        { 146,120,28,28,  "D",     "D",        ELK_KEY_D         },
+        { 178,120,28,28,  "F",     "F",        ELK_KEY_F         },
+        { 210,120,28,28,  "G",     "G",        ELK_KEY_G         },
+        { 242,120,28,28,  "H",     "H",        ELK_KEY_H         },
+        { 274,120,28,28,  "J",     "J",        ELK_KEY_J         },
+        { 306,120,28,28,  "K",     "K",        ELK_KEY_K         },
+        { 338,120,28,28,  "L",     "L",        ELK_KEY_L         },
+        { 370,120,28,28,  ";",     ";",        ELK_KEY_SEMICOLON },
+        { 402,120,28,28,  ":",     ":",        ELK_KEY_COLON     },
+        { 434,120,44,28,  "RET",   "Return",   ELK_KEY_RETURN    }, // 13 keys 3rd row
 
-        { 50,152,44,28,   COL_GREY,  "SHIFT",  "Shift",  0x00},
-        { 98,152,28,28,   COL_GREY,  "Z",      "Z",      0x61},
-        { 130,152,28,28,  COL_GREY,  "X",      "X",      0x42},
-        { 162,152,28,28,  COL_GREY,  "C",      "C",      0x52},
-        { 194,152,28,28,  COL_GREY,  "V",      "V",      0x63},
-        { 226,152,28,28,  COL_GREY,  "B",      "B",      0x64},
-        { 258,152,28,28,  COL_GREY,  "N",      "N",      0x55},
-        { 290,152,28,28,  COL_GREY,  "M",      "M",      0x65},
-        { 322,152,28,28,  COL_GREY,  ",",      ",",      0x66},
-        { 354,152,28,28,  COL_GREY,  ".",      ".",      0x67},
-        { 386,152,28,28,  COL_GREY,  "/",      "/",      0x68},
-        { 418,152,44,28,  COL_GREY,  "SHIFT",  "Shift",  0x00},
-        { 466,152,28,28,  COL_GREY,  "DEL",    "Delete", 0x59}, // TODO: Reposition - BBC position - 13 keys 4th row
+        { 50,152,44,28,   "SHIFT", "Shift",    ELK_KEY_SHIFT     },
+        { 98,152,28,28,   "Z",     "Z",        ELK_KEY_Z         },
+        { 130,152,28,28,  "X",     "X",        ELK_KEY_X         },
+        { 162,152,28,28,  "C",     "C",        ELK_KEY_C         },
+        { 194,152,28,28,  "V",     "V",        ELK_KEY_V         },
+        { 226,152,28,28,  "B",     "B",        ELK_KEY_B         },
+        { 258,152,28,28,  "N",     "N",        ELK_KEY_N         },
+        { 290,152,28,28,  "M",     "M",        ELK_KEY_M         },
+        { 322,152,28,28,  ",",     ",",        ELK_KEY_COMMA     },
+        { 354,152,28,28,  ".",     ".",        ELK_KEY_FULLSTOP  },
+        { 386,152,28,28,  "/",     "/",        ELK_KEY_FORWARD_SLASH },
+        { 418,152,44,28,  "SHIFT", "Shift",    ELK_KEY_SHIFT     },
+        { 466,152,28,28,  "DEL",   "Delete",   ELK_KEY_DEL       },
 
-        { 146,184,252,28, COL_GREY,  "SPACE",  "Space",  0x62}, // 1 key bottom row.
+        { 146,184,252,28, "SPACE", "Space",    ELK_KEY_SPACE     }, // 1 key bottom row.
 };
 
-static const key_dlg_t elk_kbd_dlg = { kcaps_elk, kcaps_elk + ELK_NKEY, 538, 304 };
+static const key_dlg_t elk_kbd_dlg = { kcaps_elk, kcaps_elk + ELK_KEY_MAX, 538, 304 };
 
 #define BTNS_Y    266
 #define BTNS_W     60
@@ -128,29 +128,18 @@ static void draw_keyboard(const key_dlg_t *key_dlg, int ok_x, int can_x)
     navy  = al_map_rgb( 32,  32,  64);
     green = al_map_rgb(  0,  127,  0);
     al_clear_to_color(brown);
-    for (kptr = key_dlg->captab; kptr < key_dlg->capend; kptr++) {
-        switch(kptr->col) {
-            case COL_RED:
-                draw_button(kptr->x, kptr->y, kptr->w, kptr->h, red, white, kptr->cap);
-                break;
-            case COL_GREY:
-                draw_button(kptr->x, kptr->y, kptr->w, kptr->h, grey, white, kptr->cap);
-                break;
-            case COL_BLACK:
-                draw_button(kptr->x, kptr->y, kptr->w, kptr->h, black, white, kptr->cap);
-                break;
-            case COL_GREEN:
-                draw_button(kptr->x, kptr->y, kptr->w, kptr->h, green, white, kptr->cap);
-                break;
-        }
+    for (kptr = key_dlg->captab; kptr < key_dlg->capend; kptr++) 
+    {
+        draw_button(kptr->x, kptr->y, kptr->w, kptr->h, grey, white, kptr->cap);
     }
     draw_button(ok_x, BTNS_Y, BTNS_W, BTNS_H, navy, white, "OK");
     draw_button(can_x, BTNS_Y, BTNS_W, BTNS_H, navy, white, "Cancel");
     al_flip_display();
 }
 
-static void redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8_t *keylookcpy)
+static elk_key_id redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8_t *keylookcpy)
 {
+    elk_key_id elkkeyid = ELK_KEY_MAX;
     int mid_x  = key_dlg->disp_x/2;
     int left_x = mid_x-200;
     int mid_y  = key_dlg->disp_y/2;
@@ -160,7 +149,8 @@ static void redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8
     char s[1024], *p;
     int size, remain, count;
 
-    log_debug("keydef-allegro: BBC key %s (%s), code %d clicked", kptr->cap, kptr->name, kptr->keycode);
+    log_debug("keydef-allegro: Elk key %s (%s) clicked", kptr->cap, kptr->name);
+    elkkeyid = kptr->elkkeyid;
 
     al_draw_filled_rectangle(left_x, top_y, left_x + 400, top_y + 72, navy);
     snprintf(s, sizeof s, "Redefining %s", kptr->name);
@@ -169,10 +159,11 @@ static void redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8
     p = s + size;
     remain = sizeof s - size;
     count = 0;
-    int actcode = 0xff - kptr->keycode;
 
-    for (int code = 0; remain > 0 && code < ALLEGRO_KEY_MAX; code++) {
-        if (keylookcpy[code] == kptr->keycode) {
+    for (int code = 0; remain > 0 && code < ALLEGRO_KEY_MAX; code++) 
+    {
+        if (keylookcpy[code] == kptr->elkkeyid) 
+        {
             const char *fmt = count == 0 ? " %s" : ", %s";
             size = snprintf(p, remain, fmt, al_keycode_to_name(code));
             p += size;
@@ -182,6 +173,8 @@ static void redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8
     al_draw_text(font, white, left_x+24, top_y+32, ALLEGRO_ALIGN_LEFT, s);
     al_draw_text(font, white, left_x+24, top_y+48, ALLEGRO_ALIGN_LEFT, "Please press new key...");
     al_flip_display();
+
+    return (elkkeyid);
 }
 
 static bool mouse_within(ALLEGRO_EVENT *event, int x, int y, int w, int h)
@@ -200,6 +193,9 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
     const key_cap_t *kptr = NULL;
     int mid_x, ok_x, can_x;
     bool alt_down = false;
+    elk_key_id elkkeyid = ELK_KEY_MAX;
+
+    keyboard_debug_dump();
 
     if (!font) {
         al_init_font_addon();
@@ -209,8 +205,10 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
     }
 
     key_dlg = &elk_kbd_dlg;
-    if ((display = al_create_display(key_dlg->disp_x, key_dlg->disp_y))) {
-        if ((queue = al_create_event_queue())) {
+    if ((display = al_create_display(key_dlg->disp_x, key_dlg->disp_y)))
+    {
+        if ((queue = al_create_event_queue()))
+        {
             al_init_user_event_source(&uevsrc);
             al_register_event_source(queue, &uevsrc);
             al_register_event_source(queue, al_get_display_event_source(display));
@@ -220,31 +218,47 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
             ok_x = mid_x-3-BTNS_W;
             can_x = mid_x+3;
             state = ST_ELK_KEY;
+            
+
+            // Make a copy and modify that (just in case the user cancels the whole operation).
             memcpy(keylookcpy, keylookup, ALLEGRO_KEY_MAX);
+
             draw_keyboard(key_dlg, ok_x, can_x);
-            while (state != ST_DONE) {
+            while (state != ST_DONE)
+            {
                 al_wait_for_event(queue, &event);
-                switch(event.type) {
+                switch(event.type)
+                {
                     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                        if (mouse_within(&event, ok_x, BTNS_Y, BTNS_W, BTNS_H)) {
-                            // Ok button clicked.
+                        if (mouse_within(&event, ok_x, BTNS_Y, BTNS_W, BTNS_H)) 
+                        {
+                            // Ok button clicked (apply settings to main keyboard lookup table)
+                            log_debug("ok");
                             memcpy(keylookup, keylookcpy, ALLEGRO_KEY_MAX);
                             state = ST_DONE;
                         }
-                        else if (mouse_within(&event, can_x, BTNS_Y, BTNS_W, BTNS_H)) {
+                        else if (mouse_within(&event, can_x, BTNS_Y, BTNS_W, BTNS_H))
+                        {
                             // Cancel button clicked.
-                            if (state == ST_PC_KEY) {
+                            if (state == ST_PC_KEY) 
+                            {
                                 state = ST_ELK_KEY;
                                 draw_keyboard(key_dlg, ok_x, can_x);
                             }
                             else
+                            {
+                                log_debug("Cancel");
                                 state = ST_DONE;
+                            }
                         }
-                        else if (state == ST_ELK_KEY) {
+                        else if (state == ST_ELK_KEY) 
+                        {
                             // Search the keyboard buttons.
-                            for (kptr = key_dlg->captab; kptr < key_dlg->capend; kptr++) {
-                                if (mouse_within(&event, kptr->x, kptr->y, kptr->w, kptr->h)) {
-                                    redef_message(key_dlg, kptr, keylookcpy);
+                            for (kptr = key_dlg->captab; kptr < key_dlg->capend; kptr++) 
+                            {
+                                if (mouse_within(&event, kptr->x, kptr->y, kptr->w, kptr->h))
+                                {
+                                    elkkeyid = redef_message(key_dlg, kptr, keylookcpy);
                                     state = ST_PC_KEY;
                                     break;
                                 }
@@ -256,17 +270,18 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                         state = ST_DONE;
                         break;
                     case ALLEGRO_EVENT_KEY_DOWN:
-                        if (event.keyboard.keycode == ALLEGRO_KEY_ALT || event.keyboard.keycode == ALLEGRO_KEY_ALTGR) {
+                        if (event.keyboard.keycode == ALLEGRO_KEY_ALT || event.keyboard.keycode == ALLEGRO_KEY_ALTGR)
+                        {
                             log_debug("keydef-allegro: alt down");
                             alt_down = true;
                         }
                         break;
                     case ALLEGRO_EVENT_KEY_CHAR:
-                        if (state == ST_PC_KEY) {
+                        if (state == ST_PC_KEY) 
+                        {
                             int keycode = event.keyboard.keycode;
-                            int actcode = kptr->keycode;
-                            log_debug("keydef-allegro: mapping allegro code %d:%s to BBC code %02x", keycode, al_keycode_to_name(keycode), actcode);
-                            keylookcpy[event.keyboard.keycode] = actcode;
+                            log_debug("keydef-allegro: mapping allegro code %d:%s to Elk code %d", keycode, al_keycode_to_name(keycode), elkkeyid);
+                            keylookcpy[keycode] = elkkeyid;
                             state = ST_ELK_KEY;
                             draw_keyboard(key_dlg, ok_x, can_x);
                         }
@@ -285,6 +300,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
     } else
         log_debug("keydef-allegro: unable to create display");
     keydefining = false;
+    keyboard_debug_dump();
     return NULL;
 }
 
@@ -306,15 +322,15 @@ void gui_keydefine_close(void)
     al_emit_user_event(&uevsrc, &event, NULL);
 }
 
-int keydef_lookup_name(const char *name)
-{
-    const key_cap_t *ptr = kcaps_elk;
-    const key_cap_t *end = ptr + ELK_NKEY;
+//int keydef_lookup_name(const char *name)
+//{
+//    const key_cap_t *ptr = kcaps_elk;
+//    const key_cap_t *end = ptr + ELK_KEY_MAX;
 
-    while (ptr < end) {
-        if (strcasecmp(name, ptr->cap) == 0 || strcasecmp(name, ptr->name) == 0)
-            return ptr->keycode;
-        ptr++;
-    }
-    return 0;
-}
+//    while (ptr < end) {
+//        if (strcasecmp(name, ptr->cap) == 0 || strcasecmp(name, ptr->name) == 0)
+//            return ptr->keycode;
+//        ptr++;
+//    }
+//    return 0;
+//}
