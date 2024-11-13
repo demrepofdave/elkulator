@@ -23,6 +23,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define printf rpclog
 
@@ -66,10 +67,8 @@ extern char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
 
 void redefinekeys();
 
-int break_pressed();
-int menu_pressed();
-void update_break_keys();
-void update_menu_keys();
+bool break_pressed();
+bool menu_pressed();
 
 void resetserial();
 uint8_t readserial(uint16_t addr);

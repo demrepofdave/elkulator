@@ -42,21 +42,25 @@ char *key_names[] =
 };
 
 /* Key reading control. */
-void update_break_keys()
+static bool special_key_pressed(elk_key_id elk_keycode)
 {
+        bool result = false;
+        for (int i = 0; i < KEY_MAX; i++)
+        {
+                if (keylookup[i] == elk_keycode && key[i])
+                {
+                        result = true;
+                }
+        }
+        return result;
 }
 
-void update_menu_keys()
+bool break_pressed()
 {
+        return special_key_pressed(ELK_KEY_BREAK);
 }
 
-
-int break_pressed()
+bool menu_pressed()
 {
-        return 0;
-}
-
-int menu_pressed()
-{
-        return 0;
+        return special_key_pressed(ELK_SPECIAL_KEY_MENU);
 }

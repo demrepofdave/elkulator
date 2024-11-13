@@ -91,7 +91,7 @@ static const key_cap_t kcaps_elk[ELK_NKEY] = {
         { 290,152,28,28,  "M",     "M",        ELK_KEY_M         },
         { 322,152,28,28,  ",",     ",",        ELK_KEY_COMMA     },
         { 354,152,28,28,  ".",     ".",        ELK_KEY_FULLSTOP  },
-        { 386,152,28,28,  "/",     "/",        ELK_KEY_FORWARD_SLASH },
+        { 386,152,28,28,  "/",     "/",        ELK_KEY_SLASH },
         { 418,152,44,28,  "SHIFT", "Shift",    ELK_KEY_SHIFT     },
         { 466,152,28,28,  "DEL",   "Delete",   ELK_KEY_DEL       },
 

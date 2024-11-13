@@ -240,13 +240,13 @@ void initelk(int argc, char *argv[])
         loaddiscsamps();
         maketapenoise();
 
-        keyboard_makelayout();
+        makekeyl();
         
         video_set_display_switch_mode_background();
 }
 
 int ddnoiseframes=0;
-int oldbreak=0;
+bool oldbreak=false;
 int resetit=0;
 int runelkframe=0;
 

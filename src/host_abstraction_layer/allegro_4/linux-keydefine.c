@@ -2,6 +2,7 @@
   Linux keyboard redefinition GUI*/
 
 #ifndef WIN32
+#include <stdbool.h>
 #include <allegro.h>
 #include "elk.h"
 #include "host_abstraction_layer/keyboard.h"
@@ -451,61 +452,33 @@ int gui_keydefine()
         if (d[i].d1)
         {
                 for (i = 0; i < KEY_MAX; i++) keylookup[i] = keytemp[i];
-
-                update_break_keys();
-                update_menu_keys();
         }
 
         close_dialog(d, b);
         return D_O_K;
 }
 
-static void update_special_keys(int special_keys[MAX_KEYS], int keycode)
+static bool special_key_pressed(elk_key_id elk_keycode)
 {
-        int i, j = 0;
-
-        for (i = 0; i < KEY_MAX; i++)
+        bool result = false;
+        for (int i = 0; i < KEY_MAX; i++)
         {
-                if (keylookup[i] == ELK_KEY_BREAK)
-                        special_keys[j++] = i;
+                if (keylookup[i] == elk_keycode && key[i])
+                {
+                        result = true;
+                }
         }
-
-        while (j < MAX_KEYS) special_keys[j++] = -1;
+        return result;
 }
 
-void update_break_keys()
+bool break_pressed()
 {
-        update_special_keys(break_keys, KEY_F12);
+        return special_key_pressed(ELK_KEY_BREAK);
 }
 
-void update_menu_keys()
+bool menu_pressed()
 {
-        update_special_keys(menu_keys, KEY_MENU);
-}
-
-static int special_key_pressed(int special_keys[MAX_KEYS])
-{
-        int i;
-
-        for (i = 0; i < MAX_KEYS; i++)
-        {
-                if (special_keys[i] == -1)
-                        break;
-                else if (key[special_keys[i]])
-                        return 1;
-        }
-
-        return 0;
-}
-
-int break_pressed()
-{
-        return special_key_pressed(break_keys);
-}
-
-int menu_pressed()
-{
-        return special_key_pressed(menu_keys);
+        return special_key_pressed(ELK_SPECIAL_KEY_MENU);
 }
 
 #endif
