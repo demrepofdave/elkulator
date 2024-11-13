@@ -8,6 +8,8 @@
 
 int keytemp[128];
 
+extern uint8_t keylookup[KEY_MAX];
+
 /* Convert widget positions to or from screen positions. */
 
 static void move_widgets(DIALOG *d, int show)
@@ -433,7 +435,7 @@ int gui_keydefine()
 
         /* Initialise the temporary mapping. */
 
-        for (i = 0; i < 128; i++) keytemp[i] = keylookup[i];
+        for (i = 0; i < KEY_MAX; i++) keytemp[i] = keylookup[i];
 
         b = open_dialog(d);
         dp = init_dialog(d, 0);
@@ -448,7 +450,7 @@ int gui_keydefine()
 
         if (d[i].d1)
         {
-                for (i = 0; i < 128; i++) keylookup[i] = keytemp[i];
+                for (i = 0; i < KEY_MAX; i++) keylookup[i] = keytemp[i];
 
                 update_break_keys();
                 update_menu_keys();
@@ -462,9 +464,9 @@ static void update_special_keys(int special_keys[MAX_KEYS], int keycode)
 {
         int i, j = 0;
 
-        for (i = 0; i < 128; i++)
+        for (i = 0; i < KEY_MAX; i++)
         {
-                if (keylookup[i] == keycode)
+                if (keylookup[i] == ELK_KEY_BREAK)
                         special_keys[j++] = i;
         }
 

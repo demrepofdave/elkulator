@@ -186,13 +186,13 @@ void loadconfig()
 
         // Just use default keyboard for now for allegro5.
         #ifdef HAL_ALLEGRO_4
-        int c;
-        char s2[20];
-        for (c=0;c<128;c++)
-        {
-                sprintf(s2,"key_define_%03i",c);
-                keylookup[c]=getintcfg(s2,c);
-        }
+        //int c;
+        //char s2[20];
+        //for (c=0;c<128;c++)
+        //{
+        //        sprintf(s2,"key_define_%03i",c);
+        //        keylookup[c]=getintcfg(s2,c);
+        //}
         #endif
 
         /* Cartridge expansions */
@@ -245,13 +245,13 @@ void saveconfig()
         
         // Use default keyboard for now.
         #ifdef HAL_ALLEGRO_4
-        int c;
-        char s[20];
-        for (c=0;c<128;c++)
-        {
-                sprintf(s,"key_define_%03i",c);
-                writeintcfg(s,keylookup[c]);
-        }
+        //int c;
+        //char s[20];
+        //for (c=0;c<128;c++)
+        //{
+        //        sprintf(s,"key_define_%03i",c);
+        //        writeintcfg(s,keylookup[c]);
+        //}
         #endif
 
         /* Cartridge expansions */
