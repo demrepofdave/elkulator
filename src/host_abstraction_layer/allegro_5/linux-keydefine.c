@@ -4,6 +4,9 @@
 #include <allegro5/allegro.h>
 #include "elk.h"
 #include "host_abstraction_layer/keyboard.h"
+#include "keyboard_internal.h"
+
+extern bool elk_key_state[ELK_KEY_MAX];
 
 char *key_names[] =
 {
@@ -45,9 +48,9 @@ char *key_names[] =
 static bool special_key_pressed(elk_key_id elk_keycode)
 {
         bool result = false;
-        for (int i = 0; i < KEY_MAX; i++)
+        for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
         {
-                if (keylookup[i] == elk_keycode && key[i])
+                if (keylookup[i] == elk_keycode && elk_key_state[i])
                 {
                         result = true;
                 }

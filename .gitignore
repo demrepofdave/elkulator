@@ -17,6 +17,11 @@
 /roms
 /tapes
 /src/.deps
+/src/.dirstamp
 /src/elkulator
 /src/Makefile
 /src/Makefile.in
+/src/host_abstraction_layer/allegro_4/.deps/
+/src/host_abstraction_layer/allegro_5/.deps/
+/src/host_abstraction_layer/allegro_4/.dirstamp
+/src/host_abstraction_layer/allegro_5/.dirstamp
