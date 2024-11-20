@@ -72,6 +72,100 @@ static const elk_key_defaults_t elk_keycode_defaults[ELK_KEY_MAX] = {
     { NO_ALTERNATE_KEY,      NO_ALTERNATE_KEY      } // ELK_SPECIAL_KEY_MENU (not used as native menus supported in allegro 5).
 };
 
+// Host key to allegro key and string lookup?
+// HOST_KEY_xx=ELK_KEY_xx
+//
+// keylookup is populated from here.
+typedef struct 
+{
+    char * host_key_string;
+    uint8_t host_key_to_native_key_mapping;
+} host_key_mapping_t;
+
+static const host_key_mapping_t host_key_mapping_defaults[254] = 
+{
+    { "HOST_KEY_0", ALLEGRO_KEY_0 },
+    { "HOST_KEY_1", ALLEGRO_KEY_1 },
+    { "HOST_KEY_2", ALLEGRO_KEY_2 },
+    { "HOST_KEY_3", ALLEGRO_KEY_3 },
+    { "HOST_KEY_4", ALLEGRO_KEY_4  },
+    { "HOST_KEY_5", ALLEGRO_KEY_5  },
+    { "HOST_KEY_6", ALLEGRO_KEY_6  },
+    { "HOST_KEY_7", ALLEGRO_KEY_7  },
+    { "HOST_KEY_8", ALLEGRO_KEY_8  },
+    { "HOST_KEY_9", ALLEGRO_KEY_9  },
+    
+    { "HOST_KEY_A", ALLEGRO_KEY_A  },
+    { "HOST_KEY_B", ALLEGRO_KEY_B  },
+    { "HOST_KEY_C", ALLEGRO_KEY_C  },
+    { "HOST_KEY_D", ALLEGRO_KEY_D  },
+    { "HOST_KEY_E", ALLEGRO_KEY_E  },
+    { "HOST_KEY_F", ALLEGRO_KEY_F  },
+    { "HOST_KEY_G", ALLEGRO_KEY_G  },
+    { "HOST_KEY_H", ALLEGRO_KEY_H  },
+    { "HOST_KEY_I", ALLEGRO_KEY_I  },
+    { "HOST_KEY_J", ALLEGRO_KEY_J  },
+    { "HOST_KEY_K", ALLEGRO_KEY_K  },
+    { "HOST_KEY_L", ALLEGRO_KEY_L  },
+    { "HOST_KEY_M", ALLEGRO_KEY_M  },
+    { "HOST_KEY_N", ALLEGRO_KEY_N  },
+    { "HOST_KEY_O", ALLEGRO_KEY_O  },
+    { "HOST_KEY_P", ALLEGRO_KEY_P  },
+    { "HOST_KEY_Q", ALLEGRO_KEY_Q  },
+    { "HOST_KEY_R", ALLEGRO_KEY_R  },
+    { "HOST_KEY_S", ALLEGRO_KEY_S  },
+    { "HOST_KEY_T", ALLEGRO_KEY_K  },
+    { "HOST_KEY_U", ALLEGRO_KEY_L  },
+    { "HOST_KEY_V", ALLEGRO_KEY_M  },
+    { "HOST_KEY_W", ALLEGRO_KEY_N  },
+    { "HOST_KEY_X", ALLEGRO_KEY_O  },
+    { "HOST_KEY_Y", ALLEGRO_KEY_P  },
+    { "HOST_KEY_Z", ALLEGRO_KEY_Q  },
+
+    { "HOST_KEY_PAD_0", ALLEGRO_KEY_PAD_0  },
+    { "HOST_KEY_PAD_1", ALLEGRO_KEY_PAD_1  },
+    { "HOST_KEY_PAD_2", ALLEGRO_KEY_PAD_2  },
+    { "HOST_KEY_PAD_3", ALLEGRO_KEY_PAD_3  },
+    { "HOST_KEY_PAD_4", ALLEGRO_KEY_PAD_4  },
+    { "HOST_KEY_PAD_5", ALLEGRO_KEY_PAD_5  },
+    { "HOST_KEY_PAD_6", ALLEGRO_KEY_PAD_6  },
+    { "HOST_KEY_PAD_7", ALLEGRO_KEY_PAD_7  },
+    { "HOST_KEY_PAD_8", ALLEGRO_KEY_PAD_8  },
+    { "HOST_KEY_PAD_9", ALLEGRO_KEY_PAD_9  },
+    { "HOST_KEY_PAD_SLASH", ALLEGRO_KEY_PAD_SLASH  },
+    { "HOST_KEY_PAD_ASTERISK", ALLEGRO_KEY_PAD_ASTERISK  },
+    { "HOST_KEY_PAD_MINUS", ALLEGRO_KEY_PAD_MINUS  },
+    { "HOST_KEY_PAD_PLUS", ALLEGRO_KEY_PAD_PLUS  },
+    { "HOST_KEY_PAD_DELETE", ALLEGRO_KEY_PAD_DELETE  },
+    { "HOST_KEY_PAD_ENTER", ALLEGRO_KEY_PAD_ENTER  },
+
+    { "HOST_KEY_F1", ALLEGRO_KEY_F1  },
+    { "HOST_KEY_F2", ALLEGRO_KEY_F2  },
+    { "HOST_KEY_F3", ALLEGRO_KEY_F3  },
+    { "HOST_KEY_F4", ALLEGRO_KEY_F4  },
+    { "HOST_KEY_F5", ALLEGRO_KEY_F5  },
+    { "HOST_KEY_F6", ALLEGRO_KEY_F6  },
+    { "HOST_KEY_F7", ALLEGRO_KEY_F7  },
+    { "HOST_KEY_F8", ALLEGRO_KEY_F8  },
+    { "HOST_KEY_F9", ALLEGRO_KEY_F9  },
+    { "HOST_KEY_F10", ALLEGRO_KEY_F10  },
+    { "HOST_KEY_F11", ALLEGRO_KEY_F11  },
+    { "HOST_KEY_F12", ALLEGRO_KEY_F12  },
+
+    { "HOST_KEY_LSHIFT", ALLEGRO_KEY_LSHIFT  },
+    { "HOST_KEY_RSHIFT", ALLEGRO_KEY_RSHIFT  },
+    { "HOST_KEY_LCTRL", ALLEGRO_KEY_LCTRL  },
+    { "HOST_KEY_RCTRL", ALLEGRO_KEY_RCTRL  },,
+    { "HOST_KEY_ALT", ALLEGRO_KEY_ALT  },
+    { "HOST_KEY_ALTGR", ALLEGRO_KEY_ALTGR  },
+    { "HOST_KEY_LWIN", ALLEGRO_KEY_LWIN  },
+    { "HOST_KEY_RWIN", ALLEGRO_KEY_RWIN  },
+    { "HOST_KEY_MENU", ALLEGRO_KEY_MENU  },
+    { "HOST_KEY_SCROLL_LOCK", ALLEGRO_KEY_SCROLLLOCK  },
+    { "HOST_KEY_NUM_LOCK", ALLEGRO_KEY_NUMLOCK  },
+    { "HOST_KEY_CAPS_LOCK", ALLEGRO_KEY_CAPSLOCK  },
+};
+
 // Records if native key is pressed or not (true = pressed, false = not pressed)
 bool elk_key_state[ELK_KEY_MAX];
 
