@@ -144,7 +144,6 @@ int video_init_part1()
         exit(1);
     }
 
-    log_debug("Display = %p", display);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP|ALLEGRO_NO_PRESERVE_TEXTURE);
 
     ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);

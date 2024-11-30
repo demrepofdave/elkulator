@@ -7,7 +7,7 @@
 
 #define NO_ALTERNATE_KEY 0
 typedef struct {
-    uint8_t allegro_keycode_main;
+    uint8_t host_keycode_main;
     uint8_t allegro_keycode_alternate;
 } elk_key_defaults_t;
 
@@ -92,7 +92,7 @@ void keyboard_makelayout()
         for(c = 0; c < ELK_KEY_MAX; c++)
         {
             elk_key_state[c] = false;
-            keylookup[elk_keycode_defaults[c].allegro_keycode_main] = c; // Assign PC key to elk key.
+            keylookup[elk_keycode_defaults[c].host_keycode_main] = c; // Assign PC key to elk key.
             if(elk_keycode_defaults[c].allegro_keycode_alternate)
             {
                 keylookup[elk_keycode_defaults[c].allegro_keycode_alternate] = c; // Assign alternate PC key to elk key (if defined).

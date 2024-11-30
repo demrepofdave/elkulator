@@ -174,16 +174,16 @@ void uncheck_menu_item(ALLEGRO_MENU *menu, int id)
     if(menu)
     {
         int flags = al_get_menu_item_flags(menu, id);
-        log_debug("Pre Menu item %04x, flags %d", id, flags);
+        //log_debug("Pre Menu item %04x, flags %d", id, flags);
         if(flags & ALLEGRO_MENU_ITEM_CHECKED)
         {
             // If set, we untoggle
             al_set_menu_item_flags(menu, id, ALLEGRO_MENU_ITEM_CHECKBOX);
-            log_debug("unchecked!");
+            //log_debug("unchecked!");
         }
         // Post verification check
         flags = al_get_menu_item_flags(menu, id);
-        log_debug("Pre Menu item %04x, post flags %d", id, flags);
+        //log_debug("Pre Menu item %04x, post flags %d", id, flags);
     }
 }
 
