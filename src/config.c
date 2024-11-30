@@ -43,7 +43,7 @@ elk_config_t elkConfig;
 * Private Function Definitions
 *******************************************************************************/
 
-char *getstringcfg(char *name)
+char *getstringcfg(const char *name)
 {
         char *t;
         int c;
@@ -103,7 +103,7 @@ bool getboolcfg(char *name, bool def)
         return(c!=0?true:false);
 }
 
-void writestringcfg(char *name, char *s)
+void writestringcfg(const char *name, char *s)
 {
         if (s[0]) fprintf(cfgfile,"%s = %s\n",name,s);
 }
@@ -184,16 +184,31 @@ void loadconfig()
         elkConfig.expansion.firstbyte = getintcfg("joy_firstbyte",0);
         elkConfig.expansion.joffset   = getintcfg("joy_offset",0);
 
-        // Just use default keyboard for now for allegro5.
-        #ifdef HAL_ALLEGRO_4
+        /* Convert old keyboard config to new keyboard config */
         //int c;
         //char s2[20];
         //for (c=0;c<128;c++)
         //{
         //        sprintf(s2,"key_define_%03i",c);
         //        keylookup[c]=getintcfg(s2,c);
+                // TODO: Convert to new host key.
+                // TODO: Convert to new elk key.
         //}
-        #endif
+
+        /* New keyboard handling */
+        elk_key_id_t elk_key;
+        for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
+        {
+            s=getstringcfg(keyboard_hostkey_to_config_str(host_key));
+            if(s)
+            {
+                elkConfig.keyboard.host_key_mapping[host_key] = keyboard_str_to_elk_key_id(s);
+            }
+            else
+            {
+                elkConfig.keyboard.host_key_mapping[host_key] = ELK_KEY_NONE;
+            }
+        }
 
         /* Cartridge expansions */
         elkConfig.expansion.enable_mgc                = getboolcfg("enable_mgc", false);
@@ -209,6 +224,7 @@ void saveconfig()
 
         cfgfile=fopen(fn,"wt");
 
+        writeintcfg ("api_version", 2);   // Version 2 of the config file api (1 = old allegro4, 2 = elkulator version 2)
         writeintcfg ("tapespeed", elkConfig.tape.speed);
         writeboolcfg("plus1",     elkConfig.expansion.plus1);
         writeboolcfg("plus3",     elkConfig.expansion.plus3);
@@ -243,16 +259,15 @@ void saveconfig()
         writeintcfg("joy_firstbyte", elkConfig.expansion.firstbyte);
         writeintcfg("joy_offset",    elkConfig.expansion.joffset);
         
-        // Use default keyboard for now.
-        #ifdef HAL_ALLEGRO_4
-        //int c;
-        //char s[20];
-        //for (c=0;c<128;c++)
-        //{
-        //        sprintf(s,"key_define_%03i",c);
-        //        writeintcfg(s,keylookup[c]);
-        //}
-        #endif
+        /* New keyboard handling */
+        elk_key_id_t elk_key;
+        for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
+        {
+            if(elkConfig.keyboard.host_key_mapping[host_key] != 0) // Not the default, so save it.
+            {
+                writestringcfg(keyboard_hostkey_to_config_str(host_key), keyboard_elkkey_to_config_str(elkConfig.keyboard.host_key_mapping[host_key]));
+            }
+        }
 
         /* Cartridge expansions */
         writeboolcfg("enable_mgc",                elkConfig.expansion.enable_mgc);
@@ -290,6 +305,15 @@ void log_config_vars()
     log_debug("  - ddtype     : %d", elkConfig.sound.ddtype);
     log_debug("  - sndtape    : %d", elkConfig.sound.sndtape);
     log_debug("  - sndex      : %d", elkConfig.sound.sndex);
+    log_debug("- keyboard:");
+
+    for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
+    {
+        if(elkConfig.keyboard.host_key_mapping[host_key] != ELK_KEY_NONE)
+        {
+            log_debug(" - %s       : %s", keyboard_hostkey_to_config_str(host_key), keyboard_elkkey_to_config_str(elkConfig.keyboard.host_key_mapping[host_key]));
+        }
+    }
     log_debug("- tape:");
     log_debug("  - speed      : %d", elkConfig.tape.speed);
     log_debug("- disc:");

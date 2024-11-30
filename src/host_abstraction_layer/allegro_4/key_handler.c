@@ -72,7 +72,6 @@ static const elk_key_defaults_t elk_keycode_defaults[ELK_KEY_MAX] = {
     { KEY_MENU,      NO_ALTERNATE_KEY      } // ELK_SPECIAL_KEY_MENU
 };
 
-
 // Records if native key is pressed or not (true = pressed, false = not pressed)
 bool elk_key_state[ELK_KEY_MAX];
 
@@ -134,7 +133,7 @@ void keyhandler_refresh_elkkeys()
 
 }
 
-bool keyhandler_elk_key_state(elk_key_id elk_key_code)
+bool keyhandler_elk_key_state(elk_key_id_t elk_key_code)
 {
     return(elk_key_state[elk_key_code]);
 }

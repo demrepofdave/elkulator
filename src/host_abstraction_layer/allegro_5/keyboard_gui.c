@@ -16,7 +16,7 @@ typedef struct {
     uint16_t x, y, w, h;
     char cap[12];
     char name[12];
-    elk_key_id elkkeyid;
+    elk_key_id_t elkkeyid;
 } key_cap_t;
 
 typedef struct {
@@ -137,9 +137,9 @@ static void draw_keyboard(const key_dlg_t *key_dlg, int ok_x, int can_x)
     al_flip_display();
 }
 
-static elk_key_id redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8_t *keylookcpy)
+static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8_t *keylookcpy)
 {
-    elk_key_id elkkeyid = ELK_KEY_MAX;
+    elk_key_id_t elkkeyid = ELK_KEY_MAX;
     int mid_x  = key_dlg->disp_x/2;
     int left_x = mid_x-200;
     int mid_y  = key_dlg->disp_y/2;
@@ -193,7 +193,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
     const key_cap_t *kptr = NULL;
     int mid_x, ok_x, can_x;
     bool alt_down = false;
-    elk_key_id elkkeyid = ELK_KEY_MAX;
+    elk_key_id_t elkkeyid = ELK_KEY_MAX;
 
     keyboard_debug_dump();
 

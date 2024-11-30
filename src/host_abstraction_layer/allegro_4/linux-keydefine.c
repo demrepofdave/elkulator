@@ -458,7 +458,7 @@ int gui_keydefine()
         return D_O_K;
 }
 
-static bool special_key_pressed(elk_key_id elk_keycode)
+static bool special_key_pressed(elk_key_id_t elk_keycode)
 {
         bool result = false;
         for (int i = 0; i < KEY_MAX; i++)

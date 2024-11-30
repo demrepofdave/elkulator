@@ -17,6 +17,7 @@
 *******************************************************************************/
 #include <stdbool.h>
 #include <stdint.h>
+#include "host_abstraction_layer/keyboard.h"
 
 /******************************************************************************
 * Preprocessor Macros
@@ -82,11 +83,17 @@ typedef struct
     uint8_t maintain_aspect_ratio;
 } display_config_t;
 
+typedef struct
+{
+    elk_key_id_t host_key_mapping[HOST_KEY_MAX]; // Host key to elk key mapping (0 = use default)
+} keyboard_config_t;
+
 typedef struct 
 {
     display_config_t   display;
     expansion_config_t expansion;
     sound_config_t     sound;
+    keyboard_config_t  keyboard;
     tape_config_t      tape;
     disc_config_t      disc;
 } elk_config_t;

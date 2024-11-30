@@ -1,3 +1,5 @@
+#ifndef _KEYBOARD_H
+#define _KEYBOARD_H
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -64,11 +66,102 @@ typedef enum {
                            //       elkulator menu key to be utilized (for libraries such as allegro 4 
                            //       that do not support native menus on their windows).
     ELK_KEY_MAX
-} elk_key_id;
+} elk_key_id_t;
+
+typedef enum {
+    HOST_KEY_0,
+    HOST_KEY_1,
+    HOST_KEY_2,
+    HOST_KEY_3,
+    HOST_KEY_4,
+    HOST_KEY_5,
+    HOST_KEY_6,
+    HOST_KEY_7,
+    HOST_KEY_8,
+    HOST_KEY_9,
+    
+    HOST_KEY_A,
+    HOST_KEY_B,
+    HOST_KEY_C,
+    HOST_KEY_D,
+    HOST_KEY_E,
+    HOST_KEY_F,
+    HOST_KEY_G,
+    HOST_KEY_H,
+    HOST_KEY_I,
+    HOST_KEY_J,
+    HOST_KEY_K,
+    HOST_KEY_L,
+    HOST_KEY_M,
+    HOST_KEY_N,
+    HOST_KEY_O,
+    HOST_KEY_P,
+    HOST_KEY_Q,
+    HOST_KEY_R,
+    HOST_KEY_S,
+    HOST_KEY_T,
+    HOST_KEY_U,
+    HOST_KEY_V,
+    HOST_KEY_W,
+    HOST_KEY_X,
+    HOST_KEY_Y,
+    HOST_KEY_Z,
+
+    HOST_KEY_PAD_0,
+    HOST_KEY_PAD_1,
+    HOST_KEY_PAD_2,
+    HOST_KEY_PAD_3,
+    HOST_KEY_PAD_4,
+    HOST_KEY_PAD_5,
+    HOST_KEY_PAD_6,
+    HOST_KEY_PAD_7,
+    HOST_KEY_PAD_8,
+    HOST_KEY_PAD_9,
+    HOST_KEY_PAD_SLASH,
+    HOST_KEY_PAD_ASTERISK,
+    HOST_KEY_PAD_MINUS,
+    HOST_KEY_PAD_PLUS,
+    HOST_KEY_PAD_DELETE,
+    HOST_KEY_PAD_ENTER,
+
+    HOST_KEY_F1,
+    HOST_KEY_F2,
+    HOST_KEY_F3,
+    HOST_KEY_F4,
+    HOST_KEY_F5,
+    HOST_KEY_F6,
+    HOST_KEY_F7,
+    HOST_KEY_F8,
+    HOST_KEY_F9,
+    HOST_KEY_F10,
+    HOST_KEY_F11,
+    HOST_KEY_F12,
+
+    HOST_KEY_LSHIFT,
+    HOST_KEY_RSHIFT,
+    HOST_KEY_LCTRL,
+    HOST_KEY_RCTRL,
+    HOST_KEY_ALT,
+    HOST_KEY_ALTGR,
+    HOST_KEY_LWIN,
+    HOST_KEY_RWIN,
+    HOST_KEY_MENU,
+    HOST_KEY_SCROLL_LOCK,
+    HOST_KEY_NUM_LOCK,
+    HOST_KEY_CAPS_LOCK,
+    HOST_KEY_MAX
+
+} host_key_t;
 
 void keyboard_makelayout();
 uint8_t keyboard_read(uint16_t addr);
 void keyboard_debug_dump();
 void keyhandler_refresh_elkkeys();
-bool keyhandler_elk_key_state(elk_key_id elk_key_code);
+bool keyhandler_elk_key_state(elk_key_id_t elk_key_code);
 
+const char * keyboard_hostkey_to_config_str(host_key_t host_key);
+char * keyboard_elkkey_to_config_str(elk_key_id_t elk_key);
+
+elk_key_id_t keyboard_str_to_elk_key_id(const char * host_config_str);
+
+#endif // _KEYBOARD_H
