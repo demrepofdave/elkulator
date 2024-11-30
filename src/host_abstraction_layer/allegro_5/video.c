@@ -52,10 +52,6 @@ typedef uint32_t elk_pallete_t;
 
 ALLEGRO_BITMAP *b             = NULL;    // Main bitmap used before blitting to window screen.
 ALLEGRO_BITMAP *b16           = NULL;  // Intermediate bitmap 1
-//ALLEGRO_BITMAP *b162          = NULL; // Intermediate bitmap 2
-//ALLEGRO_BITMAP *vidb          = NULL; // Windows bitmap
-//ALLEGRO_BITMAP *vp1           = NULL;  // Windows bitmap 1?
-//ALLEGRO_BITMAP *vp2           = NULL;  // Windows bitmap 2?
 ALLEGRO_BITMAP *bm_screenshot = NULL; // Used for screenshots.
 ALLEGRO_BITMAP *moviebitmap   = NULL; // Used for capturing movies.
 
@@ -148,7 +144,6 @@ int video_init_part1()
 
     ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
     b16 = al_create_bitmap(1300,600);
-    //b162= al_create_bitmap(640,256);
     al_set_target_bitmap(b16);
     al_clear_to_color(black);
 
@@ -549,7 +544,6 @@ void video_clearall()
     al_clear_to_color(black);
     al_set_target_bitmap(b16);
     al_clear_to_color(black);
-    //al_set_target_bitmap(b162);
     //al_clear_to_color(black);
     //al_set_target_bitmap(al_get_current_display()); // TODO: do we need this?
     //al_clear_to_color(black);
