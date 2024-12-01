@@ -196,7 +196,6 @@ void loadconfig()
         //}
 
         /* New keyboard handling */
-        elk_key_id_t elk_key;
         for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
         {
             s=getstringcfg(keyboard_hostkey_to_config_str(host_key));
@@ -260,7 +259,6 @@ void saveconfig()
         writeintcfg("joy_offset",    elkConfig.expansion.joffset);
         
         /* New keyboard handling */
-        elk_key_id_t elk_key;
         for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
         {
             if(elkConfig.keyboard.host_key_mapping[host_key] != 0) // Not the default, so save it.

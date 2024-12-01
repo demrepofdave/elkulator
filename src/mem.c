@@ -410,7 +410,7 @@ int keyl[ELK_KEY_MAX];
 
 void makekeyl()
 {
-        int c,d,e;
+        int c,d;
         memset(keyl,0,sizeof(keyl));
 
         /* Establish a mapping from emulated key presses to keyboard matrix values. */
