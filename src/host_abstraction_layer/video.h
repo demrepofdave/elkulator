@@ -89,7 +89,7 @@ void video_set_depth_and_elk_palette();
 void video_set_desktop_color_depth();
 int  video_get_desktop_color_depth();
 
-void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth);
+void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth);
 void video_capture_screenshot(int drawMode, int colDepth);
 int  video_save_screenshot_bmp(const char * filename);
 void video_destroy_screenshot();

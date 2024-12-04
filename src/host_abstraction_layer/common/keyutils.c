@@ -154,9 +154,13 @@ static const host_key_strings_t host_key_string_table[HOST_KEY_MAX] =
     { "host_key_pageup",      "Page Up"       },
     { "host_key_pagedown",    "Page Down"     },
 
+    { "host_key_tilde",       "` (tilde)"     },
     { "host_key_minus",       "-"             },
+    { "host_key_equals",      "="             },
     { "host_key_backspace",   "Backspace"     },
     { "host_key_tab",         "Tab"           },
+    { "host_key_openbrace",   "["             },
+    { "host_key_closebrace",  "]"             },
     { "host_key_semicolon",   ";"             },
     { "host_key_apostrophe",  "'"             },
 

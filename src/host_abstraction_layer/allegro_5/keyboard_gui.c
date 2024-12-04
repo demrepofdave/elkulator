@@ -117,16 +117,13 @@ static void draw_button(int x, int y, int w, int h, ALLEGRO_COLOR bcol, ALLEGRO_
 
 static void draw_keyboard(const key_dlg_t *key_dlg, int ok_x, int can_x)
 {
-    ALLEGRO_COLOR black, grey, white, red, brown, navy, green;
+    ALLEGRO_COLOR grey, white, brown, navy;
     const key_cap_t *kptr;
 
-    black = al_map_rgb(  0,   0,   0);
     grey  = al_map_rgb(127, 127, 127);
     white = al_map_rgb(255, 255, 255);
     brown = al_map_rgb( 64,  32,  32);
-    red   = al_map_rgb(255,  64,  64);
     navy  = al_map_rgb( 32,  32,  64);
-    green = al_map_rgb(  0,  127,  0);
     al_clear_to_color(brown);
     for (kptr = key_dlg->captab; kptr < key_dlg->capend; kptr++) 
     {

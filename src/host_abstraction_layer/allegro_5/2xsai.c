@@ -173,7 +173,7 @@ static uint8_t *src_line[4];
 static uint8_t *dst_line[2];
 
 
-void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, char * elk_screen_data, int s_x, int s_y, int d_x, int d_y, int w, int h)
+void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, uint8_t * elk_screen_data, int s_x, int s_y, int d_x, int d_y, int w, int h)
 {
 	int sbpp, dbpp;
 
@@ -182,7 +182,7 @@ void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, char * elk_screen_data, int s_x, in
 	return;
 }
 
-void Super2xSaI_ex(char * elk_screen_data, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
+void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
 {
 	int j, v;
 	unsigned int x, y;

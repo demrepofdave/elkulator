@@ -97,10 +97,10 @@ void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, boo
     }
 }
 
-static void add_radio_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, int this_value, int cur_value)
-{
-    add_checkbox_item(parent, title, menu_id_num(id, this_value), this_value == cur_value, NULL);
-}
+//static void add_radio_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, int this_value, int cur_value)
+//{
+//    add_checkbox_item(parent, title, menu_id_num(id, this_value), this_value == cur_value, NULL);
+//}
 
 void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int cur_value, callback_event_handler_t menu_handler_function)
 {

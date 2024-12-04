@@ -50,7 +50,7 @@ typedef struct {
     { HOST_KEY_X,         NO_ALTERNATE_KEY   }, // ELK_KEY_X,
     { HOST_KEY_Y,         NO_ALTERNATE_KEY   }, // ELK_KEY_Y,
     { HOST_KEY_Z,         NO_ALTERNATE_KEY   }, // ELK_KEY_Z,
-    { HOST_KEY_MINUS,     NO_ALTERNATE_KEY   }, // ELK_KEY_EQUALS,
+    { HOST_KEY_MINUS,     HOST_KEY_EQUALS    }, // ELK_KEY_EQUALS,
     { HOST_KEY_COMMA,     NO_ALTERNATE_KEY   }, // ELK_KEY_COMMA,
     { HOST_KEY_FULLSTOP,  NO_ALTERNATE_KEY   }, // ELK_KEY_FULLSTOP,
     { HOST_KEY_SLASH,     NO_ALTERNATE_KEY   }, // ELK_KEY_SLASH,
@@ -165,9 +165,13 @@ static const uint8_t host_key_mapping_defaults[HOST_KEY_MAX] =
     ALLEGRO_KEY_PGUP,   // HOST_KEY_PAGEUP
     ALLEGRO_KEY_PGDN,   // HOST_KEY_PAGEDOWN
 
+    ALLEGRO_KEY_TILDE, // HOST_KEY_TILDE
     ALLEGRO_KEY_MINUS,  // HOST_KEY_MINUS
+    ALLEGRO_KEY_EQUALS,  // HOST_KEY_EQUALS
     ALLEGRO_KEY_BACKSPACE, // HOST_KEY_BACKSPACE
     ALLEGRO_KEY_TAB,    // HOST_KEY_TAB
+    ALLEGRO_KEY_OPENBRACE, // HOST_KEY_OPENBRACE
+    ALLEGRO_KEY_CLOSEBRACE, // HOST_KEY_CLOSEBRACE
     ALLEGRO_KEY_SEMICOLON, // HOST_KEY_SEMICOLON
     ALLEGRO_KEY_QUOTE, // HOST_KEY_APOSTROPHE
     ALLEGRO_KEY_ENTER, // HOST_KEY_ENTER
@@ -188,6 +192,33 @@ static const uint8_t host_key_mapping_defaults[HOST_KEY_MAX] =
     ALLEGRO_KEY_NUMLOCK,  // HOST_KEY_NUMLOCK
     ALLEGRO_KEY_CAPSLOCK,  // HOST_KEY_CAPSLOCK
 };
+
+/* Note these values are deliberately the same as in Allegro 4.1.x *
+   ALLEGRO_KEY_BACKSLASH	= 70,
+   ALLEGRO_KEY_BACKSLASH2	= 71, * DirectInput calls this DIK_OEM_102: "< > | on UK/Germany keyboards" *
+
+   ALLEGRO_KEY_PRINTSCREEN	= 92,
+   ALLEGRO_KEY_PAUSE		= 93,
+
+   ALLEGRO_KEY_ABNT_C1	= 94,
+   ALLEGRO_KEY_YEN		= 95,
+   ALLEGRO_KEY_KANA		= 96,
+   ALLEGRO_KEY_CONVERT	= 97,
+   ALLEGRO_KEY_NOCONVERT	= 98,
+   ALLEGRO_KEY_AT		= 99,
+   ALLEGRO_KEY_CIRCUMFLEX	= 100,
+   ALLEGRO_KEY_COLON2	= 101,
+   ALLEGRO_KEY_KANJI		= 102,
+
+   ALLEGRO_KEY_PAD_EQUALS	= 103,	* MacOS X *
+   ALLEGRO_KEY_BACKQUOTE	= 104,	* MacOS X *
+   ALLEGRO_KEY_SEMICOLON2	= 105,	* MacOS X -- TODO: ask lillo what this should be *
+   ALLEGRO_KEY_COMMAND	= 106,	* MacOS X *
+   
+   ALLEGRO_KEY_BACK = 107,        * Android back key *
+   ALLEGRO_KEY_VOLUME_UP = 108,
+   ALLEGRO_KEY_VOLUME_DOWN = 109,
+*/
 
 // Records if native key is pressed or not (true = pressed, false = not pressed)
 bool elk_key_state[ELK_KEY_MAX];
