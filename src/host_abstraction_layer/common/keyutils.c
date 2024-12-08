@@ -190,13 +190,22 @@ static const host_key_strings_t host_key_string_table[HOST_KEY_MAX] =
     { "host_key_semicolon2",   "Semicolon2"    },
     { "host_key_command",      "Command"    },
 
+    { "host_key_unknown1",     "Unknown 1"    },
+    { "host_key_unknown2",     "Unknown 2"    },
+    { "host_key_unknown3",     "Unknown 3"    },
+    { "host_key_unknown4",     "Unknown 4"    },
+    { "host_key_unknown5",     "Unknown 5"    },
+    { "host_key_unknown6",     "Unknown 6"    },
+    { "host_key_unknown7",     "Unknown 7"    },
+    { "host_key_unknown8",     "Unknown 8"    },
+
     { "host_key_lshift",      "Left Shift"    },
     { "host_key_rshift",      "Right Shift"   },
     { "host_key_lctrl",       "Left CTRL"     },
     { "host_key_rctrl",       "Left CTRL"     },
     { "host_key_alt",         "ALT"           },
-    
     { "host_key_altgr",       "ALTGR"         },
+
     { "host_key_lwin",        "Left WIN"      },
     { "host_key_rwin",        "Right WIN"     },
     { "host_key_menu",        "MENU"          },
@@ -326,32 +335,31 @@ static const int old_config_keys_to_new_host_keys_table[128] =
     HOST_KEY_BACKQUOTE,	    // key_define_104	MacOS X
     HOST_KEY_SEMICOLON2,	// key_define_105	MacOS X
     HOST_KEY_COMMAND,	    // key_define_106	MacOS X
-   
-   HOST_KEY_BACK, // key_define_107,        /* Android back key */
-   HOST_KEY_VOLUME_UP, // key_define_108,
-   HOST_KEY_VOLUME_DOWN, // key_define_109,
 
-   /* Android game keys */
-   HOST_KEY_SEARCH,       // key_define_110,
-   HOST_KEY_DPAD_CENTER,  // key_define_111,
-   HOST_KEY_BUTTON_X,     // key_define_112,
-   HOST_KEY_BUTTON_Y,     // key_define_113,
-   HOST_KEY_DPAD_UP,      // key_define_114,
-   HOST_KEY_DPAD_DOWN,    // key_define_115,
-   HOST_KEY_DPAD_LEFT,    // key_define_116,
-   HOST_KEY_DPAD_RIGHT,   // key_define_117,
-   HOST_KEY_SELECT,       // key_define_118,
-   HOST_KEY_START,        // key_define_119,
-   HOST_KEY_BUTTON_L1,    // key_define_120,
-   HOST_KEY_BUTTON_R1,    // key_define_121,
-   HOST_KEY_BUTTON_L2,    // key_define_122,
-   HOST_KEY_BUTTON_R2,    // key_define_123,
-   HOST_KEY_BUTTON_A,     // key_define_124,
-   HOST_KEY_BUTTON_B,     // key_define_125,
-   HOST_KEY_THUMBL,       // key_define_126,
-   HOST_KEY_THUMBR,       // key_define_127,
-   
-   HOST_KEY_UNKNOWN,      // key_define_128,
+    HOST_KEY_UNKNOWN1,      // key_define_107
+    HOST_KEY_UNKNOWN2,      // key_define_108
+    HOST_KEY_UNKNOWN3,      // key_define_109
+    HOST_KEY_UNKNOWN4,      // key_define_110
+    HOST_KEY_UNKNOWN5,      // key_define_111
+    HOST_KEY_UNKNOWN6,      // key_define_112
+    HOST_KEY_UNKNOWN7,      // key_define_113
+    HOST_KEY_UNKNOWN8,      // key_define_114
+
+    HOST_KEY_LSHIFT,        // key_define_115
+    HOST_KEY_RSHIFT,        // key_define_116
+    HOST_KEY_LCTRL,         // key_define_117
+    HOST_KEY_RCTRL,         // key_define_118
+    HOST_KEY_ALT,           // key_define_119
+    HOST_KEY_ALTGR,         // key_define_120
+
+    HOST_KEY_LWIN,          // key_define_121
+    HOST_KEY_RWIN,          // key_define_122
+    HOST_KEY_MENU,          // key_define_123
+    HOST_KEY_SCROLLLOCK,    // key_define_124
+    HOST_KEY_NUMLOCK,       // key_define_125
+    HOST_KEY_CAPSLOCK,      // key_define_126
+
+    HOST_KEY_MAX,           // key_define_127,
 
 };
 
