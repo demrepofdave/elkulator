@@ -68,18 +68,12 @@ typedef enum {
     ELK_KEY_MAX
 } elk_key_id_t;
 
+// HOST_KEY order is as per allegro4 key order as this
+// simplifies the code to update elk.cfg key definition
+// from the old key_define_999=999 to the new more human
+// readable format (e.g. HOST_KEY_F12=ELK_KEY_BREAK).
 typedef enum {
-    HOST_KEY_0,
-    HOST_KEY_1,
-    HOST_KEY_2,
-    HOST_KEY_3,
-    HOST_KEY_4,
-    HOST_KEY_5,
-    HOST_KEY_6,
-    HOST_KEY_7,
-    HOST_KEY_8,
-    HOST_KEY_9,
-    
+  
     HOST_KEY_A,
     HOST_KEY_B,
     HOST_KEY_C,
@@ -107,6 +101,17 @@ typedef enum {
     HOST_KEY_Y,
     HOST_KEY_Z,
 
+    HOST_KEY_0,
+    HOST_KEY_1,
+    HOST_KEY_2,
+    HOST_KEY_3,
+    HOST_KEY_4,
+    HOST_KEY_5,
+    HOST_KEY_6,
+    HOST_KEY_7,
+    HOST_KEY_8,
+    HOST_KEY_9,
+
     HOST_KEY_PAD_0,
     HOST_KEY_PAD_1,
     HOST_KEY_PAD_2,
@@ -118,14 +123,6 @@ typedef enum {
     HOST_KEY_PAD_8,
     HOST_KEY_PAD_9,
 
-    HOST_KEY_PAD_SLASH,
-    HOST_KEY_PAD_ASTERISK,
-    HOST_KEY_PAD_MINUS,
-    HOST_KEY_PAD_PLUS,
-    HOST_KEY_PAD_DELETE,
-    HOST_KEY_PAD_ENTER,
-
-    HOST_KEY_ESCAPE,
     HOST_KEY_F1,
     HOST_KEY_F2,
     HOST_KEY_F3,
@@ -139,18 +136,7 @@ typedef enum {
     HOST_KEY_F11,
     HOST_KEY_F12,
 
-    HOST_KEY_LEFT,
-    HOST_KEY_RIGHT,
-    HOST_KEY_UP,
-    HOST_KEY_DOWN, 
-
-    HOST_KEY_INSERT,
-    HOST_KEY_DELETE,
-    HOST_KEY_HOME,
-    HOST_KEY_END,
-    HOST_KEY_PAGEUP,
-    HOST_KEY_PAGEDOWN,
-
+    HOST_KEY_ESCAPE,
     HOST_KEY_TILDE,
     HOST_KEY_MINUS,
     HOST_KEY_EQUALS,
@@ -158,18 +144,58 @@ typedef enum {
     HOST_KEY_TAB,
     HOST_KEY_OPENBRACE,
     HOST_KEY_CLOSEBRACE,
+    HOST_KEY_ENTER,
     HOST_KEY_SEMICOLON,
     HOST_KEY_APOSTROPHE,
-    HOST_KEY_ENTER,
+    HOST_KEY_BACKSLASH,
+    HOST_KEY_BACKSLASH2,
+    HOST_KEY_COMMA,
+    HOST_KEY_FULLSTOP,
+    HOST_KEY_SLASH,
+    HOST_KEY_SPACE,
+    HOST_KEY_INSERT,
+    HOST_KEY_DELETE,
+    HOST_KEY_HOME,
+    HOST_KEY_END,
+    HOST_KEY_PAGEUP,
+    HOST_KEY_PAGEDOWN,
+
+    HOST_KEY_LEFT,
+    HOST_KEY_RIGHT,
+    HOST_KEY_UP,
+    HOST_KEY_DOWN, 
+    
+    HOST_KEY_PAD_SLASH,
+    HOST_KEY_PAD_ASTERISK,
+    HOST_KEY_PAD_MINUS,
+    HOST_KEY_PAD_PLUS,
+    HOST_KEY_PAD_DELETE,
+    HOST_KEY_PAD_ENTER,
+
+    HOST_KEY_PRINT_SCREEN,
+    HOST_KEY_PAUSE,
+
+    HOST_KEY_ABNT_C1,
+    HOST_KEY_YEN,
+    HOST_KEY_KANA,
+    HOST_KEY_CONVERT,
+    HOST_KEY_NOCONVERT,
+    HOST_KEY_AT,
+    HOST_KEY_CIRCUMFLEX,
+    HOST_KEY_COLON2,
+    HOST_KEY_KANJI,
+    HOST_KEY_PAD_EQUALS,
+    HOST_KEY_BACKQUOTE,
+    HOST_KEY_SEMICOLON2,
+    HOST_KEY_COMMAND,
+
     HOST_KEY_LSHIFT,
     HOST_KEY_RSHIFT,
     HOST_KEY_LCTRL,
     HOST_KEY_RCTRL,
-    HOST_KEY_COMMA,
-    HOST_KEY_FULLSTOP,
-    HOST_KEY_SLASH,
+
     HOST_KEY_ALT,
-    HOST_KEY_SPACE,
+
     HOST_KEY_ALTGR,
     HOST_KEY_LWIN,
     HOST_KEY_RWIN,
