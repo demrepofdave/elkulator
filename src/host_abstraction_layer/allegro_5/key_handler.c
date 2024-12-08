@@ -83,7 +83,7 @@ typedef struct {
 // keylookup is populated from here.
 static const uint8_t host_key_mapping_defaults[HOST_KEY_MAX] = 
 {
-   
+    NULL,
     ALLEGRO_KEY_A, // HOST_KEY_A
     ALLEGRO_KEY_B, // HOST_KEY_B
     ALLEGRO_KEY_C, // HOST_KEY_C
@@ -199,15 +199,6 @@ static const uint8_t host_key_mapping_defaults[HOST_KEY_MAX] =
     ALLEGRO_KEY_BACKQUOTE,  // HOST_KEY_BACKQUOTE
     ALLEGRO_KEY_SEMICOLON2, // HOST_KEY_SEMICOLON2
     ALLEGRO_KEY_COMMAND,    // HOST_KEY_COMMAND
-
-    0,      // HOST_KEY_UNKNOWN1
-    0,      // HOST_KEY_UNKNOWN2
-    0,      // HOST_KEY_UNKNOWN3
-    0,      // HOST_KEY_UNKNOWN4
-    0,      // HOST_KEY_UNKNOWN5
-    0,      // HOST_KEY_UNKNOWN6
-    0,      // HOST_KEY_UNKNOWN7
-    0,      // HOST_KEY_UNKNOWN8
     
     ALLEGRO_KEY_LSHIFT,     // HOST_KEY_LSHIFT
     ALLEGRO_KEY_RSHIFT,     // HOST_KEY_RSHIFT
@@ -269,6 +260,21 @@ void keyboard_makelayout()
                 keylookup[keyboard_host_key_to_allegro5_key(elk_keycode_defaults[c].host_keycode_alternate)] = c; // Assign alternate PC key to elk key (if defined).
             }
         }
+}
+
+elk_key_id_t get_elk_key_from_host_key(host_key_t host_key)
+{
+    elk_key_id_t elk_key = ELK_KEY_NONE;
+    int index = 0;
+    for(index = 0; index < ELK_KEY_MAX; index++)
+    {
+        if(elk_keycode_defaults[index].host_keycode_main == host_key || 
+           elk_keycode_defaults[index].host_keycode_alternate == host_key)
+        {
+            elk_key = index;
+        }
+    }
+    return elk_key;
 }
 
 void keyboard_debug_dump()

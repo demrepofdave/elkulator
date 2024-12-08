@@ -74,6 +74,7 @@ typedef enum {
 // readable format (e.g. HOST_KEY_F12=ELK_KEY_BREAK).
 typedef enum {
   
+    HOST_KEY_NONE,
     HOST_KEY_A,
     HOST_KEY_B,
     HOST_KEY_C,
@@ -189,22 +190,13 @@ typedef enum {
     HOST_KEY_SEMICOLON2,
     HOST_KEY_COMMAND,
 
-    HOST_KEY_UNKNOWN1,
-    HOST_KEY_UNKNOWN2,
-    HOST_KEY_UNKNOWN3,
-    HOST_KEY_UNKNOWN4,
-    HOST_KEY_UNKNOWN5,
-    HOST_KEY_UNKNOWN6,
-    HOST_KEY_UNKNOWN7,
-    HOST_KEY_UNKNOWN8,
-
     HOST_KEY_LSHIFT,
     HOST_KEY_RSHIFT,
     HOST_KEY_LCTRL,
     HOST_KEY_RCTRL,
     HOST_KEY_ALT,
     HOST_KEY_ALTGR,
-    
+
     HOST_KEY_LWIN,
     HOST_KEY_RWIN,
     HOST_KEY_MENU,
@@ -220,6 +212,7 @@ uint8_t keyboard_read(uint16_t addr);
 void keyboard_debug_dump();
 void keyhandler_refresh_elkkeys();
 bool keyhandler_elk_key_state(elk_key_id_t elk_key_code);
+elk_key_id_t get_elk_key_from_host_key(host_key_t host_key);
 
 const char * keyboard_hostkey_to_config_str(host_key_t host_key);
 char * keyboard_elkkey_to_config_str(elk_key_id_t elk_key);

@@ -1,6 +1,7 @@
 
 #include <string.h>
 #include "host_abstraction_layer/keyboard.h"
+#include "logger.h"
 
 static char * elk_keycode_config_string[ELK_KEY_MAX] =
 {
@@ -74,6 +75,7 @@ typedef struct
 // see https://planet.racket-lang.org/package-source/kazzmir/allegro.plt/1/6/allegro-4.2.0/examples/exkeys.c
 static const host_key_strings_t host_key_string_table[HOST_KEY_MAX] = 
 {
+    { "", "" },
     { "host_key_a", "A" },
     { "host_key_b", "B" },
     { "host_key_c", "C" },
@@ -190,15 +192,6 @@ static const host_key_strings_t host_key_string_table[HOST_KEY_MAX] =
     { "host_key_semicolon2",   "Semicolon2"    },
     { "host_key_command",      "Command"    },
 
-    { "host_key_unknown1",     "Unknown 1"    },
-    { "host_key_unknown2",     "Unknown 2"    },
-    { "host_key_unknown3",     "Unknown 3"    },
-    { "host_key_unknown4",     "Unknown 4"    },
-    { "host_key_unknown5",     "Unknown 5"    },
-    { "host_key_unknown6",     "Unknown 6"    },
-    { "host_key_unknown7",     "Unknown 7"    },
-    { "host_key_unknown8",     "Unknown 8"    },
-
     { "host_key_lshift",      "Left Shift"    },
     { "host_key_rshift",      "Right Shift"   },
     { "host_key_lctrl",       "Left CTRL"     },
@@ -218,7 +211,7 @@ static const host_key_strings_t host_key_string_table[HOST_KEY_MAX] =
 // see https://planet.racket-lang.org/package-source/kazzmir/allegro.plt/1/6/allegro-4.2.0/examples/exkeys.c
 static const int old_config_keys_to_new_host_keys_table[128] =
 {
-    -1, // key_define_000 (N/A)
+    HOST_KEY_NONE, // key_define_000
     HOST_KEY_A,  // key_define_001
     HOST_KEY_B,  // key_define_002
     HOST_KEY_C,  // key_define_003
@@ -336,14 +329,14 @@ static const int old_config_keys_to_new_host_keys_table[128] =
     HOST_KEY_SEMICOLON2,	// key_define_105	MacOS X
     HOST_KEY_COMMAND,	    // key_define_106	MacOS X
 
-    HOST_KEY_UNKNOWN1,      // key_define_107
-    HOST_KEY_UNKNOWN2,      // key_define_108
-    HOST_KEY_UNKNOWN3,      // key_define_109
-    HOST_KEY_UNKNOWN4,      // key_define_110
-    HOST_KEY_UNKNOWN5,      // key_define_111
-    HOST_KEY_UNKNOWN6,      // key_define_112
-    HOST_KEY_UNKNOWN7,      // key_define_113
-    HOST_KEY_UNKNOWN8,      // key_define_114
+    HOST_KEY_NONE,      // key_define_107
+    HOST_KEY_NONE,      // key_define_108
+    HOST_KEY_NONE,      // key_define_109
+    HOST_KEY_NONE,      // key_define_110
+    HOST_KEY_NONE,      // key_define_111
+    HOST_KEY_NONE,      // key_define_112
+    HOST_KEY_NONE,      // key_define_113
+    HOST_KEY_NONE,      // key_define_114
 
     HOST_KEY_LSHIFT,        // key_define_115
     HOST_KEY_RSHIFT,        // key_define_116
@@ -362,6 +355,18 @@ static const int old_config_keys_to_new_host_keys_table[128] =
     HOST_KEY_MAX,           // key_define_127,
 
 };
+
+host_key_t keyboard_get_host_key_from_old_config_id(uint8_t old_key_id)
+{
+    host_key_t host_key = HOST_KEY_NONE;
+
+    if(old_key_id < HOST_KEY_MAX)
+    {
+        host_key = old_config_keys_to_new_host_keys_table[old_key_id];
+    }
+    log_debug("old_key_id = %d, returns host_key %d", old_key_id, host_key);
+    return(host_key);
+}
 
 const char * keyboard_hostkey_to_config_str(host_key_t host_key)
 {

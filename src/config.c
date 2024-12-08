@@ -130,6 +130,8 @@ void loadconfig()
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"rt");
 
+        int api_version = getintcfg("api_version", 1);  // Assume old config file unless apiversion is present (2 is latest).
+
         elkConfig.tape.speed            = getintcfg("tapespeed",0);
 
         elkConfig.expansion.plus1       = getboolcfg("plus1",   false);
@@ -184,17 +186,6 @@ void loadconfig()
         elkConfig.expansion.firstbyte = getintcfg("joy_firstbyte",0);
         elkConfig.expansion.joffset   = getintcfg("joy_offset",0);
 
-        /* Convert old keyboard config to new keyboard config */
-        //int c;
-        //char s2[20];
-        //for (c=0;c<128;c++)
-        //{
-        //        sprintf(s2,"key_define_%03i",c);
-        //        keylookup[c]=getintcfg(s2,c);
-                // TODO: Convert to new host key.
-                // TODO: Convert to new elk key.
-        //}
-
         /* New keyboard handling */
         for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
         {
@@ -207,6 +198,43 @@ void loadconfig()
             {
                 elkConfig.keyboard.host_key_mapping[host_key] = ELK_KEY_NONE;
             }
+        }
+
+        if(api_version == 1)
+        {
+                /* Convert old keyboard config to new keyboard config */
+                /* TODO: Very hacky code but it is working - refactor */
+                int key_id, key_value;
+                host_key_t old_host_key;
+                host_key_t old_host_assigned_key;
+                char s2[20];
+                // Keys 001 to xxx and xxx to 127 can be converted.
+                // Other keys are undefined for allegro4.
+                log_debug("Upgrading elkulator keyboard config definitions");
+
+                for (key_id=0; key_id<128; key_id++)
+                {
+                        // Can key be defined (not part of the undefined set in allegro4)
+                        old_host_key = keyboard_get_host_key_from_old_config_id(key_id);
+                        if(old_host_key != HOST_KEY_NONE)
+                        {
+                                sprintf(s2,"key_define_%03i", key_id);
+                                key_value=getintcfg(s2,key_id);
+                                // Only store if values are different.
+                                if(key_id != key_value)
+                                {
+                                        old_host_assigned_key = keyboard_get_host_key_from_old_config_id(key_value);
+                                        log_debug("Key value %d = %d", key_value, key_id);
+                                        log_debug("Key value %s = %s", keyboard_hostkey_to_config_str(old_host_assigned_key), keyboard_hostkey_to_config_str(old_host_key));
+                                        int elk_key = get_elk_key_from_host_key(old_host_assigned_key);
+                                        if(old_host_assigned_key != HOST_KEY_NONE && elk_key != ELK_KEY_NONE)
+                                        {
+                                                elkConfig.keyboard.host_key_mapping[old_host_assigned_key] = elk_key;
+                                                log_debug("%s=%s", keyboard_hostkey_to_config_str(old_host_assigned_key), keyboard_elkkey_to_config_str(elk_key));
+                                        }
+                                }
+                        }
+                }
         }
 
         /* Cartridge expansions */
