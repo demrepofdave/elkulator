@@ -132,6 +132,8 @@ void loadconfig()
 
         int api_version = getintcfg("api_version", 1);  // Assume old config file unless apiversion is present (2 is latest).
 
+        log_debug("Api version = %d", api_version);
+
         elkConfig.tape.speed            = getintcfg("tapespeed",0);
 
         elkConfig.expansion.plus1       = getboolcfg("plus1",   false);

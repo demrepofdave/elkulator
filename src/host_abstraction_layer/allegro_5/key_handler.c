@@ -4,6 +4,7 @@
 #include "elk.h"
 #include "host_abstraction_layer/event_handler.h"
 #include "logger.h"
+#include "config_vars.h"
 
 #define NO_ALTERNATE_KEY HOST_KEY_MAX
 typedef struct {
@@ -242,24 +243,35 @@ uint8_t keyboard_host_key_to_allegro5_key(host_key_t host_key)
 
 void keyboard_makelayout()
 {
-        int c;
+    int c;
 
-        // Reset keyboard
-        for(c = 0; c < ALLEGRO_KEY_MAX; c++)
-        {
-            keylookup[c] = ELK_KEY_MAX; // This signifies no ELK key assignemnt
-        }
+    log_debug("Make layout");
+    // Reset keyboard
+    for(c = 0; c < ALLEGRO_KEY_MAX; c++)
+    {
+        keylookup[c] = ELK_KEY_MAX; // This signifies no ELK key assignemnt
+    }
 
-        // Now assign defaults.
-        for(c = 0; c < ELK_KEY_MAX; c++)
+    // Now assign defaults.
+    for(c = 0; c < ELK_KEY_MAX; c++)
+    {
+        elk_key_state[c] = false;
+        keylookup[keyboard_host_key_to_allegro5_key(elk_keycode_defaults[c].host_keycode_main)] = c; // Assign PC key to elk key.
+        if(elk_keycode_defaults[c].host_keycode_alternate != NO_ALTERNATE_KEY)
         {
-            elk_key_state[c] = false;
-            keylookup[keyboard_host_key_to_allegro5_key(elk_keycode_defaults[c].host_keycode_main)] = c; // Assign PC key to elk key.
-            if(elk_keycode_defaults[c].host_keycode_alternate != NO_ALTERNATE_KEY)
-            {
-                keylookup[keyboard_host_key_to_allegro5_key(elk_keycode_defaults[c].host_keycode_alternate)] = c; // Assign alternate PC key to elk key (if defined).
-            }
+            keylookup[keyboard_host_key_to_allegro5_key(elk_keycode_defaults[c].host_keycode_alternate)] = c; // Assign alternate PC key to elk key (if defined).
         }
+    }
+
+    // Now assign any keyboard changes made in the config file.
+    for(c = 0; c < HOST_KEY_MAX; c++)
+    {
+        if(elkConfig.keyboard.host_key_mapping[c] != ELK_KEY_NONE)
+        {
+            log_debug("%s=%s", keyboard_hostkey_to_config_str(c), keyboard_elkkey_to_config_str(elkConfig.keyboard.host_key_mapping[c]));
+            keylookup[c] = elkConfig.keyboard.host_key_mapping[c];
+        }
+    }
 }
 
 elk_key_id_t get_elk_key_from_host_key(host_key_t host_key)

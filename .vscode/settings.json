@@ -27,6 +27,7 @@
         "adf.h": "c",
         "config.h": "c",
         "allegro_font.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "keyboard_internal.h": "c"
     }
 }

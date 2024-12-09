@@ -47,23 +47,23 @@ char *key_names[] =
 /* Key reading control. */
 static bool special_key_pressed(elk_key_id_t elk_keycode)
 {
-        bool result = false;
-        for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
+    bool result = false;
+    for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
+    {
+        if (keylookup[i] == elk_keycode && elk_key_state[i])
         {
-                if (keylookup[i] == elk_keycode && elk_key_state[i])
-                {
-                        result = true;
-                }
+            result = true;
         }
-        return result;
+    }
+    return result;
 }
 
 bool break_pressed()
 {
-        return special_key_pressed(ELK_KEY_BREAK);
+    return special_key_pressed(ELK_KEY_BREAK);
 }
 
 bool menu_pressed()
 {
-        return special_key_pressed(ELK_SPECIAL_KEY_MENU);
+    return special_key_pressed(ELK_SPECIAL_KEY_MENU);
 }
