@@ -296,7 +296,7 @@ void keyboard_debug_dump()
     {
         if(keylookup[c] < ELK_KEY_MAX)
         {
-            log_debug("keylookup[%d] = %s(%d)", c, al_keycode_to_name(keylookup[c]), keylookup[c]);
+            log_debug("keylookup[%s]=%s", keyboard_hostkey_to_config_str(c), keyboard_elkkey_to_config_str(keylookup[c]));
         }
     }
 }

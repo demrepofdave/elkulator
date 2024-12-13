@@ -5,13 +5,6 @@
 #include "host_abstraction_layer/keyboard.h"
 #include "logger.h"
 
-typedef enum {
-    COL_BLACK,
-    COL_GREY,
-    COL_RED,
-    COL_GREEN
-} key_col_t;
-
 typedef struct {
     uint16_t x, y, w, h;
     char cap[12];

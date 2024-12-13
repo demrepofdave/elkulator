@@ -30,7 +30,7 @@ static const char * elk_cfg_filename = "/elk.cfg"; // Filename for elkulator con
 *******************************************************************************/
 
 FILE *cfgfile;
-uint8_t cfgbuffer[1024];
+char cfgbuffer[1024];
 
 /******************************************************************************
 * Public Variable Definitions
