@@ -214,10 +214,4 @@ void keyhandler_refresh_elkkeys();
 bool keyhandler_elk_key_state(elk_key_id_t elk_key_code);
 elk_key_id_t get_elk_key_from_host_key(host_key_t host_key);
 
-host_key_t keyboard_get_host_key_from_old_config_id(uint8_t old_key_id);
-const char * keyboard_hostkey_to_config_str(host_key_t host_key);
-char * keyboard_elkkey_to_config_str(elk_key_id_t elk_key);
-
-elk_key_id_t keyboard_str_to_elk_key_id(const char * host_config_str);
-
 #endif // _KEYBOARD_H

@@ -356,7 +356,7 @@ static const int old_config_keys_to_new_host_keys_table[128] =
 
 };
 
-host_key_t keyboard_get_host_key_from_old_config_id(uint8_t old_key_id)
+host_key_t keyutils_get_hostkey_from_legacy_keyid(uint8_t old_key_id)
 {
     host_key_t host_key = HOST_KEY_NONE;
 
@@ -368,7 +368,7 @@ host_key_t keyboard_get_host_key_from_old_config_id(uint8_t old_key_id)
     return(host_key);
 }
 
-const char * keyboard_hostkey_to_config_str(host_key_t host_key)
+const char * keyutils_get_hostkey_config_string(host_key_t host_key)
 {
     const char * config_str = NULL;
     if(host_key < HOST_KEY_MAX)
@@ -378,7 +378,7 @@ const char * keyboard_hostkey_to_config_str(host_key_t host_key)
     return config_str;
 }
 
-char * keyboard_elkkey_to_config_str(elk_key_id_t elk_key)
+char * keyutils_get_elkkey_config_string(elk_key_id_t elk_key)
 {
     char * config_str = NULL;
     if(elk_key < ELK_KEY_MAX)
@@ -388,7 +388,7 @@ char * keyboard_elkkey_to_config_str(elk_key_id_t elk_key)
     return config_str;
 }
 
-elk_key_id_t keyboard_str_to_elk_key_id(const char * host_config_str)
+elk_key_id_t keyutils_str_to_elk_key_id(const char * host_config_str)
 {
     elk_key_id_t elk_key = ELK_KEY_NONE;
     bool found = false;

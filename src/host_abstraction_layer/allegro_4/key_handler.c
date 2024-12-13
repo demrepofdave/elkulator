@@ -1,4 +1,5 @@
 #include "host_abstraction_layer/keyboard.h"
+#include "host_abstraction_layer/keyutils.h"
 #include "elk.h"
 #include "logger.h"
 #include <allegro.h>

@@ -1,5 +1,6 @@
 #include <allegro5/allegro.h>
 #include "host_abstraction_layer/keyboard.h"
+#include "host_abstraction_layer/keyutils.h"
 #include "keyboard_internal.h"
 #include "elk.h"
 #include "host_abstraction_layer/event_handler.h"
@@ -268,7 +269,7 @@ void keyboard_makelayout()
     {
         if(elkConfig.keyboard.host_key_mapping[c] != ELK_KEY_NONE)
         {
-            log_debug("%s=%s", keyboard_hostkey_to_config_str(c), keyboard_elkkey_to_config_str(elkConfig.keyboard.host_key_mapping[c]));
+            log_debug("%s=%s", keyutils_get_hostkey_config_string(c), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[c]));
             keylookup[c] = elkConfig.keyboard.host_key_mapping[c];
         }
     }
@@ -296,7 +297,7 @@ void keyboard_debug_dump()
     {
         if(keylookup[c] < ELK_KEY_MAX)
         {
-            log_debug("keylookup[%s]=%s", keyboard_hostkey_to_config_str(c), keyboard_elkkey_to_config_str(keylookup[c]));
+            log_debug("keylookup[%s]=%s", keyutils_get_hostkey_config_string(c), keyutils_get_elkkey_config_string(keylookup[c]));
         }
     }
 }
