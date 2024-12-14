@@ -10,13 +10,21 @@
 
 typedef struct
 {
-    long timestamp;
+    native_timestamp_t timestamp;
     char msg[128];
 } t_timeEntry;
 
 static t_timeEntry log_timing_list[1024];
 
 static int timeEntryIndex = 0;
+
+void native_timediff_sprintf(char * diff_string, size_t diff_string_length, native_timediff_t timediff)
+{
+    if(diff_string)
+    {
+        snprintf(diff_string, diff_string_length, "+%ld.%03ld ms", (timediff / 1000), (timediff %1000));
+    }
+}
 
 void log_msg(const char * function, char *format, ...)
 {
@@ -43,7 +51,7 @@ void log_msg(const char * function, char *format, ...)
     fflush(stdout);
 }
 
-long log_get_timestamp()
+native_timestamp_t log_get_timestamp()
 {
     struct timeval tv;
     struct timezone tz;
@@ -72,10 +80,10 @@ void log_time_mark(const char *msg)
 
 void log_time_display()
 {
-    long previous_timestamp;
-    long start_timestamp;
-    long diff_begin;
-    long diff_last;
+    native_timestamp_t previous_timestamp;
+    native_timestamp_t start_timestamp;
+    native_timestamp_t diff_begin;
+    native_timediff_t  diff_last;
     if(timeEntryIndex > 0)
     {
         // Print first item.
