@@ -958,6 +958,8 @@ void startmovie(const char * filename)
 
         sndstreamindex = 0;
         sndstreamcount = 0;
+
+        video_set_window_title(VERSION_STR " - Recording");
     }
 }
 
@@ -969,6 +971,7 @@ void stopmovie()
         fclose(moviefile);
         moviefile = NULL;
     }
+    video_set_window_title(VERSION_STR);
 }
 
 #define DEFLATE_CHUNK_SIZE 262144
@@ -1046,3 +1049,8 @@ void saveframe()
     sndstreamcount = 0;
 }
 
+
+bool is_tapeon()
+{
+        return tapeon;
+}

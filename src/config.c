@@ -104,7 +104,7 @@ bool getboolcfg(char *name, bool def)
         return(c!=0?true:false);
 }
 
-void writestringcfg(const char *name, char *s)
+void writestringcfg(const char *name, const char *s)
 {
         if (s[0]) fprintf(cfgfile,"%s = %s\n",name,s);
 }
@@ -195,7 +195,7 @@ void loadconfig()
             s=getstringcfg(keyutils_get_hostkey_config_string(host_key));
             if(s)
             {
-                elkConfig.keyboard.host_key_mapping[host_key] = keyutils_str_to_elk_key_id(s);
+                elkConfig.keyboard.host_key_mapping[host_key] = keyutils_config_string_to_elk_key_id(s);
             }
             else
             {

@@ -3,77 +3,76 @@
 #include "host_abstraction_layer/keyboard.h"
 #include "logger.h"
 
-static char * elk_keycode_config_string[ELK_KEY_MAX] =
-{
-    "",
-    "elk_key_0",
-    "elk_key_1",
-    "elk_key_2",
-    "elk_key_3",
-    "elk_key_4",
-    "elk_key_5",
-    "elk_key_6",
-    "elk_key_7",
-    "elk_key_8",
-    "elk_key_9",
-    "elk_key_a",
-    "elk_key_b",
-    "elk_key_c",
-    "elk_key_d",
-    "elk_key_e",
-    "elk_key_f",
-    "elk_key_g",
-    "elk_key_h",
-    "elk_key_i",
-    "elk_key_j",
-    "elk_key_k",
-    "elk_key_l",
-    "elk_key_m",
-    "elk_key_n",
-    "elk_key_o",
-    "elk_key_p",
-    "elk_key_q",
-    "elk_key_r",
-    "elk_key_s",
-    "elk_key_t",
-    "elk_key_u",
-    "elk_key_v",
-    "elk_key_w",
-    "elk_key_x",
-    "elk_key_y",
-    "elk_key_z",
-    "elk_key_equals",
-    "elk_key_comma",
-    "elk_key_fullstop",
-    "elk_key_slash",
-    "elk_key_semicolon",
-    "elk_key_colon",
-    "elk_key_left",
-    "elk_key_right",
-    "elk_key_up",
-    "elk_key_down",
-    "elk_key_function",
-    "elk_key_copy",
-    "elk_key_control",
-    "elk_key_shift",
-    "elk_key_del",
-    "elk_key_space",
-    "elk_key_return",
-    "elk_key_escape",
-    "elk_key_break",
-    "elk_special_key_menu",
-};
-
-
 typedef struct 
 {
     const char * config_key_string;
     const char * key_longname;
-} host_key_strings_t;
+} key_strings_t;
+
+static key_strings_t elk_keycode_config_string[ELK_KEY_MAX] =
+{
+    { "",                     ""  },
+    { "elk_key_0",            "0" },
+    { "elk_key_1",            "1" },
+    { "elk_key_2",            "2" },
+    { "elk_key_3",            "3" },
+    { "elk_key_4",            "4" },
+    { "elk_key_5",            "5" },
+    { "elk_key_6",            "6" },
+    { "elk_key_7",            "7" },
+    { "elk_key_8",            "8" },
+    { "elk_key_9",            "9" },
+    { "elk_key_a",            "A" },
+    { "elk_key_b",            "B" },
+    { "elk_key_c",            "C" },
+    { "elk_key_d",            "D" },
+    { "elk_key_e",            "E" },
+    { "elk_key_f",            "F" },
+    { "elk_key_g",            "G" },
+    { "elk_key_h",            "H" },
+    { "elk_key_i",            "I" },
+    { "elk_key_j",            "J" },
+    { "elk_key_k",            "K" },
+    { "elk_key_l",            "L" },
+    { "elk_key_m",            "M" },
+    { "elk_key_n",            "N" },
+    { "elk_key_o",            "O" },
+    { "elk_key_p",            "P" },
+    { "elk_key_q",            "Q" },
+    { "elk_key_r",            "R" },
+    { "elk_key_s",            "S" },
+    { "elk_key_t",            "T" },
+    { "elk_key_u",            "U" },
+    { "elk_key_v",            "V" },
+    { "elk_key_w",            "W" },
+    { "elk_key_x",            "X" },
+    { "elk_key_y",            "Y" },
+    { "elk_key_z",            "Z" },
+    { "elk_key_equals",       "=" },
+    { "elk_key_comma",        "," },
+    { "elk_key_fullstop",     "." },
+    { "elk_key_slash",        "/" },
+    { "elk_key_semicolon",    ";" },
+    { "elk_key_colon",        ":" },
+    { "elk_key_left",         "Left" },
+    { "elk_key_right",        "Right" },
+    { "elk_key_up",           "Up" },
+    { "elk_key_down",         "Down" },
+    { "elk_key_function",     "Function" },
+    { "elk_key_copy",         "Copy" },
+    { "elk_key_control",      "Control" },
+    { "elk_key_shift",        "Shift" },
+    { "elk_key_del",          "Delete" },
+    { "elk_key_space",        "Spacebar" },
+    { "elk_key_return",       "Return" },
+    { "elk_key_escape",       "Escape" },
+    { "elk_key_break",        "Break" },
+    { "elk_special_key_menu", "<menu>" }
+};
 
 
 // see https://planet.racket-lang.org/package-source/kazzmir/allegro.plt/1/6/allegro-4.2.0/examples/exkeys.c
-static const host_key_strings_t host_key_string_table[HOST_KEY_MAX] = 
+static const key_strings_t host_key_string_table[HOST_KEY_MAX] = 
 {
     { "", "" },
     { "host_key_a", "A" },
@@ -368,6 +367,17 @@ host_key_t keyutils_get_hostkey_from_legacy_keyid(uint8_t old_key_id)
     return(host_key);
 }
 
+const char * keyutils_get_hostkey_longname(host_key_t host_key)
+{
+    const char * config_str = NULL;
+    if(host_key < HOST_KEY_MAX)
+    {
+        config_str = host_key_string_table[host_key].key_longname;
+    }
+    return config_str;
+}
+
+
 const char * keyutils_get_hostkey_config_string(host_key_t host_key)
 {
     const char * config_str = NULL;
@@ -378,23 +388,33 @@ const char * keyutils_get_hostkey_config_string(host_key_t host_key)
     return config_str;
 }
 
-char * keyutils_get_elkkey_config_string(elk_key_id_t elk_key)
+const char * keyutils_get_elkkey_longname(elk_key_id_t elk_key)
 {
-    char * config_str = NULL;
+    const char * config_str = NULL;
     if(elk_key < ELK_KEY_MAX)
     {
-        config_str = elk_keycode_config_string[elk_key];
+        config_str = elk_keycode_config_string[elk_key].key_longname;
     }
     return config_str;
 }
 
-elk_key_id_t keyutils_str_to_elk_key_id(const char * host_config_str)
+const char * keyutils_get_elkkey_config_string(elk_key_id_t elk_key)
+{
+    const char * config_str = NULL;
+    if(elk_key < ELK_KEY_MAX)
+    {
+        config_str = elk_keycode_config_string[elk_key].config_key_string;
+    }
+    return config_str;
+}
+
+elk_key_id_t keyutils_config_string_to_elk_key_id(const char * host_config_str)
 {
     elk_key_id_t elk_key = ELK_KEY_NONE;
     bool found = false;
     while(!found && ++elk_key < ELK_KEY_MAX)
     {
-        if(strcmp(host_config_str, elk_keycode_config_string[elk_key]) == 0)
+        if(strcmp(host_config_str, elk_keycode_config_string[elk_key].config_key_string) == 0)
         {
             found = true;
         }

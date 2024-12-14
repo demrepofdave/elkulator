@@ -32,5 +32,7 @@
 void openuef (const char *fn);
 void closeuef();
 void polluef ();
+bool is_uef();
+
 
 #endif // _UEF_H

@@ -81,6 +81,7 @@ void video_rest(unsigned int period);  // Only used in allegro4.
 
 void video_update_native_window_size(int w, int h);
 void video_resize_elk_window(bool aspect_ratio);
+void video_set_window_title(const char * title);
 void video_set_window_size(int w, int h, int v_w, int v_h);
 void video_apply_window_size();
 void video_set_gfx_mode_windowed();

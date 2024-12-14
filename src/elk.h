@@ -27,6 +27,8 @@ extern "C" {
 
 #define printf rpclog
 
+#define VERSION_STR "Elkulator v2.00a-1214"
+
 void rpclog(char *format, ...);
 
 extern int rombank,intrombank;

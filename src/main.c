@@ -15,6 +15,7 @@
 #include "callback_handlers.h"
 #include "config.h"
 #include "config_vars.h"
+#include "csw.h"
 #include "disc.h"
 #include "ddnoise.h"
 #include "debugger.h"
@@ -23,6 +24,7 @@
 #include "mem.h"
 #include "tapenoise.h"
 #include "ula.h"
+#include "uef.h"
 
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/fileutils.h"
@@ -258,7 +260,7 @@ void runelk()
         long timestamp_diff = 0;
         int c;
         //log_time_mark("=== runelk begin ===");
-        if (drawit || (tapeon && elkConfig.tape.speed))
+        if (drawit || (is_tapeon() && elkConfig.tape.speed))
         {
                 if (drawit) drawit--;
                 if (drawit>8 || drawit<0) drawit=0;
@@ -361,7 +363,7 @@ int main(int argc, char *argv[])
                         // does as it runs the function every 1 millisecond with
                         // drawing every normal 20ms).
                         count = 19;
-                        while(count && tapeon && elkConfig.tape.speed)
+                        while(count && is_tapeon() && (is_csw() || is_uef()) && elkConfig.tape.speed)
                         {
                                 runelk();
                                 count--;

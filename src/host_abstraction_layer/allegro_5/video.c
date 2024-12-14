@@ -31,14 +31,13 @@
 #include "host_abstraction_layer/video.h"
 #include "host_abstraction_layer/allegro_5//menu_internal.h"
 #include "logger.h"
+#include "elk.h"
 #include "video_internal.h"
 #include "event_handler_internal.h"
 
 /******************************************************************************
 * Preprocessor Macros
 *******************************************************************************/
-
-#define VERSION_STR "Elkulator v2.00a-1020"
 
 /******************************************************************************
 * Typedefs
@@ -213,6 +212,11 @@ void video_init_part3(void (*timer_function)(void))
 void video_rest(unsigned int period)
 {
     return;
+}
+
+void video_set_window_title(const char * title)
+{
+    al_set_window_title(display, title);
 }
 
 void video_set_window_size(int w, int h, int v_w, int v_h)

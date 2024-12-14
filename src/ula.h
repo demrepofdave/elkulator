@@ -33,7 +33,6 @@ enum
 * Variable externs
 *******************************************************************************/
 extern int ulacycles;
-extern int tapeon;
 extern int tapewrite;
 extern int pauseit;
 
@@ -60,5 +59,8 @@ void saveulastate(FILE *f);
 
 void startmovie(const char * filename);
 void stopmovie();
+
+bool is_tapeon();
+
 
 #endif // _ULA_H
