@@ -18,6 +18,18 @@ static t_timeEntry log_timing_list[1024];
 
 static int timeEntryIndex = 0;
 
+
+native_timediff_t native_cumulative_time_adjust(native_timediff_t offset, native_timediff_t cumulative_total, native_timediff_t current_timediff)
+{
+    native_timediff_t adjusted_timediff = current_timediff - offset;
+    native_timediff_t new_cumulative_total = cumulative_total + adjusted_timediff;
+    if(new_cumulative_total < 0)
+    {
+        new_cumulative_total = 0;
+    }
+    return(new_cumulative_total);
+}
+
 void native_timediff_sprintf(char * diff_string, size_t diff_string_length, native_timediff_t timediff)
 {
     if(diff_string)

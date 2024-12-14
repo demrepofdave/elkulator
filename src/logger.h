@@ -15,6 +15,7 @@
 typedef long native_timestamp_t;
 typedef long native_timediff_t;
 
+native_timediff_t native_cumulative_time_adjust(native_timediff_t offset, native_timediff_t cumulative_total, native_timediff_t current_timediff);
 void native_timediff_sprintf(char * diff_string, size_t diff_string_length, native_timediff_t timediff);
 native_timestamp_t log_get_timestamp();
 void log_msg(const char * function, char *format, ...);

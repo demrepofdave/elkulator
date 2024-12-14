@@ -343,8 +343,9 @@ int main(int argc, char *argv[])
                 elk_event_t elkEvent = 0;
                 native_timediff_t elk_runtime = 0;
                 native_timediff_t native_timer_diff = 0;
+                native_timediff_t native_cummulative_time_diff = 0;
                 native_timestamp_t native_timestamp_last_trigger = log_get_timestamp();
-                native_timestamp_t native_timestamp_current;
+                native_timestamp_t native_timestamp_current = 0;
                 while (!(elkEvent & ELK_EVENT_EXIT))
                 {
                         elkEvent = event_await();
@@ -358,12 +359,22 @@ int main(int argc, char *argv[])
                         //log_debug("elkEvent=%04x", elkEvent);
                         if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
                         {
-                                drawit++;
-                                elk_runtime = runelk();
-
                                 native_timestamp_current = log_get_timestamp();
                                 native_timer_diff = native_timestamp_current - native_timestamp_last_trigger;
                                 native_timestamp_last_trigger = native_timestamp_current;
+                                native_cummulative_time_diff = native_cumulative_time_adjust(20000, native_cummulative_time_diff, native_timer_diff);
+
+                                //drawit++;
+                                if(native_cummulative_time_diff > 20000)
+                                {
+                                        pause_video_blit();
+                                        // Print out some stats for debug purposes.
+                                        native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), elk_runtime);
+                                        native_timediff_sprintf(elk_cumulated_timediff_str, sizeof(elk_cumulated_timediff_str), native_cummulative_time_diff);
+                                        log_debug("elkruntime = %s (%s)", elk_timediff_str, elk_cumulated_timediff_str);
+                                }
+                                elk_runtime = runelk();
+
 
                                 // If tape is running and its speed is fast or really fast
                                 // We need to runelk another 19 times (or until tape is
@@ -377,16 +388,18 @@ int main(int argc, char *argv[])
                                         if(elk_runtime > 20000 && !skip_video_refresh)
                                         {
                                                 log_debug("!!tape skip video refresh disabled!!");
+                                                skip_video_refresh = true;
                                                 pause_video_blit(); // We don't need to update the screen for this (helps on slower machines).
                                         }
                                         elk_runtime += runelk(skip_video_refresh);
                                         count--;
                                 }
                                 resume_video_blit();
-
-                                native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), elk_runtime);
-                                native_timediff_sprintf(elk_cumulated_timediff_str, sizeof(elk_cumulated_timediff_str), native_timer_diff);
-                                log_debug("elkruntime = %s (%s)", elk_timediff_str, elk_cumulated_timediff_str);
+                        }
+                        else if(elkEvent & ELK_EVENT_HANDLED)
+                        {
+                                // Menu may have been accessed, reset timing.
+                                native_timestamp_last_trigger = log_get_timestamp();
                         }
                 }
         #endif // HAL_ALLEGRO_4
