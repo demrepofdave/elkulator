@@ -48,7 +48,7 @@ char *key_names[] =
 static bool special_key_pressed(elk_key_id_t elk_keycode)
 {
     bool result = false;
-    for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
+    for (int i = 0; i < HOST_KEY_MAX; i++)
     {
         if (keylookup[i] == elk_keycode && elk_key_state[i])
         {

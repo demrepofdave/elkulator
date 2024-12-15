@@ -3,12 +3,13 @@
 #include <limits.h>
 #include "keyboard_internal.h"
 #include "host_abstraction_layer/keyboard.h"
+#include "host_abstraction_layer/keyutils.h"
 #include "logger.h"
+#include "config_vars.h"
 
 typedef struct {
     uint16_t x, y, w, h;
     char cap[12];
-    char name[12];
     elk_key_id_t elkkeyid;
 } key_cap_t;
 
@@ -27,68 +28,68 @@ typedef enum {
 #define ELK_NKEY 56
 
 static const key_cap_t kcaps_elk[ELK_NKEY] = {
-        /* x,y,w,h,       key,  fullname,      elk hal keycode */
+        /* x,y,w,h,       key,     elk hal keycode */
 
-        { 26,56,28,28,    "ESC",   "Escape",   ELK_KEY_ESCAPE    },
-        { 58,56,28,28,    "1",     "1",        ELK_KEY_1         },
-        { 90,56,28,28,    "2",     "2",        ELK_KEY_2         },
-        { 122,56,28,28,   "3",     "3",        ELK_KEY_3         },
-        { 154,56,28,28,   "4",     "4",        ELK_KEY_4         },
-        { 186,56,28,28,   "5",     "5",        ELK_KEY_5         },
-        { 218,56,28,28,   "6",     "6",        ELK_KEY_6         },
-        { 250,56,28,28,   "7",     "7",        ELK_KEY_7         },
-        { 282,56,28,28,   "8",     "8",        ELK_KEY_8         },
-        { 314,56,28,28,   "9",     "9",        ELK_KEY_9         },
-        { 346,56,28,28,   "0",     "0",        ELK_KEY_0         },
-        { 378,56,28,28,   "=",     "=",        ELK_KEY_EQUALS    },
-        { 410,56,28,28,   "LFT",   "Left",     ELK_KEY_LEFT      },
-        { 442,56,28,28,   "RGT",   "Right",    ELK_KEY_RIGHT     },
-        { 474,56,28,28,   "BRK",   "Break",    ELK_KEY_BREAK     },  // 15 keys - top row.
+        { 26,56,28,28,    "ESC",   ELK_KEY_ESCAPE    },
+        { 58,56,28,28,    "1",     ELK_KEY_1         },
+        { 90,56,28,28,    "2",     ELK_KEY_2         },
+        { 122,56,28,28,   "3",     ELK_KEY_3         },
+        { 154,56,28,28,   "4",     ELK_KEY_4         },
+        { 186,56,28,28,   "5",     ELK_KEY_5         },
+        { 218,56,28,28,   "6",     ELK_KEY_6         },
+        { 250,56,28,28,   "7",     ELK_KEY_7         },
+        { 282,56,28,28,   "8",     ELK_KEY_8         },
+        { 314,56,28,28,   "9",     ELK_KEY_9         },
+        { 346,56,28,28,   "0",     ELK_KEY_0         },
+        { 378,56,28,28,   "=",     ELK_KEY_EQUALS    },
+        { 410,56,28,28,   "LFT",   ELK_KEY_LEFT      },
+        { 442,56,28,28,   "RGT",   ELK_KEY_RIGHT     },
+        { 474,56,28,28,   "BRK",   ELK_KEY_BREAK     },  // 15 keys - top row.
 
-        { 42,88,28,28,    "FN",    "Function", ELK_KEY_FUNCTION  },
-        { 74,88,28,28,    "Q",     "Q",        ELK_KEY_Q         },
-        { 106,88,28,28,   "W",     "W",        ELK_KEY_W         },
-        { 138,88,28,28,   "E",     "E",        ELK_KEY_E         },
-        { 170,88,28,28,   "R",     "R",        ELK_KEY_R         },
-        { 202,88,28,28,   "T",     "T",        ELK_KEY_T         },
-        { 234,88,28,28,   "Y",     "Y",        ELK_KEY_Y         },
-        { 266,88,28,28,   "U",     "U",        ELK_KEY_U         },
-        { 298,88,28,28,   "I",     "I",        ELK_KEY_I         },
-        { 330,88,28,28,   "O",     "O",        ELK_KEY_O         },
-        { 362,88,28,28,   "P",     "P",        ELK_KEY_P         },
-        { 394,88,28,28,   "UP",    "Up",       ELK_KEY_UP        },
-        { 426,88,28,28,   "DWN",   "Down",     ELK_KEY_DOWN      },
-        { 458,88,28,28,   "CPY",   "Copy",     ELK_KEY_COPY      }, // TODO: Reposition - BBC position. - 14 keys 2nd row
+        { 42,88,28,28,    "FN",    ELK_KEY_FUNCTION  },
+        { 74,88,28,28,    "Q",     ELK_KEY_Q         },
+        { 106,88,28,28,   "W",     ELK_KEY_W         },
+        { 138,88,28,28,   "E",     ELK_KEY_E         },
+        { 170,88,28,28,   "R",     ELK_KEY_R         },
+        { 202,88,28,28,   "T",     ELK_KEY_T         },
+        { 234,88,28,28,   "Y",     ELK_KEY_Y         },
+        { 266,88,28,28,   "U",     ELK_KEY_U         },
+        { 298,88,28,28,   "I",     ELK_KEY_I         },
+        { 330,88,28,28,   "O",     ELK_KEY_O         },
+        { 362,88,28,28,   "P",     ELK_KEY_P         },
+        { 394,88,28,28,   "UP",    ELK_KEY_UP        },
+        { 426,88,28,28,   "DWN",   ELK_KEY_DOWN      },
+        { 458,88,28,28,   "CPY",   ELK_KEY_COPY      }, // TODO: Reposition - BBC position. - 14 keys 2nd row
 
-        { 50,120,28,28,   "CTL",   "Ctrl",     ELK_KEY_CONTROL   },
-        { 82,120,28,28,   "A",     "A",        ELK_KEY_A         },
-        { 114,120,28,28,  "S",     "S",        ELK_KEY_S         },
-        { 146,120,28,28,  "D",     "D",        ELK_KEY_D         },
-        { 178,120,28,28,  "F",     "F",        ELK_KEY_F         },
-        { 210,120,28,28,  "G",     "G",        ELK_KEY_G         },
-        { 242,120,28,28,  "H",     "H",        ELK_KEY_H         },
-        { 274,120,28,28,  "J",     "J",        ELK_KEY_J         },
-        { 306,120,28,28,  "K",     "K",        ELK_KEY_K         },
-        { 338,120,28,28,  "L",     "L",        ELK_KEY_L         },
-        { 370,120,28,28,  ";",     ";",        ELK_KEY_SEMICOLON },
-        { 402,120,28,28,  ":",     ":",        ELK_KEY_COLON     },
-        { 434,120,44,28,  "RET",   "Return",   ELK_KEY_RETURN    }, // 13 keys 3rd row
+        { 50,120,28,28,   "CTL",   ELK_KEY_CONTROL   },
+        { 82,120,28,28,   "A",     ELK_KEY_A         },
+        { 114,120,28,28,  "S",     ELK_KEY_S         },
+        { 146,120,28,28,  "D",     ELK_KEY_D         },
+        { 178,120,28,28,  "F",     ELK_KEY_F         },
+        { 210,120,28,28,  "G",     ELK_KEY_G         },
+        { 242,120,28,28,  "H",     ELK_KEY_H         },
+        { 274,120,28,28,  "J",     ELK_KEY_J         },
+        { 306,120,28,28,  "K",     ELK_KEY_K         },
+        { 338,120,28,28,  "L",     ELK_KEY_L         },
+        { 370,120,28,28,  ";",     ELK_KEY_SEMICOLON },
+        { 402,120,28,28,  ":",     ELK_KEY_COLON     },
+        { 434,120,44,28,  "RET",   ELK_KEY_RETURN    }, // 13 keys 3rd row
 
-        { 50,152,44,28,   "SHIFT", "Shift",    ELK_KEY_SHIFT     },
-        { 98,152,28,28,   "Z",     "Z",        ELK_KEY_Z         },
-        { 130,152,28,28,  "X",     "X",        ELK_KEY_X         },
-        { 162,152,28,28,  "C",     "C",        ELK_KEY_C         },
-        { 194,152,28,28,  "V",     "V",        ELK_KEY_V         },
-        { 226,152,28,28,  "B",     "B",        ELK_KEY_B         },
-        { 258,152,28,28,  "N",     "N",        ELK_KEY_N         },
-        { 290,152,28,28,  "M",     "M",        ELK_KEY_M         },
-        { 322,152,28,28,  ",",     ",",        ELK_KEY_COMMA     },
-        { 354,152,28,28,  ".",     ".",        ELK_KEY_FULLSTOP  },
-        { 386,152,28,28,  "/",     "/",        ELK_KEY_SLASH },
-        { 418,152,44,28,  "SHIFT", "Shift",    ELK_KEY_SHIFT     },
-        { 466,152,28,28,  "DEL",   "Delete",   ELK_KEY_DEL       },
+        { 50,152,44,28,   "SHIFT", ELK_KEY_SHIFT     },
+        { 98,152,28,28,   "Z",     ELK_KEY_Z         },
+        { 130,152,28,28,  "X",     ELK_KEY_X         },
+        { 162,152,28,28,  "C",     ELK_KEY_C         },
+        { 194,152,28,28,  "V",     ELK_KEY_V         },
+        { 226,152,28,28,  "B",     ELK_KEY_B         },
+        { 258,152,28,28,  "N",     ELK_KEY_N         },
+        { 290,152,28,28,  "M",     ELK_KEY_M         },
+        { 322,152,28,28,  ",",     ELK_KEY_COMMA     },
+        { 354,152,28,28,  ".",     ELK_KEY_FULLSTOP  },
+        { 386,152,28,28,  "/",     ELK_KEY_SLASH     },
+        { 418,152,44,28,  "SHIFT", ELK_KEY_SHIFT     },
+        { 466,152,28,28,  "DEL",   ELK_KEY_DEL       },
 
-        { 146,184,252,28, "SPACE", "Space",    ELK_KEY_SPACE     }, // 1 key bottom row.
+        { 146,184,252,28, "SPACE", ELK_KEY_SPACE     }, // 1 key bottom row.
 };
 
 static const key_dlg_t elk_kbd_dlg = { kcaps_elk, kcaps_elk + ELK_KEY_MAX, 538, 304 };
@@ -129,7 +130,6 @@ static void draw_keyboard(const key_dlg_t *key_dlg, int ok_x, int can_x)
 
 static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8_t *keylookcpy)
 {
-    elk_key_id_t elkkeyid = ELK_KEY_MAX;
     int mid_x  = key_dlg->disp_x/2;
     int left_x = mid_x-200;
     int mid_y  = key_dlg->disp_y/2;
@@ -139,32 +139,33 @@ static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kpt
     char s[1024], *p;
     int size, remain, count;
 
-    log_debug("keydef-allegro: Elk key %s (%s) clicked", kptr->cap, kptr->name);
-    elkkeyid = kptr->elkkeyid;
+    log_debug("keydef-allegro: Elk key %s clicked", keyutils_get_elkkey_longname(kptr->elkkeyid));
 
     al_draw_filled_rectangle(left_x, top_y, left_x + 400, top_y + 72, navy);
-    snprintf(s, sizeof s, "Redefining %s", kptr->name);
+    snprintf(s, sizeof s, "Redefining %s", keyutils_get_elkkey_longname(kptr->elkkeyid));
     al_draw_text(font, white, left_x+24, top_y+16, ALLEGRO_ALIGN_LEFT, s);
     size = snprintf(s, sizeof s, "Assigned to PC key(s):");
     p = s + size;
     remain = sizeof s - size;
     count = 0;
 
-    for (int code = 0; remain > 0 && code < ALLEGRO_KEY_MAX; code++) 
+    for(int code = 0; code < HOST_KEY_MAX; code++)
     {
-        if (keylookcpy[code] == kptr->elkkeyid) 
+        if(elkConfig.keyboard.host_key_mapping[code] == kptr->elkkeyid)
         {
             const char *fmt = count == 0 ? " %s" : ", %s";
-            size = snprintf(p, remain, fmt, al_keycode_to_name(code));
+            log_debug("%s=%s", keyutils_get_hostkey_longname(code), keyutils_get_elkkey_config_string(kptr->elkkeyid));
+            size = snprintf(p, remain, fmt, keyutils_get_hostkey_longname(code));
             p += size;
             remain -= size;
         }
     }
+
     al_draw_text(font, white, left_x+24, top_y+32, ALLEGRO_ALIGN_LEFT, s);
-    al_draw_text(font, white, left_x+24, top_y+48, ALLEGRO_ALIGN_LEFT, "Please press new key...");
+    al_draw_text(font, white, left_x+24, top_y+48, ALLEGRO_ALIGN_LEFT, "Please press new key, or click cancel to abort");
     al_flip_display();
 
-    return (elkkeyid);
+    return (kptr->elkkeyid);
 }
 
 static bool mouse_within(ALLEGRO_EVENT *event, int x, int y, int w, int h)
