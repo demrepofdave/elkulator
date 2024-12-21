@@ -82,7 +82,6 @@ typedef struct {
 // HOST_KEY get mapped to ALLEGRO_KEY.
 // 
 // ALLEGRO KEY pressed.. need to map to HOST_KEY or ELK_KEY.
-// keylookup is populated from here.
 static const uint8_t allegro_key_to_host_key_mapping[ALLEGRO_KEY_MAX] = 
 {
     0,
@@ -341,9 +340,6 @@ static const uint8_t allegro_key_to_host_key_mapping[ALLEGRO_KEY_MAX] =
 // Records if native key is pressed or not (true = pressed, false = not pressed)
 bool elk_key_state[ELK_KEY_MAX];
 
-// keylookup allows the user to redefine a native key with another native key(?)
-host_key_t keylookup[HOST_KEY_MAX];
-
 bool keydefining = false;
 
 uint8_t keyboard_allegro5_key_to_host_key(uint8_t allegro_key)
@@ -360,33 +356,37 @@ void keyboard_makelayout()
 {
     int c;
 
+    // Config will aleady have any redefined keys in it prior to entering
+    // this function.  We fill in the remaining defaults.
     log_debug("Make layout");
-    // Reset keyboard
-    for(c = 0; c < HOST_KEY_MAX; c++)
-    {
-        keylookup[c] = ELK_KEY_MAX; // This signifies no ELK key assignemnt
-    }
 
     // Now assign defaults.
     for(c = 0; c < ELK_KEY_MAX; c++)
     {
         elk_key_state[c] = false;
-        keylookup[elk_keycode_defaults[c].host_keycode_main] = c; // Assign Host key to elk key.
-        if(elk_keycode_defaults[c].host_keycode_alternate != NO_ALTERNATE_KEY)
+        
+        // Map default
+        if(elkConfig.keyboard.host_key_mapping[elk_keycode_defaults[c].host_keycode_main] == ELK_KEY_NONE)
         {
-            keylookup[elk_keycode_defaults[c].host_keycode_alternate] = c; // Assign alternate PC key to elk key (if defined).
+            elkConfig.keyboard.host_key_mapping[elk_keycode_defaults[c].host_keycode_main] = c;
+        }
+
+        // Map alternate if it exists
+        if(elk_keycode_defaults[c].host_keycode_alternate != NO_ALTERNATE_KEY &&
+           elkConfig.keyboard.host_key_mapping[elk_keycode_defaults[c].host_keycode_alternate] == ELK_KEY_NONE)
+        {
+            elkConfig.keyboard.host_key_mapping[elk_keycode_defaults[c].host_keycode_alternate] = c;
         }
     }
 
     // Now assign any keyboard changes made in the config file.
-    for(c = 0; c < HOST_KEY_MAX; c++)
-    {
-        if(elkConfig.keyboard.host_key_mapping[c] != ELK_KEY_NONE)
-        {
-            log_debug("%s=%s", keyutils_get_hostkey_config_string(c), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[c]));
-            keylookup[c] = elkConfig.keyboard.host_key_mapping[c];
-        }
-    }
+    //for(c = 0; c < HOST_KEY_MAX; c++)
+    //{
+    //    if(elkConfig.keyboard.host_key_mapping[c] != ELK_KEY_NONE)
+    //    {
+    //        log_debug("%s=%s", keyutils_get_hostkey_config_string(c), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[c]));
+    //    }
+    //}
 }
 
 elk_key_id_t get_elk_key_from_host_key(host_key_t host_key)
@@ -409,9 +409,9 @@ void keyboard_debug_dump()
     int c;
     for(c = 0; c< HOST_KEY_MAX; c++)
     {
-        if(keylookup[c] < HOST_KEY_MAX)
+        if(elkConfig.keyboard.host_key_mapping[c] != ELK_KEY_NONE)
         {
-            log_debug("keylookup[%s]=%s", keyutils_get_hostkey_config_string(c), keyutils_get_elkkey_config_string(keylookup[c]));
+            log_debug("%s=%s", keyutils_get_hostkey_config_string(c), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[c]));
         }
     }
 }
@@ -429,12 +429,12 @@ bool keyhandler_elk_key_state(elk_key_id_t elk_key_code)
 
 void key_down(host_key_t hostkey)
 {
-    elk_key_id_t elkkey = keylookup[hostkey];
+    elk_key_id_t elkkey = elkConfig.keyboard.host_key_mapping[hostkey];
 
     if(elkkey != ELK_KEY_MAX)
     {
         log_debug("keycode %d, elkkey %s", hostkey, keyutils_get_elkkey_longname(elkkey));
-        elk_key_state[keylookup[hostkey]] = true;
+        elk_key_state[elkkey] = true;
     }
     else
     {
@@ -448,7 +448,7 @@ void key_down_event(ALLEGRO_EVENT *event)
 //    if (keycode == ALLEGRO_KEY_ALT || keycode == ALLEGRO_KEY_ALTGR)
 //        hostalt = true;
 //    else if (keycode == ALLEGRO_KEY_CAPSLOCK)
-//            key_down(keylookup[keycode]);
+//            key_down(elkConfig.keyboard.host_key_mapping[keycode]);
 //    else {
 //        bool shiftctrl = false;
 //        if (keycode == ALLEGRO_KEY_LSHIFT || keycode == ALLEGRO_KEY_RSHIFT) {
@@ -475,12 +475,12 @@ void key_down_event(ALLEGRO_EVENT *event)
 
 void key_up(host_key_t hostkey)
 {
-    elk_key_id_t elkkey = keylookup[hostkey];
+    elk_key_id_t elkkey = elkConfig.keyboard.host_key_mapping[hostkey];
 
     if(elkkey != ELK_KEY_MAX)
     {
         log_debug("keycode %d, elkkey %s", hostkey, keyutils_get_elkkey_longname(elkkey));
-        elk_key_state[keylookup[hostkey]] = false;
+        elk_key_state[elkkey] = false;
     }
     else
     {
@@ -501,7 +501,7 @@ void key_up_event(ALLEGRO_EVENT *event)
 //        if (keycode == ALLEGRO_KEY_ALT || keycode == ALLEGRO_KEY_ALTGR)
 //            hostalt = false;
 //        else if (keycode == ALLEGRO_KEY_CAPSLOCK)
-//            key_up(keylookup[keycode]);
+//            key_up(elkConfig.keyboard.host_key_mapping[keycode]);
 //        else {
 //            int unichar = last_unichar[keycode];
 //            bool shiftctrl = false;
@@ -523,7 +523,7 @@ void key_up_event(ALLEGRO_EVENT *event)
 //            if (keylogical)
 //                set_key_logical(keycode, unichar, false);
 //            else
-//                key_up(keylookup[keycode]);
+//                key_up(elkConfig.keyboard.host_key_mapping[keycode]);
 //        }
     }
 }
@@ -542,7 +542,7 @@ void key_char_event(ALLEGRO_EVENT *event)
 //        if (keylogical)
 //            set_key_logical(keycode, unichar, true);
 //        else
-//            key_down(keylookup[keycode]);
+//            key_down(elkConfig.keyboard.host_key_mapping[keycode]);
 //    }
 }
 

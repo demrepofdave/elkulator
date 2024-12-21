@@ -58,6 +58,16 @@ extern uint8_t sndstreambuf[626];
 extern int sndstreamptr;
 
 extern int discspd;
+typedef enum {
+    ELK_STATE_INITIALIZING,
+    ELK_STATE_PAUSED,
+    ELK_STATE_KEY_DEFINING,
+    ELK_STATE_RUNNING
+} elkstate_t;
+
+extern elkstate_t elk_state;
+
+// Place here for now.
 
 // Maximum file name buffer size (previously this was defined as magic number
 // in the code at 512, however it is possible that a file path on modern OS's

@@ -7,8 +7,8 @@
 #include "host_abstraction_layer/keyboard.h"
 
 extern bool keydefining;
-extern host_key_t keylookup[HOST_KEY_MAX];
 
+uint8_t keyboard_allegro5_key_to_host_key(uint8_t allegro_key);
 elk_event_t keyboard_handle_event(ALLEGRO_EVENT *event);
 
 # endif // _KEYBOARD_INTERNAL_H

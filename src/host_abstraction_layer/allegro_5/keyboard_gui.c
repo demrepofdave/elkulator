@@ -180,7 +180,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
     ALLEGRO_EVENT_QUEUE *queue;
     ALLEGRO_EVENT event;
     state_t state;
-    uint8_t keylookcpy[ALLEGRO_KEY_MAX];
+    uint8_t keylookcpy[HOST_KEY_MAX];
     const key_cap_t *kptr = NULL;
     int mid_x, ok_x, can_x;
     bool alt_down = false;
@@ -212,7 +212,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
             
 
             // Make a copy and modify that (just in case the user cancels the whole operation).
-            memcpy(keylookcpy, keylookup, ALLEGRO_KEY_MAX);
+            memcpy(keylookcpy, elkConfig.keyboard.host_key_mapping, HOST_KEY_MAX);
 
             draw_keyboard(key_dlg, ok_x, can_x);
             while (state != ST_DONE)
@@ -225,7 +225,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                         {
                             // Ok button clicked (apply settings to main keyboard lookup table)
                             log_debug("ok");
-                            memcpy(keylookup, keylookcpy, ALLEGRO_KEY_MAX);
+                            memcpy(elkConfig.keyboard.host_key_mapping, keylookcpy, HOST_KEY_MAX);
                             state = ST_DONE;
                         }
                         else if (mouse_within(&event, can_x, BTNS_Y, BTNS_W, BTNS_H))
@@ -257,7 +257,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                         }
                         break;
                     case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                        memcpy(keylookup, keylookcpy, ALLEGRO_KEY_MAX);
+                        memcpy(elkConfig.keyboard.host_key_mapping, keylookcpy, HOST_KEY_MAX);
                         state = ST_DONE;
                         break;
                     case ALLEGRO_EVENT_KEY_DOWN:
@@ -270,9 +270,9 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                     case ALLEGRO_EVENT_KEY_CHAR:
                         if (state == ST_PC_KEY) 
                         {
-                            int keycode = event.keyboard.keycode;
-                            log_debug("keydef-allegro: mapping allegro code %d:%s to Elk code %d", keycode, al_keycode_to_name(keycode), elkkeyid);
-                            keylookcpy[keycode] = elkkeyid;
+                            host_key_t hostkey = keyboard_allegro5_key_to_host_key(event.keyboard.keycode);
+                            log_debug("keydef-allegro: mapping allegro code %d, hostkey %s to Elk key %s", event.keyboard.keycode, keyutils_get_hostkey_longname(hostkey), keyutils_get_elkkey_longname(elkkeyid));
+                            keylookcpy[hostkey] = elkkeyid;
                             state = ST_ELK_KEY;
                             draw_keyboard(key_dlg, ok_x, can_x);
                         }
@@ -282,6 +282,16 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                             log_debug("keydef-allegro: alt up");
                             alt_down = false;
                         }
+                        break;
+                    case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
+                        draw_keyboard(key_dlg, ok_x, can_x);
+                        break;
+                    default: 
+                        if(event.type != ALLEGRO_EVENT_MOUSE_AXES)
+                        {
+                            log_debug("Allegro event %d", event.type);
+                        }
+                        break;
                 }
             }
             al_destroy_event_queue(queue);

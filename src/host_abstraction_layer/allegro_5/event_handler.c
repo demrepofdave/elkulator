@@ -154,10 +154,10 @@ uint32_t event_await()
         {
             log_debug("event_await: event %d handled", event.type);
         }
-        //else if(event.type != ALLEGRO_EVENT_TIMER)
-        //{
-        //    log_debug("event_await: event %d detected", event.type);
-        //}
+        else if(event.type != ALLEGRO_EVENT_TIMER && event.type != ALLEGRO_EVENT_MOUSE_AXES)
+        {
+            log_debug("event_await: event %d detected", event.type);
+        }
     }
 
     if(elkEvent & ELK_EVENT_RESET)

@@ -5,6 +5,7 @@
 #include "elk.h"
 #include "host_abstraction_layer/keyboard.h"
 #include "keyboard_internal.h"
+#include "config_vars.h"
 
 extern bool elk_key_state[ELK_KEY_MAX];
 
@@ -50,7 +51,7 @@ static bool special_key_pressed(elk_key_id_t elk_keycode)
     bool result = false;
     for (int i = 0; i < HOST_KEY_MAX; i++)
     {
-        if (keylookup[i] == elk_keycode && elk_key_state[i])
+        if (elkConfig.keyboard.host_key_mapping[i] == elk_keycode && elk_key_state[i])
         {
             result = true;
         }
