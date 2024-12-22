@@ -151,11 +151,9 @@ static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kpt
 
     for(int code = 0; code < HOST_KEY_MAX; code++)
     {
-        log_debug("%s=%s", keyutils_get_hostkey_longname(code), keyutils_get_elkkey_config_string(kptr->elkkeyid));
         if(keylookcpy[code] == kptr->elkkeyid)
         {
             const char *fmt = count == 0 ? " %s" : ", %s";
-            log_debug("[[ %s=%s ]]", keyutils_get_hostkey_longname(code), keyutils_get_elkkey_config_string(kptr->elkkeyid));
             size = snprintf(p, remain, fmt, keyutils_get_hostkey_longname(code));
             p += size;
             remain -= size;
@@ -186,8 +184,6 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
     int mid_x, ok_x, can_x;
     bool alt_down = false;
     elk_key_id_t elkkeyid = ELK_KEY_MAX;
-
-    keyboard_debug_dump();
 
     if (!font) {
         al_init_font_addon();
@@ -311,12 +307,12 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                             }
                         }
                         break;
-                    default: 
-                        if(event.type != ALLEGRO_EVENT_MOUSE_AXES)
-                        {
-                            log_debug("Allegro event %d", event.type);
-                        }
-                        break;
+                    //default: 
+                        //if(event.type != ALLEGRO_EVENT_MOUSE_AXES)
+                        //{
+                        //    log_debug("Allegro event %d", event.type);
+                        //}
+                        //break;
                 }
             }
             al_destroy_event_queue(queue);
@@ -326,7 +322,6 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
     } else
         log_debug("keydef-allegro: unable to create display");
     keydefining = false;
-    keyboard_debug_dump();
     return NULL;
 }
 

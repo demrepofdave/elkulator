@@ -104,6 +104,11 @@ bool getboolcfg(char *name, bool def)
         return(c!=0?true:false);
 }
 
+void writecommentcfg(const char *comment)
+{
+    fprintf(cfgfile,"# %s\n",comment);    
+}
+
 void writestringcfg(const char *name, const char *s)
 {
         if (s[0]) fprintf(cfgfile,"%s = %s\n",name,s);
@@ -199,7 +204,7 @@ void loadconfig()
             }
             else
             {
-                elkConfig.keyboard.host_key_mapping[host_key] = ELK_KEY_NONE;
+                elkConfig.keyboard.host_key_mapping[host_key] = kayboard_get_default_elk_key_from_host_key(host_key);
             }
         }
 
@@ -229,7 +234,7 @@ void loadconfig()
                                         old_host_assigned_key = keyutils_get_hostkey_from_legacy_keyid(key_value);
                                         log_debug("Key value %d = %d", key_value, key_id);
                                         log_debug("Key value %s = %s", keyutils_get_hostkey_config_string(old_host_assigned_key), keyutils_get_hostkey_config_string(old_host_key));
-                                        int elk_key = get_elk_key_from_host_key(old_host_assigned_key);
+                                        int elk_key = kayboard_get_default_elk_key_from_host_key(old_host_assigned_key);
                                         if(old_host_assigned_key != HOST_KEY_NONE && elk_key != ELK_KEY_NONE)
                                         {
                                                 elkConfig.keyboard.host_key_mapping[old_host_assigned_key] = elk_key;
@@ -254,6 +259,7 @@ void saveconfig()
 
         cfgfile=fopen(fn,"wt");
 
+        writecommentcfg("Api version (1 = elkulator v1.0, 2 = elkulator v2.0+");
         writeintcfg ("api_version", 2);   // Version 2 of the config file api (1 = old allegro4, 2 = elkulator version 2)
         writeintcfg ("tapespeed", elkConfig.tape.speed);
         writeboolcfg("plus1",     elkConfig.expansion.plus1);
@@ -290,15 +296,18 @@ void saveconfig()
         writeintcfg("joy_offset",    elkConfig.expansion.joffset);
         
         /* New keyboard handling */
+        writecommentcfg("Key redefinitions (note only differences from the default keys are stored)");
         for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
         {
-            if(elkConfig.keyboard.host_key_mapping[host_key] != 0) // Not the default, so save it.
+            if(elkConfig.keyboard.host_key_mapping[host_key] != ELK_KEY_NONE &&
+               elkConfig.keyboard.host_key_mapping[host_key] != kayboard_get_default_elk_key_from_host_key(host_key)) // Not the default, so save it.
             {
                 writestringcfg(keyutils_get_hostkey_config_string(host_key), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[host_key]));
             }
         }
 
         /* Cartridge expansions */
+        writecommentcfg("Cartridge expansions config");
         writeboolcfg("enable_mgc",                elkConfig.expansion.enable_mgc);
         writeboolcfg("enable_db_flash_cartridge", elkConfig.expansion.enable_db_flash_cartridge);
 

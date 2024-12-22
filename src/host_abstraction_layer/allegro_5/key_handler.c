@@ -390,7 +390,7 @@ void keyboard_makelayout()
     //}
 }
 
-elk_key_id_t get_elk_key_from_host_key(host_key_t host_key)
+elk_key_id_t kayboard_get_default_elk_key_from_host_key(host_key_t host_key)
 {
     elk_key_id_t elk_key = ELK_KEY_NONE;
     int index = 0;
@@ -434,12 +434,12 @@ void key_down(host_key_t hostkey)
 
     if(elkkey != ELK_KEY_MAX)
     {
-        log_debug("keycode %d, elkkey %s", hostkey, keyutils_get_elkkey_longname(elkkey));
+        //log_debug("keycode %d, elkkey %s", hostkey, keyutils_get_elkkey_longname(elkkey));
         elk_key_state[elkkey] = true;
     }
     else
     {
-        log_debug("keycode=%d", hostkey);
+        //log_debug("keycode=%d", hostkey);
     }
 }
 
@@ -464,7 +464,6 @@ void key_down_event(ALLEGRO_EVENT *event)
 //            if (keylogical)
 //                set_logical_shift_ctrl_if_idle();
 //            else
-                log_debug("Allegro5 keycode = %d", keycode);
                 host_key_t hostkey = keyboard_allegro5_key_to_host_key(keycode);
                 if(hostkey != HOST_KEY_NONE)
                 {
@@ -480,12 +479,12 @@ void key_up(host_key_t hostkey)
 
     if(elkkey != ELK_KEY_MAX)
     {
-        log_debug("keycode %d, elkkey %s", hostkey, keyutils_get_elkkey_longname(elkkey));
+//        log_debug("keycode %d, elkkey %s", hostkey, keyutils_get_elkkey_longname(elkkey));
         elk_key_state[elkkey] = false;
     }
     else
     {
-        log_debug("keycode=%d", hostkey);
+//      log_debug("keycode=%d", hostkey);
     }
 }
 
@@ -529,10 +528,10 @@ void key_up_event(ALLEGRO_EVENT *event)
     }
 }
 
-void key_char_event(ALLEGRO_EVENT *event)
-{
-    int keycode = event->keyboard.keycode;
-    log_debug("key char event, keycode=%d", keycode);
+//void key_char_event(ALLEGRO_EVENT *event)
+//{
+//    int keycode = event->keyboard.keycode;
+//    log_debug("key char event, keycode=%d", keycode);
 //    if ((!event->keyboard.repeat || unichar != last_unichar[keycode]) && keycode < ALLEGRO_KEY_MAX) {
 //        last_unichar[keycode] = unichar;
 //        keycode = map_keypad_intern(keycode, unichar);
@@ -545,7 +544,7 @@ void key_char_event(ALLEGRO_EVENT *event)
 //        else
 //            key_down(elkConfig.keyboard.host_key_mapping[keycode]);
 //    }
-}
+//}
 
 
 // Main event handling Code
@@ -565,9 +564,10 @@ elk_event_t keyboard_handle_event(ALLEGRO_EVENT *event)
                 key_down_event(event);
                 break;
 
-            case ALLEGRO_EVENT_KEY_CHAR:
-                key_char_event(event);
-                break;
+            // Don't seem to need this for the moment.
+//            case ALLEGRO_EVENT_KEY_CHAR:
+//                key_char_event(event);
+//                break;
 
             case ALLEGRO_EVENT_KEY_UP:
                 key_up_event(event);

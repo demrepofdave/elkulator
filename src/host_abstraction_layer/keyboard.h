@@ -212,6 +212,6 @@ uint8_t keyboard_read(uint16_t addr);
 void keyboard_debug_dump();
 void keyhandler_refresh_elkkeys();
 bool keyhandler_elk_key_state(elk_key_id_t elk_key_code);
-elk_key_id_t get_elk_key_from_host_key(host_key_t host_key);
+elk_key_id_t kayboard_get_default_elk_key_from_host_key(host_key_t host_key);
 
 #endif // _KEYBOARD_H

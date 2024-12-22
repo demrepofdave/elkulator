@@ -150,14 +150,14 @@ uint32_t event_await()
             count++;
         }
 
-        if(!(elkEvent & ELK_EVENT_HANDLED))
-        {
-            log_debug("event_await: event %d handled", event.type);
-        }
-        else if(event.type != ALLEGRO_EVENT_TIMER && event.type != ALLEGRO_EVENT_MOUSE_AXES)
-        {
-            log_debug("event_await: event %d detected", event.type);
-        }
+        //if(!(elkEvent & ELK_EVENT_HANDLED))
+        //{
+        //    log_debug("event_await: event %d handled", event.type);
+        //}
+        //else if(event.type != ALLEGRO_EVENT_TIMER && event.type != ALLEGRO_EVENT_MOUSE_AXES)
+        //{
+        //    log_debug("event_await: event %d detected", event.type);
+        //}
     }
 
     if(elkEvent & ELK_EVENT_RESET)
