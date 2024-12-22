@@ -1,3 +1,22 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * keyboard_gui.c
+ * 
+ * Handles keys redefinition windo rendering and handling.
+ * 
+ * NOTE: Credit must go to B-Em devs (Steve Fosdick and co) as this code 
+ *       has been lifted from elkulators big brother emulator B-Em 
+ *       (keydef-allegro5.c), and although heavily modified it's main
+ *       purpose lives on.
+ * 
+ * Ultimately this code will be replaced but bertween now and then all
+ * credit to the B-Em devs:
+ * 
+ */
+
+
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 #include <limits.h>
@@ -342,16 +361,3 @@ void gui_keydefine_close(void)
     event.type = ALLEGRO_EVENT_DISPLAY_CLOSE;
     al_emit_user_event(&uevsrc, &event, NULL);
 }
-
-//int keydef_lookup_name(const char *name)
-//{
-//    const key_cap_t *ptr = kcaps_elk;
-//    const key_cap_t *end = ptr + ELK_KEY_MAX;
-
-//    while (ptr < end) {
-//        if (strcasecmp(name, ptr->cap) == 0 || strcasecmp(name, ptr->name) == 0)
-//            return ptr->keycode;
-//        ptr++;
-//    }
-//    return 0;
-//}
