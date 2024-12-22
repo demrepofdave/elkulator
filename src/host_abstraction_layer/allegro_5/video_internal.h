@@ -13,6 +13,8 @@
 #define uint8 unsigned char
 
 
+bool video_is_main_display(ALLEGRO_DISPLAY * current_display);
+
 int Init_2xSaI(int depth);
 void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, uint8_t * elk_screen_data, int s_x, int s_y, int d_x, int d_y, int w, int h);
 void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);

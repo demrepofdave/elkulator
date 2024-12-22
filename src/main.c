@@ -246,6 +246,7 @@ int ddnoiseframes=0;
 bool oldbreak=false;
 int resetit=0;
 int runelkframe=0;
+elkstate_t elk_state = ELK_STATE_INITIALIZING;
 
 
 native_timediff_t runelk()
@@ -300,6 +301,17 @@ void closeelk()
         saveconfig();
 }
 
+void pauseelk()
+{
+    video_stop_timer();
+    elk_state = ELK_STATE_PAUSED;
+}
+
+void resumeelk()
+{
+    video_start_timer();
+    elk_state = ELK_STATE_RUNNING;
+}
 
 void native_window_close_button_handler(void)
 {
@@ -337,7 +349,7 @@ int main(int argc, char *argv[])
                         if (menu_pressed()) entergui();
                 }
         #else       
-                video_start_timer();
+                resumeelk();
                 char elk_timediff_str[28];
                 char elk_cumulated_timediff_str[28];
                 elk_event_t elkEvent = 0;

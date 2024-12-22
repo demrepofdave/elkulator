@@ -342,6 +342,7 @@ int video_get_desktop_color_depth()
     return(8); // TODO: probably won't need this in allegro5
 }
 
+
 //#ifdef WIN32
 //CRITICAL_SECTION cs;
 //#endif
@@ -568,6 +569,12 @@ void video_stop_timer()
 {
     //log_debug("video_start_timer: staring timer %p", timer);
     al_stop_timer(timer);   
+}
+
+bool video_is_main_display(ALLEGRO_DISPLAY * current_display)
+{
+    log_debug("display %p = %p = %p", current_display, display, al_get_current_display());
+    return(current_display == display);
 }
 
 

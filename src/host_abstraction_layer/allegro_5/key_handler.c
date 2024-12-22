@@ -1,6 +1,7 @@
 #include <allegro5/allegro.h>
 #include "host_abstraction_layer/keyboard.h"
 #include "host_abstraction_layer/keyutils.h"
+#include "video_internal.h"
 #include "keyboard_internal.h"
 #include "elk.h"
 #include "host_abstraction_layer/event_handler.h"
@@ -551,9 +552,13 @@ void key_char_event(ALLEGRO_EVENT *event)
 elk_event_t keyboard_handle_event(ALLEGRO_EVENT *event)
 {
     elk_event_t elkEvent = 0;
+
+    // Was the key pressed in our main screen?
+    // If not it was on the keyboard redefining screen
+    // so we ignore.
     if (!keydefining)
     {
-        switch(event->type) 
+        switch(event->type)
         {
             // Keyboard handling.
             case ALLEGRO_EVENT_KEY_DOWN:

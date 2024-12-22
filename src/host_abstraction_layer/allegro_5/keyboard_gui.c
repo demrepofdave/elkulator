@@ -128,7 +128,7 @@ static void draw_keyboard(const key_dlg_t *key_dlg, int ok_x, int can_x)
     al_flip_display();
 }
 
-static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, uint8_t *keylookcpy)
+static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kptr, elk_key_id_t *keylookcpy)
 {
     int mid_x  = key_dlg->disp_x/2;
     int left_x = mid_x-200;
@@ -151,10 +151,11 @@ static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kpt
 
     for(int code = 0; code < HOST_KEY_MAX; code++)
     {
-        if(elkConfig.keyboard.host_key_mapping[code] == kptr->elkkeyid)
+        log_debug("%s=%s", keyutils_get_hostkey_longname(code), keyutils_get_elkkey_config_string(kptr->elkkeyid));
+        if(keylookcpy[code] == kptr->elkkeyid)
         {
             const char *fmt = count == 0 ? " %s" : ", %s";
-            log_debug("%s=%s", keyutils_get_hostkey_longname(code), keyutils_get_elkkey_config_string(kptr->elkkeyid));
+            log_debug("[[ %s=%s ]]", keyutils_get_hostkey_longname(code), keyutils_get_elkkey_config_string(kptr->elkkeyid));
             size = snprintf(p, remain, fmt, keyutils_get_hostkey_longname(code));
             p += size;
             remain -= size;
@@ -180,7 +181,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
     ALLEGRO_EVENT_QUEUE *queue;
     ALLEGRO_EVENT event;
     state_t state;
-    uint8_t keylookcpy[HOST_KEY_MAX];
+    elk_key_id_t keylookcpy[HOST_KEY_MAX];
     const key_cap_t *kptr = NULL;
     int mid_x, ok_x, can_x;
     bool alt_down = false;
@@ -212,7 +213,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
             
 
             // Make a copy and modify that (just in case the user cancels the whole operation).
-            memcpy(keylookcpy, elkConfig.keyboard.host_key_mapping, HOST_KEY_MAX);
+            memcpy(keylookcpy, elkConfig.keyboard.host_key_mapping, sizeof(keylookcpy));
 
             draw_keyboard(key_dlg, ok_x, can_x);
             while (state != ST_DONE)
@@ -221,37 +222,41 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                 switch(event.type)
                 {
                     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                        if (mouse_within(&event, ok_x, BTNS_Y, BTNS_W, BTNS_H)) 
+                        // Verify is mouse click is in our window.
+                        if(event.mouse.display = display)
                         {
-                            // Ok button clicked (apply settings to main keyboard lookup table)
-                            log_debug("ok");
-                            memcpy(elkConfig.keyboard.host_key_mapping, keylookcpy, HOST_KEY_MAX);
-                            state = ST_DONE;
-                        }
-                        else if (mouse_within(&event, can_x, BTNS_Y, BTNS_W, BTNS_H))
-                        {
-                            // Cancel button clicked.
-                            if (state == ST_PC_KEY) 
+                            if (mouse_within(&event, ok_x, BTNS_Y, BTNS_W, BTNS_H)) 
                             {
-                                state = ST_ELK_KEY;
-                                draw_keyboard(key_dlg, ok_x, can_x);
-                            }
-                            else
-                            {
-                                log_debug("Cancel");
+                                // Ok button clicked (apply settings to main keyboard lookup table)
+                                log_debug("ok");
+                                memcpy(elkConfig.keyboard.host_key_mapping, keylookcpy, sizeof(elkConfig.keyboard.host_key_mapping));
                                 state = ST_DONE;
                             }
-                        }
-                        else if (state == ST_ELK_KEY) 
-                        {
-                            // Search the keyboard buttons.
-                            for (kptr = key_dlg->captab; kptr < key_dlg->capend; kptr++) 
+                            else if (mouse_within(&event, can_x, BTNS_Y, BTNS_W, BTNS_H))
                             {
-                                if (mouse_within(&event, kptr->x, kptr->y, kptr->w, kptr->h))
+                                // Cancel button clicked.
+                                if (state == ST_PC_KEY) 
                                 {
-                                    elkkeyid = redef_message(key_dlg, kptr, keylookcpy);
-                                    state = ST_PC_KEY;
-                                    break;
+                                    state = ST_ELK_KEY;
+                                    draw_keyboard(key_dlg, ok_x, can_x);
+                                }
+                                else
+                                {
+                                    log_debug("Cancel");
+                                    state = ST_DONE;
+                                }
+                            }
+                            else if (state == ST_ELK_KEY) 
+                            {
+                                // Search the keyboard buttons.
+                                for (kptr = key_dlg->captab; kptr < key_dlg->capend; kptr++) 
+                                {
+                                    if (mouse_within(&event, kptr->x, kptr->y, kptr->w, kptr->h))
+                                    {
+                                        elkkeyid = redef_message(key_dlg, kptr, keylookcpy);
+                                        state = ST_PC_KEY;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -261,30 +266,50 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                         state = ST_DONE;
                         break;
                     case ALLEGRO_EVENT_KEY_DOWN:
-                        if (event.keyboard.keycode == ALLEGRO_KEY_ALT || event.keyboard.keycode == ALLEGRO_KEY_ALTGR)
+                        // Check if key was pressed in this window
+                        if (event.keyboard.display == display)
                         {
-                            log_debug("keydef-allegro: alt down");
-                            alt_down = true;
+                            if (event.keyboard.keycode == ALLEGRO_KEY_ALT || event.keyboard.keycode == ALLEGRO_KEY_ALTGR)
+                            {
+                                log_debug("keydef-allegro: alt down");
+                                alt_down = true;
+                            }
                         }
                         break;
                     case ALLEGRO_EVENT_KEY_CHAR:
-                        if (state == ST_PC_KEY) 
+                        // Check if key was pressed in this window
+                        if (event.keyboard.display == display)
                         {
-                            host_key_t hostkey = keyboard_allegro5_key_to_host_key(event.keyboard.keycode);
-                            log_debug("keydef-allegro: mapping allegro code %d, hostkey %s to Elk key %s", event.keyboard.keycode, keyutils_get_hostkey_longname(hostkey), keyutils_get_elkkey_longname(elkkeyid));
-                            keylookcpy[hostkey] = elkkeyid;
-                            state = ST_ELK_KEY;
-                            draw_keyboard(key_dlg, ok_x, can_x);
+                            if (state == ST_PC_KEY) 
+                            {
+                                host_key_t hostkey = keyboard_allegro5_key_to_host_key(event.keyboard.keycode);
+                                log_debug("keydef-allegro: mapping allegro code %d, hostkey %s to Elk key %s", event.keyboard.keycode, keyutils_get_hostkey_longname(hostkey), keyutils_get_elkkey_longname(elkkeyid));
+                                keylookcpy[hostkey] = elkkeyid;
+                                state = ST_ELK_KEY;
+                                draw_keyboard(key_dlg, ok_x, can_x);
+                            }
                         }
                         break;
                     case ALLEGRO_EVENT_KEY_UP:
-                        if (event.keyboard.keycode == ALLEGRO_KEY_ALT || event.keyboard.keycode == ALLEGRO_KEY_ALTGR) {
-                            log_debug("keydef-allegro: alt up");
-                            alt_down = false;
+                        // Check if key was pressed in this window
+                        if (event.keyboard.display == display)
+                        {
+                            if (event.keyboard.keycode == ALLEGRO_KEY_ALT || event.keyboard.keycode == ALLEGRO_KEY_ALTGR) {
+                                log_debug("keydef-allegro: alt up");
+                                alt_down = false;
+                            }
                         }
                         break;
                     case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
-                        draw_keyboard(key_dlg, ok_x, can_x);
+                        if(event.display.source == display)
+                        {
+                            draw_keyboard(key_dlg, ok_x, can_x);
+                            if (state == ST_PC_KEY)
+                            {
+                                // Redraw keyboard definition message as well.
+                                redef_message(key_dlg, kptr, keylookcpy);
+                            }
+                        }
                         break;
                     default: 
                         if(event.type != ALLEGRO_EVENT_MOUSE_AXES)
