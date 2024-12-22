@@ -1823,7 +1823,7 @@ void exec6502()
         cycles-=128;
         ulacycles-=128;
         #if 0
-                if (tapeon)
+                if (is_tapeon())
                 {
                         if (tapelcount<=0)
                         {

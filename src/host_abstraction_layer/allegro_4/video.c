@@ -136,7 +136,7 @@ void endblit()
     #endif
 }
 
-void blit_normal(BITMAP * destBitmap, char * elk_screen_data)
+void blit_normal(BITMAP * destBitmap, uint8_t * elk_screen_data)
 {
     int y = 0;
     int x = 0;
@@ -154,7 +154,7 @@ void blit_normal(BITMAP * destBitmap, char * elk_screen_data)
     }
 }
 
-void blit_scanlines(BITMAP * destBitmap, char * elk_screen_data)
+void blit_scanlines(BITMAP * destBitmap, uint8_t * elk_screen_data)
 {
     int y = 0;
     int x = 0;
@@ -173,7 +173,7 @@ void blit_scanlines(BITMAP * destBitmap, char * elk_screen_data)
     }
 }
 
-void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
+void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth)
 {
     int c;
     startblit();

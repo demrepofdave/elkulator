@@ -23,16 +23,16 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define printf rpclog
+
+#define VERSION_STR "Elkulator v2.00a-1214"
 
 void rpclog(char *format, ...);
 
 extern int rombank,intrombank;
 extern int extrom;
-#ifdef HAL_ALLEGRO_4
-extern int keylookup[128];
-#endif
 
 void polltape();
 
@@ -58,6 +58,16 @@ extern uint8_t sndstreambuf[626];
 extern int sndstreamptr;
 
 extern int discspd;
+typedef enum {
+    ELK_STATE_INITIALIZING,
+    ELK_STATE_PAUSED,
+    ELK_STATE_KEY_DEFINING,
+    ELK_STATE_RUNNING
+} elkstate_t;
+
+extern elkstate_t elk_state;
+
+// Place here for now.
 
 // Maximum file name buffer size (previously this was defined as magic number
 // in the code at 512, however it is possible that a file path on modern OS's
@@ -69,10 +79,8 @@ extern char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
 
 void redefinekeys();
 
-int break_pressed();
-int menu_pressed();
-void update_break_keys();
-void update_menu_keys();
+bool break_pressed();
+bool menu_pressed();
 
 void resetserial();
 uint8_t readserial(uint16_t addr);

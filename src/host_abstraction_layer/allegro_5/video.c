@@ -31,14 +31,13 @@
 #include "host_abstraction_layer/video.h"
 #include "host_abstraction_layer/allegro_5//menu_internal.h"
 #include "logger.h"
+#include "elk.h"
 #include "video_internal.h"
 #include "event_handler_internal.h"
 
 /******************************************************************************
 * Preprocessor Macros
 *******************************************************************************/
-
-#define VERSION_STR "Elkulator v2.00a-1020"
 
 /******************************************************************************
 * Typedefs
@@ -52,10 +51,6 @@ typedef uint32_t elk_pallete_t;
 
 ALLEGRO_BITMAP *b             = NULL;    // Main bitmap used before blitting to window screen.
 ALLEGRO_BITMAP *b16           = NULL;  // Intermediate bitmap 1
-//ALLEGRO_BITMAP *b162          = NULL; // Intermediate bitmap 2
-//ALLEGRO_BITMAP *vidb          = NULL; // Windows bitmap
-//ALLEGRO_BITMAP *vp1           = NULL;  // Windows bitmap 1?
-//ALLEGRO_BITMAP *vp2           = NULL;  // Windows bitmap 2?
 ALLEGRO_BITMAP *bm_screenshot = NULL; // Used for screenshots.
 ALLEGRO_BITMAP *moviebitmap   = NULL; // Used for capturing movies.
 
@@ -144,12 +139,10 @@ int video_init_part1()
         exit(1);
     }
 
-    log_debug("Display = %p", display);
     al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP|ALLEGRO_NO_PRESERVE_TEXTURE);
 
     ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
     b16 = al_create_bitmap(1300,600);
-    //b162= al_create_bitmap(640,256);
     al_set_target_bitmap(b16);
     al_clear_to_color(black);
 
@@ -219,6 +212,11 @@ void video_init_part3(void (*timer_function)(void))
 void video_rest(unsigned int period)
 {
     return;
+}
+
+void video_set_window_title(const char * title)
+{
+    al_set_window_title(display, title);
 }
 
 void video_set_window_size(int w, int h, int v_w, int v_h)
@@ -344,6 +342,7 @@ int video_get_desktop_color_depth()
     return(8); // TODO: probably won't need this in allegro5
 }
 
+
 //#ifdef WIN32
 //CRITICAL_SECTION cs;
 //#endif
@@ -362,7 +361,7 @@ void endblit()
 //    #endif
 }
 
-void blit_normal(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
+void blit_normal(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 {
     int y = 0;
     int x = 0;
@@ -385,7 +384,7 @@ void blit_normal(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
     al_unlock_bitmap(destBitmap);
 }
 
-void blit_scanlines(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
+void blit_scanlines(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 {
     int y = 0;
     int x = 0;
@@ -413,7 +412,7 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
 }
 
 
-void video_blit_to_screen(int drawMode, char * elk_screen_data, int colDepth)
+void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth)
 {
     //log_timer_begin();
     //log_time_mark("video_blit_to_screen - start");
@@ -550,7 +549,6 @@ void video_clearall()
     al_clear_to_color(black);
     al_set_target_bitmap(b16);
     al_clear_to_color(black);
-    //al_set_target_bitmap(b162);
     //al_clear_to_color(black);
     //al_set_target_bitmap(al_get_current_display()); // TODO: do we need this?
     //al_clear_to_color(black);
@@ -571,6 +569,12 @@ void video_stop_timer()
 {
     //log_debug("video_start_timer: staring timer %p", timer);
     al_stop_timer(timer);   
+}
+
+bool video_is_main_display(ALLEGRO_DISPLAY * current_display)
+{
+    log_debug("display %p = %p = %p", current_display, display, al_get_current_display());
+    return(current_display == display);
 }
 
 

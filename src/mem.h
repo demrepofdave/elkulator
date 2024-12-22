@@ -44,6 +44,8 @@ void dumpram();
 void loadcart(const char *filename);
 void loadcart2(const char *filename);
 void unloadcart();
+void makekeyl();
+uint8_t readkeys(uint16_t addr);
 void loadmemstate(FILE *f);
 void savememstate(FILE *f);
 

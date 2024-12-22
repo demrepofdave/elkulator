@@ -171,3 +171,9 @@ void pollcsw()
                 }
         }
 }
+
+/* Returns true if uef file is open, false if not */
+bool is_csw()
+{
+        return(cswf?true:false);
+}

@@ -79,6 +79,8 @@ int soundlimit,soundon=1,soundcount,soundstat;
 uint8_t sndstreambuf[626];
 int sndstreamindex = 0;
 int sndstreamcount = 0;
+// If elkulator is runnning to slowly on native machine we may want to occasionally pause video rendering to catch-up.
+bool video_blit_enabled = true;
 char scrshotname[260];
 char moviename[260];
 uint8_t electron_screen[640*256];
@@ -772,7 +774,7 @@ void yield()
 //                                        rpclog("ULA addr %04X\n",ula.addr);
                                         if (!ula.addr) ula.addr=0x8000-modeInfo[ula.mode].modelens;
                                         
-                                        if (ula.draw)
+                                        if (ula.draw && video_blit_enabled)
                                         {
                                                 video_blit_to_screen(elkConfig.display.drawmode, electron_screen, coldepth);
                                                 //startblit()
@@ -958,6 +960,8 @@ void startmovie(const char * filename)
 
         sndstreamindex = 0;
         sndstreamcount = 0;
+
+        video_set_window_title(VERSION_STR " - Recording");
     }
 }
 
@@ -969,6 +973,7 @@ void stopmovie()
         fclose(moviefile);
         moviefile = NULL;
     }
+    video_set_window_title(VERSION_STR);
 }
 
 #define DEFLATE_CHUNK_SIZE 262144
@@ -1046,3 +1051,18 @@ void saveframe()
     sndstreamcount = 0;
 }
 
+
+bool is_tapeon()
+{
+        return tapeon;
+}
+
+void pause_video_blit()
+{
+        video_blit_enabled = false;
+}
+
+void resume_video_blit()
+{
+        video_blit_enabled = true;
+}

@@ -32,16 +32,17 @@ elkulator_hal_src = src/host_abstraction_layer/allegro_4/2xsai.c \
                     src/host_abstraction_layer/allegro_4/linux-gui.c \
                     src/host_abstraction_layer/allegro_4/linux-keydefine.c \
                     src/host_abstraction_layer/allegro_4/video.c \
-                    src/host_abstraction_layer/allegro_4/keyboard.c \
+                    src/host_abstraction_layer/allegro_4/key_handler.c \
                     src/host_abstraction_layer/allegro_4/samples.c \
                     src/host_abstraction_layer/allegro_4/fileutils.c \
-                    src/host_abstraction_layer/allegro_4/allegro_icon.c
+                    src/host_abstraction_layer/allegro_4/allegro_icon.c \
+                    src/host_abstraction_layer/common/keyutils.c                    
 else
 elkulator_hal_src = src/host_abstraction_layer/allegro_5/adc.c  \
                     src/host_abstraction_layer/allegro_5/event_handler.c \
                     src/host_abstraction_layer/allegro_5/firstbyte.c \
                     src/host_abstraction_layer/allegro_5/fileutils.c \
-                    src/host_abstraction_layer/allegro_5/keyboard.c \
+                    src/host_abstraction_layer/allegro_5/key_handler.c \
                     src/host_abstraction_layer/allegro_5/linux-keydefine.c \
                     src/host_abstraction_layer/allegro_5/menus.c \
                     src/host_abstraction_layer/allegro_5/menu_file.c \
@@ -54,7 +55,9 @@ elkulator_hal_src = src/host_abstraction_layer/allegro_5/adc.c  \
                     src/host_abstraction_layer/allegro_5/samples.c \
                     src/host_abstraction_layer/allegro_5/scale2x.c \
                     src/host_abstraction_layer/allegro_5/soundopenal.c \
-                    src/host_abstraction_layer/allegro_5/video.c
+                    src/host_abstraction_layer/allegro_5/video.c \
+                    src/host_abstraction_layer/allegro_5/keyboard_gui.c \
+                    src/host_abstraction_layer/common/keyutils.c
 endif
 
 elkulator_SOURCES = src/1770.c \

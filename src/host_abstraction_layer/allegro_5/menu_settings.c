@@ -17,6 +17,7 @@
 #include "config_vars.h"
 #include "logger.h"
 #include "menu_internal.h"
+#include "keyboard_gui.h"
 
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/video.h"
@@ -39,6 +40,7 @@ elk_event_t menu_handle_toggle_paged_ram_jim(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_plus_3_enable(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_adfs_enable(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
+elk_event_t menu_redefine_keyboard(ALLEGRO_EVENT * event);
 
 /******************************************************************************
 * Private Variable Definitions
@@ -173,7 +175,7 @@ static ALLEGRO_MENU *create_settings_joystick_menu(void)
 static ALLEGRO_MENU *create_settings_keyboard_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Redefine keyboard", IDM_SETTINGS_KEYBOARD_REDEFINE,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+    append_menu_item(menu, "Redefine keyboard", IDM_SETTINGS_KEYBOARD_REDEFINE,      0, menu_redefine_keyboard);
     return menu;
 }
 
@@ -356,4 +358,10 @@ elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event)
         al_set_menu_item_flags(menu, IDM_SETTINGS_DISC_ADFS_ENABLE, ALLEGRO_MENU_ITEM_CHECKBOX);
     }
     return(ELK_EVENT_RESET);
+}
+
+elk_event_t menu_redefine_keyboard(ALLEGRO_EVENT * event)
+{
+    gui_keydefine_open();
+    return(ELK_EVENT_NONE);
 }

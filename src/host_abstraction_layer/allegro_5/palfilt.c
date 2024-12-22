@@ -120,7 +120,7 @@ void initpaltables()
 }
 
 
-void palfilter(ALLEGRO_BITMAP * destBitmap, char * elk_screen_data)
+void palfilter(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 {
     int x,y;
     uint32_t c;

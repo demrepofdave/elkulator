@@ -15,6 +15,7 @@
 #include "callback_handlers.h"
 #include "config.h"
 #include "config_vars.h"
+#include "csw.h"
 #include "disc.h"
 #include "ddnoise.h"
 #include "debugger.h"
@@ -23,6 +24,7 @@
 #include "mem.h"
 #include "tapenoise.h"
 #include "ula.h"
+#include "uef.h"
 
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/fileutils.h"
@@ -50,11 +52,6 @@ int drawit=0;
 void drawitint()
 {
         drawit++;
-}
-
-void cleardrawit()
-{
-        drawit=0;
 }
 
 char exedir[MAX_PATH_FILENAME_BUFFER_SIZE];
@@ -124,7 +121,7 @@ void initelk(int argc, char *argv[])
 #ifndef WIN32
                 if (!strcasecmp(argv[c],"--help"))
                 {
-                        printf("Elkulator v1.0 command line options :\n\n");
+                        printf("Elkulator v2.0 command line options :\n\n");
                         printf("-disc disc.ssd  - load disc.ssd into drives :0/:2\n");
                         printf("-disc1 disc.ssd - load disc.ssd into drives :1/:3\n");
                         printf("-tape tape.uef  - load tape.uef\n");
@@ -240,66 +237,62 @@ void initelk(int argc, char *argv[])
         loaddiscsamps();
         maketapenoise();
 
-        keyboard_makelayout();
+        makekeyl();
         
         video_set_display_switch_mode_background();
 }
 
 int ddnoiseframes=0;
-int oldbreak=0;
+bool oldbreak=false;
 int resetit=0;
 int runelkframe=0;
+elkstate_t elk_state = ELK_STATE_INITIALIZING;
 
-int timing_debug_stats = 0;
 
-void runelk()
+native_timediff_t runelk()
 {       
-        long timestamp_start = log_get_timestamp();
-        long timestamp_diff = 0;
+        native_timestamp_t timestamp_start = log_get_timestamp();
+        native_timediff_t  timestamp_diff  = 0;
         int c;
         //log_time_mark("=== runelk begin ===");
-        if (drawit || (tapeon && elkConfig.tape.speed))
-        {
-                if (drawit) drawit--;
-                if (drawit>8 || drawit<0) drawit=0;
-                for (c=0;c<312;c++) exec6502();
-                if (runelkframe) exec6502();
-                runelkframe=!runelkframe;
-                if (resetit)
-                {
-                        memset(ram,0,SIZE_32K);
-                        resetula();
-                        #ifndef WIN32
-                                resetserial();
-                        #endif // WIN32
-                        reset6502();
-                        resetit=0;
-                }
-                if (break_pressed() && !oldbreak)
-                {
-                        reset6502();
-                }
-                oldbreak = break_pressed();
-                if (wantloadstate) doloadstate(ssname);
-                if (wantsavestate) dosavestate(ssname);
-                if (infocus) video_poll_joystick();
-                if (autoboot) autoboot--;
-                ddnoiseframes++;
-                if (ddnoiseframes>=5)
-                {
-                        ddnoiseframes=0;
-                        mixddnoise();
-                }
-                if(timing_debug_stats++ == 5)
-                {
-                    timestamp_diff = log_get_timestamp() - timestamp_start;
-                    log_debug("runelk time taken = %ld.%d ms", (timestamp_diff / 1000), (timestamp_diff % 1000));
-                    timing_debug_stats = 0;
-                }
-        }
-        else
-           video_rest(1);
 
+        if (drawit) drawit--;
+        if (drawit>8 || drawit<0) drawit=0;
+        for (c=0;c<312;c++) exec6502();
+        if (runelkframe) exec6502();
+        runelkframe=!runelkframe;
+        if (resetit)
+        {
+                memset(ram,0,SIZE_32K);
+                resetula();
+                #ifndef WIN32
+                        resetserial();
+                #endif // WIN32
+                reset6502();
+                resetit=0;
+        }
+        if (break_pressed() && !oldbreak)
+        {
+                reset6502();
+        }
+        oldbreak = break_pressed();
+        if (wantloadstate) doloadstate(ssname);
+        if (wantsavestate) dosavestate(ssname);
+        if (infocus) video_poll_joystick();
+        if (autoboot) autoboot--;
+        ddnoiseframes++;
+        if (ddnoiseframes>=5)
+        {
+                ddnoiseframes=0;
+                mixddnoise();
+        }
+
+        // Record how long elkrun took (this will allow the calling
+        // function to make adjustments if this function took too
+        // long (e.g. rendering took longer than expected)
+        timestamp_diff = log_get_timestamp() - timestamp_start;
+
+        return timestamp_diff;
 }
 
 void closeelk()
@@ -308,6 +301,17 @@ void closeelk()
         saveconfig();
 }
 
+void pauseelk()
+{
+    video_stop_timer();
+    elk_state = ELK_STATE_PAUSED;
+}
+
+void resumeelk()
+{
+    video_start_timer();
+    elk_state = ELK_STATE_RUNNING;
+}
 
 void native_window_close_button_handler(void)
 {
@@ -333,38 +337,81 @@ int main(int argc, char *argv[])
         #ifdef HAL_ALLEGRO_4 
                         while (!quited)
                 {
-                        runelk();
+                        if (drawit || (is_tapeon() && elkConfig.tape.speed))
+                        {
+                                runelk();
+                        }
+                        else
+                        {
+                                video_rest(1);
+                        }
+
                         if (menu_pressed()) entergui();
                 }
         #else       
-                video_start_timer();
+                resumeelk();
+                char elk_timediff_str[28];
+                char elk_cumulated_timediff_str[28];
                 elk_event_t elkEvent = 0;
+                native_timediff_t elk_runtime = 0;
+                native_timediff_t native_timer_diff = 0;
+                native_timediff_t native_cummulative_time_diff = 0;
+                native_timestamp_t native_timestamp_last_trigger = log_get_timestamp();
+                native_timestamp_t native_timestamp_current = 0;
                 while (!(elkEvent & ELK_EVENT_EXIT))
                 {
                         elkEvent = event_await();
-                        //log_debug("elkEvent=%04x", elkEvent);
-                        if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
-                        {
-                                drawit++;
-                        }
+
                         if(elkEvent & ELK_EVENT_RESET)
                         {
                                 resetit = 1;
                                 log_config_vars();
                         }
 
-                        runelk();
-
-                        // If tape is running and its speed is fast or really fast
-                        // We need to runelk another 19 times (or until tape is
-                        // stopped, this maintains the fast loading that allegro4
-                        // does as it runs the function every 1 millisecond with
-                        // drawing every normal 20ms).
-                        count = 19;
-                        while(count && tapeon && elkConfig.tape.speed)
+                        //log_debug("elkEvent=%04x", elkEvent);
+                        if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
                         {
-                                runelk();
-                                count--;
+                                native_timestamp_current = log_get_timestamp();
+                                native_timer_diff = native_timestamp_current - native_timestamp_last_trigger;
+                                native_timestamp_last_trigger = native_timestamp_current;
+                                native_cummulative_time_diff = native_cumulative_time_adjust(20000, native_cummulative_time_diff, native_timer_diff);
+
+                                //drawit++;
+                                if(native_cummulative_time_diff > 20000)
+                                {
+                                        pause_video_blit();
+                                        // Print out some stats for debug purposes.
+                                        native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), elk_runtime);
+                                        native_timediff_sprintf(elk_cumulated_timediff_str, sizeof(elk_cumulated_timediff_str), native_cummulative_time_diff);
+                                        log_debug("elkruntime = %s (%s)", elk_timediff_str, elk_cumulated_timediff_str);
+                                }
+                                elk_runtime = runelk();
+
+
+                                // If tape is running and its speed is fast or really fast
+                                // We need to runelk another 19 times (or until tape is
+                                // stopped, this maintains the fast loading that allegro4
+                                // does as it runs the function every 1 millisecond with
+                                // drawing every normal 20ms).
+                                count = 19;
+                                bool skip_video_refresh = false;
+                                while(count && is_tapeon() && (is_csw() || is_uef()) && elkConfig.tape.speed)
+                                {
+                                        if(elk_runtime > 20000 && !skip_video_refresh)
+                                        {
+                                                log_debug("!!tape skip video refresh disabled!!");
+                                                skip_video_refresh = true;
+                                                pause_video_blit(); // We don't need to update the screen for this (helps on slower machines).
+                                        }
+                                        elk_runtime += runelk(skip_video_refresh);
+                                        count--;
+                                }
+                                resume_video_blit();
+                        }
+                        else if(elkEvent & ELK_EVENT_HANDLED)
+                        {
+                                // Menu may have been accessed, reset timing.
+                                native_timestamp_last_trigger = log_get_timestamp();
                         }
                 }
         #endif // HAL_ALLEGRO_4

@@ -27,5 +27,6 @@ extern int cswena;
 void opencsw (const char *fn);
 void closecsw();
 void pollcsw ();
+bool is_csw();
 
 #endif // _CSW_H

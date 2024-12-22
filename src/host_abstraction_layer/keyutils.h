@@ -2,17 +2,27 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * uef.h - UEF Tape format support
+ * keyutils.c
+ * 
+ * A collection of keyboard utilities common to both the 
+ * hardware abstraction layer and the main electron code.
+ *
+ * Helps with things like string to key id conversion.
+ * to be abstracted from the actual electron code
  * 
  */
 
-#ifndef _UEF_H
-#define _UEF_H
+#ifndef _KEYUTILS_H
+#define _KEYUTILS_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
-#include <stdint.h>
+#include "keyboard.h"
+
+/******************************************************************************
+* Preprocessor Macros
+*******************************************************************************/
 
 
 /******************************************************************************
@@ -21,18 +31,15 @@
 
 
 /******************************************************************************
-* Variable externs
-*******************************************************************************/
-
-
-/******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
 
-void openuef (const char *fn);
-void closeuef();
-void polluef ();
-bool is_uef();
+host_key_t   keyutils_get_hostkey_from_legacy_keyid(uint8_t old_key_id);
+const char * keyutils_get_hostkey_longname(host_key_t host_key);
+const char * keyutils_get_hostkey_config_string(host_key_t host_key);
+const char * keyutils_get_elkkey_longname(elk_key_id_t elk_key);
+const char * keyutils_get_elkkey_config_string(elk_key_id_t elk_key);
 
+elk_key_id_t keyutils_config_string_to_elk_key_id(const char * host_config_str);
 
-#endif // _UEF_H
+#endif // _KEYUTILS_H

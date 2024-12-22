@@ -269,3 +269,9 @@ void closeuef()
 		uef=NULL;
 	}
 }
+
+/* Returns true if uef file is open, false if not */
+bool is_uef()
+{
+        return(uef?true:false);
+}

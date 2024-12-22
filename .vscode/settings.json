@@ -25,6 +25,9 @@
         "event_handler_internal.h": "c",
         "stdlib.h": "c",
         "adf.h": "c",
-        "config.h": "c"
+        "config.h": "c",
+        "allegro_font.h": "c",
+        "cstdlib": "c",
+        "keyboard_internal.h": "c"
     }
 }

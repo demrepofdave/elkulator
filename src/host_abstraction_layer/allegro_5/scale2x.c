@@ -28,7 +28,7 @@
 typedef uint32_t elk_pallete_t;
 extern elk_pallete_t elkpal[8];
 
-void scale2x(char * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int width, int height)
+void scale2x(uint8_t * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int width, int height)
 {
 	int looph, loopw;
     char * region_data = NULL;
