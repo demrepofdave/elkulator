@@ -8,6 +8,21 @@ written by Sarah Walker and has many community contirbutions since (see below).
 
 Elkulator is licensed under the GPL, see COPYING for more details.
 
+# ROMs
+
+The ROMs required by Elkulator can be obtained from the 1.0 release of the
+emulator, available from http://elkulator.acornelectron.co.uk/ElkulatorV1.0Linux.tar.gz
+
+Simply unpack the contents of the above archive to a new directory and copy
+the `roms` directory it contains to the root of this repository:
+
+  mkdir temp
+  wget http://elkulator.acornelectron.co.uk/ElkulatorV1.0Linux.tar.gz
+  cd temp
+  tar zxf ../ElkulatorV1.0Linux.tar.gz
+  cd ..
+  cp -r temp/roms .
+
 # Compiling
 
 With version 2, Elkulator now compiles against the current Allegro5 libraries.  This
@@ -41,7 +56,7 @@ If this is successful then you should be able to run the emulator:
   ./elkulator.exe
 ```
  
-## Linux
+## Linux (Ubuntu and debian based distros)
 
 You will need the following libraries:
 
@@ -77,7 +92,43 @@ If this is successful then you should be able to run the emulator:
   ./elkulator
 ```
 
-## Linux (Legacy Allegro4 build)
+## Linux (Fedora 40 and above)
+
+You will need the following libraries:
+
+- Allegro 5.x
+- OpenAL
+- ALut
+- Zlib
+
+On a Debian system you should be able to install these by invoking the
+following command in a terminal window:
+
+```
+  sudo apt-get update
+  sudo apt-get install automake allegro5-devel allegro5-addon-dialog-devel allegro5-addon-audio-devel allegro5-addon-acodec-devel allegro5-addon-image-devel allegro5-addon-video-devel openal-devel freealut-devel zlib-devel 
+```
+
+To configure and build Elkulator, open a terminal window, navigate to the
+Elkulator directory then enter
+
+```
+  ./scripts/autoconfigure.sh
+```
+
+To build enter: 
+
+```
+  make
+```
+
+If this is successful then you should be able to run the emulator:
+
+```
+  ./elkulator
+```
+
+## Linux (Legacy Allegro4 build - Ubuntu and debian based distros)
 
 Elkulator can still be compiled against allegro4 for reference, allthough this will
 be deprecated soon.
@@ -142,7 +193,6 @@ the lack of hardware acceleration support in Elkulator.
 
 
 # Features
-
 
 - Emulates basic 32k Electron
 - Emulation of all modes + line-by-line effects
