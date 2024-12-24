@@ -69,7 +69,7 @@ typedef struct {
     { HOST_KEY_ENTER,     HOST_KEY_PAD_ENTER }, // ELK_KEY_RETURN,
     { HOST_KEY_ESCAPE,    NO_ALTERNATE_KEY   }, // ELK_KEY_ESCAPE,
     { HOST_KEY_F12,       NO_ALTERNATE_KEY   }, // ELK_KEY_BREAK,
-    { NO_ALTERNATE_KEY,   NO_ALTERNATE_KEY   }  // ELK_SPECIAL_KEY_MENU (not used as native menus supported in allegro 5).
+    { HOST_KEY_F11,       HOST_KEY_MENU      }  // ELK_SPECIAL_KEY_MENU (only used for allegro 4).
 };
 
 typedef struct 
@@ -428,6 +428,7 @@ void keyboard_keydown(host_key_t hostkey)
 {
     elk_key_id_t elkkey = elkConfig.keyboard.host_key_mapping[hostkey];
 
+    log_debug("Host key %s, elk_key %s", keyboard_get_hostkey_longname(hostkey), keyboard_get_elkkey_longname(elkkey));
     if(elkkey != ELK_KEY_MAX)
     {
         //log_debug("keycode %d, elkkey %s", hostkey, keyboard_get_elkkey_longname(elkkey));

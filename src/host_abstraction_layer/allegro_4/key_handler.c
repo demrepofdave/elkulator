@@ -183,22 +183,17 @@ void keyhandler_refresh_elkkeys()
     // correct keyboard callbacks so that the electron logic can decide
     for(allegro4_key = 0; allegro4_key < KEY_MAX; allegro4_key++)
     {
-        if(allegro4_keystate[allegro4_key] != key[allegro4_key])
+        hostkeyid = keyhandler_allegro4_key_to_host_key(allegro4_key);
+        if(!allegro4_keystate[allegro4_key] && key[allegro4_key] && hostkeyid != HOST_KEY_NONE)
         {
-            hostkeyid = keyhandler_allegro4_key_to_host_key(allegro4_key);
+            callback_handlers.handle_key_down(hostkeyid);
+            allegro4_keystate[allegro4_key] = true;
+        }
+        else if(allegro4_keystate[allegro4_key] && !key[allegro4_key] && hostkeyid != HOST_KEY_NONE)
+        {
             // Get hostkey id and report if necessary.
-            if(hostkeyid != HOST_KEY_NONE)
-            {
-                if(key[allegro4_key])
-                {
-                    callback_handlers.handle_key_down(hostkeyid);
-                }
-                else
-                {
-                    callback_handlers.handle_key_up(hostkeyid);
-                }
-            }
-            allegro4_keystate[allegro4_key] = key[allegro4_key];
+            callback_handlers.handle_key_up(hostkeyid);
+            allegro4_keystate[allegro4_key] = false;
         }
     }
 }

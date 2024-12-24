@@ -1,12 +1,13 @@
 #include <allegro5/allegro.h>
-#include "keyboard.h"
-#include "host_abstraction_layer/keyutils.h"
-#include "video_internal.h"
-#include "keyboard_internal.h"
+#include "callback_handlers.h"
+#include "config_vars.h"
 #include "elk.h"
 #include "host_abstraction_layer/event_handler.h"
+#include "host_abstraction_layer/keyutils.h"
+#include "keyboard.h"
+#include "keyboard_internal.h"
 #include "logger.h"
-#include "config_vars.h"
+#include "video_internal.h"
 
 // HOST_KEY get mapped to ALLEGRO_KEY.
 // 
