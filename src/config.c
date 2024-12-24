@@ -197,14 +197,14 @@ void loadconfig()
         /* New keyboard handling */
         for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
         {
-            s=getstringcfg(keyutils_get_hostkey_config_string(host_key));
+            s=getstringcfg(keyboard_get_hostkey_config_string(host_key));
             if(s)
             {
-                elkConfig.keyboard.host_key_mapping[host_key] = keyutils_config_string_to_elk_key_id(s);
+                elkConfig.keyboard.host_key_mapping[host_key] = keyboard_config_string_to_elk_key_id(s);
             }
             else
             {
-                elkConfig.keyboard.host_key_mapping[host_key] = kayboard_get_default_elk_key_from_host_key(host_key);
+                elkConfig.keyboard.host_key_mapping[host_key] = keyboard_get_default_elk_key_from_host_key(host_key);
             }
         }
 
@@ -233,12 +233,12 @@ void loadconfig()
                                 {
                                         old_host_assigned_key = keyutils_get_hostkey_from_legacy_keyid(key_value);
                                         log_debug("Key value %d = %d", key_value, key_id);
-                                        log_debug("Key value %s = %s", keyutils_get_hostkey_config_string(old_host_assigned_key), keyutils_get_hostkey_config_string(old_host_key));
-                                        int elk_key = kayboard_get_default_elk_key_from_host_key(old_host_assigned_key);
+                                        log_debug("Key value %s = %s", keyboard_get_hostkey_config_string(old_host_assigned_key), keyboard_get_hostkey_config_string(old_host_key));
+                                        int elk_key = keyboard_get_default_elk_key_from_host_key(old_host_assigned_key);
                                         if(old_host_assigned_key != HOST_KEY_NONE && elk_key != ELK_KEY_NONE)
                                         {
                                                 elkConfig.keyboard.host_key_mapping[old_host_assigned_key] = elk_key;
-                                                log_debug("%s=%s", keyutils_get_hostkey_config_string(old_host_assigned_key), keyutils_get_elkkey_config_string(elk_key));
+                                                log_debug("%s=%s", keyboard_get_hostkey_config_string(old_host_assigned_key), keyboard_get_elkkey_config_string(elk_key));
                                         }
                                 }
                         }
@@ -300,9 +300,9 @@ void saveconfig()
         for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
         {
             if(elkConfig.keyboard.host_key_mapping[host_key] != ELK_KEY_NONE &&
-               elkConfig.keyboard.host_key_mapping[host_key] != kayboard_get_default_elk_key_from_host_key(host_key)) // Not the default, so save it.
+               elkConfig.keyboard.host_key_mapping[host_key] != keyboard_get_default_elk_key_from_host_key(host_key)) // Not the default, so save it.
             {
-                writestringcfg(keyutils_get_hostkey_config_string(host_key), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[host_key]));
+                writestringcfg(keyboard_get_hostkey_config_string(host_key), keyboard_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[host_key]));
             }
         }
 
@@ -349,7 +349,7 @@ void log_config_vars()
     {
         if(elkConfig.keyboard.host_key_mapping[host_key] != ELK_KEY_NONE)
         {
-            log_debug(" - %s       : %s", keyutils_get_hostkey_config_string(host_key), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[host_key]));
+            log_debug(" - %s       : %s", keyboard_get_hostkey_config_string(host_key), keyboard_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[host_key]));
         }
     }
     log_debug("- tape:");

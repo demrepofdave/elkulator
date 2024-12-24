@@ -210,8 +210,19 @@ typedef enum {
 void keyboard_makelayout();
 uint8_t keyboard_read(uint16_t addr);
 void keyboard_debug_dump();
-void keyhandler_refresh_elkkeys();
-bool keyhandler_elk_key_state(elk_key_id_t elk_key_code);
-elk_key_id_t kayboard_get_default_elk_key_from_host_key(host_key_t host_key);
+bool keyboard_elk_key_state(elk_key_id_t elk_key_code);
+elk_key_id_t keyboard_get_default_elk_key_from_host_key(host_key_t host_key);
+
+const char * keyboard_get_hostkey_longname(host_key_t host_key);
+const char * keyboard_get_hostkey_config_string(host_key_t host_key);
+const char * keyboard_get_elkkey_longname(elk_key_id_t elk_key);
+const char * keyboard_get_elkkey_config_string(elk_key_id_t elk_key);
+
+elk_key_id_t keyboard_config_string_to_elk_key_id(const char * host_config_str);
+
+void keyboard_keydown(host_key_t hostkey);
+void keyboard_keyup(host_key_t hostkey);
+
+
 
 #endif // _KEYBOARD_H

@@ -28,6 +28,7 @@
         "config.h": "c",
         "allegro_font.h": "c",
         "cstdlib": "c",
-        "keyboard_internal.h": "c"
+        "keyboard_internal.h": "c",
+        "keyutils.h": "c"
     }
 }

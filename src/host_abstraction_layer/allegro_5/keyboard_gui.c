@@ -21,7 +21,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <limits.h>
 #include "keyboard_internal.h"
-#include "host_abstraction_layer/keyboard.h"
+#include "keyboard.h"
 #include "host_abstraction_layer/keyutils.h"
 #include "logger.h"
 #include "config_vars.h"
@@ -158,10 +158,10 @@ static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kpt
     char s[1024], *p;
     int size, remain, count;
 
-    log_debug("keydef-allegro: Elk key %s clicked", keyutils_get_elkkey_longname(kptr->elkkeyid));
+    log_debug("keydef-allegro: Elk key %s clicked", keyboard_get_elkkey_longname(kptr->elkkeyid));
 
     al_draw_filled_rectangle(left_x, top_y, left_x + 400, top_y + 72, navy);
-    snprintf(s, sizeof s, "Redefining %s", keyutils_get_elkkey_longname(kptr->elkkeyid));
+    snprintf(s, sizeof s, "Redefining %s", keyboard_get_elkkey_longname(kptr->elkkeyid));
     al_draw_text(font, white, left_x+24, top_y+16, ALLEGRO_ALIGN_LEFT, s);
     size = snprintf(s, sizeof s, "Assigned to PC key(s):");
     p = s + size;
@@ -173,7 +173,7 @@ static elk_key_id_t redef_message(const key_dlg_t *key_dlg, const key_cap_t *kpt
         if(keylookcpy[code] == kptr->elkkeyid)
         {
             const char *fmt = count == 0 ? " %s" : ", %s";
-            size = snprintf(p, remain, fmt, keyutils_get_hostkey_longname(code));
+            size = snprintf(p, remain, fmt, keyboard_get_hostkey_longname(code));
             p += size;
             remain -= size;
         }
@@ -297,8 +297,8 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                         {
                             if (state == ST_PC_KEY) 
                             {
-                                host_key_t hostkey = keyboard_allegro5_key_to_host_key(event.keyboard.keycode);
-                                log_debug("keydef-allegro: mapping allegro code %d, hostkey %s to Elk key %s", event.keyboard.keycode, keyutils_get_hostkey_longname(hostkey), keyutils_get_elkkey_longname(elkkeyid));
+                                host_key_t hostkey = keyhandler_allegro5_key_to_host_key(event.keyboard.keycode);
+                                log_debug("keydef-allegro: mapping allegro code %d, hostkey %s to Elk key %s", event.keyboard.keycode, keyboard_get_hostkey_longname(hostkey), keyboard_get_elkkey_longname(elkkeyid));
                                 keylookcpy[hostkey] = elkkeyid;
                                 state = ST_ELK_KEY;
                                 draw_keyboard(key_dlg, ok_x, can_x);

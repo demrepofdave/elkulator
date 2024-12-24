@@ -4,12 +4,11 @@
 #ifndef WIN32
 #include <stdbool.h>
 #include <allegro.h>
+#include "config_vars.h"
 #include "elk.h"
-#include "host_abstraction_layer/keyboard.h"
+#include "keyboard.h"
 
-int keytemp[128];
-
-extern uint8_t keylookup[KEY_MAX];
+elk_key_id_t keylookcpy[HOST_KEY_MAX];
 
 /* Convert widget positions to or from screen positions. */
 
@@ -107,39 +106,39 @@ static int menu_keys[MAX_KEYS];
 
 static void populate_current_keys()
 {
-        int i, count;
+        //int i, count;
 
         /* Clear current keys. */
 
-        for (i = 0; i < MAX_KEYS; i++)
-                current_keys[i] = -1;
+        //for (i = 0; i < MAX_KEYS; i++)
+        //        current_keys[i] = -1;
 
         /* Populate with registered keys. */
 
-        for (i = 0, count = 0; (i < 128) && (count < MAX_KEYS); i++)
-        {
-                if (keytemp[i] == key_to_define)
-                {
-                        current_keys[count] = i;
-                        count++;
-                }
-        }
+        //for (i = 0, count = 0; (i < 128) && (count < MAX_KEYS); i++)
+        //{
+        //        if (keytemp[i] == key_to_define)
+        //        {
+        //                current_keys[count] = i;
+        //                count++;
+        //        }
+        //}
 }
 
 static void update_defined_keys()
 {
-        int i;
+        //int i;
 
         /* Reset to defaults. */
 
-        for (i = 0; i < 128; i++)
-                if (keytemp[i] == key_to_define)
-                        keytemp[i] = -1;
+        //for (i = 0; i < 128; i++)
+        //        if (keytemp[i] == key_to_define)
+        //                keytemp[i] = -1;
 
         /* Apply changes. */
 
-        for (i = 0; (i < MAX_KEYS) && (current_keys[i] != -1); i++)
-                keytemp[current_keys[i]] = key_to_define;
+        //for (i = 0; (i < MAX_KEYS) && (current_keys[i] != -1); i++)
+        //        keytemp[current_keys[i]] = key_to_define;
 }
 
 static char *get_current_keys(int index, int *list_size)
@@ -435,8 +434,7 @@ int gui_keydefine()
         int i;
 
         /* Initialise the temporary mapping. */
-
-        for (i = 0; i < KEY_MAX; i++) keytemp[i] = keylookup[i];
+        memcpy(keylookcpy, elkConfig.keyboard.host_key_mapping, sizeof(keylookcpy));
 
         b = open_dialog(d);
         dp = init_dialog(d, 0);
@@ -451,34 +449,11 @@ int gui_keydefine()
 
         if (d[i].d1)
         {
-                for (i = 0; i < KEY_MAX; i++) keylookup[i] = keytemp[i];
+                memcpy(elkConfig.keyboard.host_key_mapping, keylookcpy, sizeof(elkConfig.keyboard.host_key_mapping));
         }
 
         close_dialog(d, b);
         return D_O_K;
-}
-
-static bool special_key_pressed(elk_key_id_t elk_keycode)
-{
-        bool result = false;
-        for (int i = 0; i < KEY_MAX; i++)
-        {
-                if (keylookup[i] == elk_keycode && key[i])
-                {
-                        result = true;
-                }
-        }
-        return result;
-}
-
-bool break_pressed()
-{
-        return special_key_pressed(ELK_KEY_BREAK);
-}
-
-bool menu_pressed()
-{
-        return special_key_pressed(ELK_SPECIAL_KEY_MENU);
 }
 
 #endif

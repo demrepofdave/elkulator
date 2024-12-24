@@ -20,6 +20,7 @@
 #include "ddnoise.h"
 #include "debugger.h"
 #include "elk.h"
+#include "keyboard.h"
 #include "logger.h"
 #include "mem.h"
 #include "tapenoise.h"
@@ -29,7 +30,6 @@
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/fileutils.h"
 #include "host_abstraction_layer/sound.h"
-#include "host_abstraction_layer/keyboard.h"
 #include "host_abstraction_layer/video.h"
 
 int autoboot;
@@ -89,6 +89,8 @@ void initHandlers()
         callback_handlers.handle_startmovie = startmovie;
         callback_handlers.handle_stopmovie = stopmovie;
         callback_handlers.handle_enable_debugger= startdebug;
+        callback_handlers.handle_key_down = keyboard_keydown;
+        callback_handlers.handle_key_up = keyboard_keyup;
 }
 
 void initelk(int argc, char *argv[])
