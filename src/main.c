@@ -348,7 +348,11 @@ int main(int argc, char *argv[])
                                 video_rest(1);
                         }
 
-                        if (menu_pressed()) entergui();
+                        if (menu_pressed())
+                        {
+                                log_debug("Enter GUI!");
+                                entergui();
+                        } 
                 }
         #else       
                 resumeelk();

@@ -403,15 +403,7 @@ elk_key_id_t keyboard_get_default_elk_key_from_host_key(host_key_t host_key)
 /* Key reading control. */
 static bool special_key_pressed(elk_key_id_t elk_keycode)
 {
-    bool result = false;
-    for (int i = 0; i < HOST_KEY_MAX; i++)
-    {
-        if (elkConfig.keyboard.host_key_mapping[i] == elk_keycode && elk_key_state[i])
-        {
-            result = true;
-        }
-    }
-    return result;
+    return elk_key_state[elk_keycode];
 }
 
 bool break_pressed()

@@ -14,6 +14,7 @@
 #include "disc.h"
 #include "csw.h"
 #include "uef.h"
+#include "logger.h"
 
 #undef printf
 
@@ -724,7 +725,7 @@ void entergui()
         DIALOG_PLAYER *dp;
         
         //BITMAP *guib;
-        
+
         while (keypressed())
         {
                 readkey();
@@ -732,11 +733,11 @@ void entergui()
 
         while (menu_pressed())
         {
+                keyhandler_refresh_elkkeys();
                 rest(100);
         } 
 
         updatelinuxgui();
-
 
         set_color_depth(desktop_color_depth());
         show_mouse(screen);
@@ -776,6 +777,7 @@ void entergui()
                         allegro_gl_flip();
                 }*/
 //              updatelinuxgui();
+                keyhandler_refresh_elkkeys();
         }
         shutdown_dialog(dp);
         show_mouse(NULL);
