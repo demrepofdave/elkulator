@@ -234,7 +234,7 @@ static const key_strings_t host_key_string_table[HOST_KEY_MAX] =
     { "host_key_left",        "Arrow Left"    },
     { "host_key_right",       "Arrow Right"   },
     { "host_key_up",          "Arrow Up"      },
-    { "host_key_down",        "Arror Down"    },
+    { "host_key_down",        "Arrow Down"    },
 
     { "host_key_pad_slash",    "Keypad /"  },
     { "host_key_pad_asterisk", "Keypad *"  },
