@@ -131,14 +131,14 @@ static void update_defined_keys()
 
         /* Reset to defaults. */
 
-        //for (i = 0; i < 128; i++)
-        //        if (keytemp[i] == key_to_define)
-        //                keytemp[i] = -1;
+        for (i = 0; i < HOST_KEY_MAX; i++)
+                if (keylookcpy[i] == key_to_define)
+                        keylookcpy[i] = ELK_KEY_NONE;
 
         /* Apply changes. */
 
-        //for (i = 0; (i < MAX_KEYS) && (current_keys[i] != -1); i++)
-        //        keytemp[current_keys[i]] = key_to_define;
+        for (i = 0; (i < MAX_KEYS) && (current_keys[i] != -1); i++)
+                keylookcpy[current_keys[i]] = key_to_define;
 }
 
 static char *get_current_keys(int index, int *list_size)
