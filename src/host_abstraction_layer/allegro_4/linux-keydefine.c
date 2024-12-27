@@ -98,36 +98,36 @@ char *key_names[] =
 
 #define MAX_KEYS 5
 
-static int key_to_define;
-static int current_keys[MAX_KEYS];
+static elk_key_id_t key_to_define;
+static host_key_t current_keys[MAX_KEYS];
 static char keysel[MAX_KEYS];
-static int break_keys[MAX_KEYS];
-static int menu_keys[MAX_KEYS];
 
 static void populate_current_keys()
 {
-        //int i, count;
+        int i, count;
 
         /* Clear current keys. */
 
-        //for (i = 0; i < MAX_KEYS; i++)
-        //        current_keys[i] = -1;
+        for (i = 0; i < MAX_KEYS; i++)
+        {
+                current_keys[i] = -1;
+        }
 
         /* Populate with registered keys. */
 
-        //for (i = 0, count = 0; (i < 128) && (count < MAX_KEYS); i++)
-        //{
-        //        if (keytemp[i] == key_to_define)
-        //        {
-        //                current_keys[count] = i;
-        //                count++;
-        //        }
-        //}
+        for (i = 0, count = 0; (i < HOST_KEY_MAX) && (count < MAX_KEYS); i++)
+        {
+                if (keylookcpy[i] == key_to_define)
+                {
+                        current_keys[count] = i;
+                        count++;
+                }
+        }
 }
 
 static void update_defined_keys()
 {
-        //int i;
+        int i;
 
         /* Reset to defaults. */
 
@@ -160,7 +160,9 @@ static char *get_current_keys(int index, int *list_size)
         /* Otherwise, return the name of the indicated key. */
 
         else
-                return key_names[current_keys[index]];
+        {
+                return keyboard_get_hostkey_longname(current_keys[index]);
+        }
 }
 
 static int d_assign_key(int msg, DIALOG *d, int c)
@@ -359,68 +361,68 @@ DIALOG bemdefinegui[] =
         {d_button_proc, 205,232,60,28,  FG,BG,  0,   D_CLOSE, 1,  0,              "OK",     NULL,      NULL},
         {d_button_proc, 271,232,60,28,  FG,BG,  0,   D_CLOSE, 0,  0,              "Cancel", NULL,      NULL},
 
-        {d_getkey,      8,8,522,28,     FG,BG,  0,   D_EXIT,  0,  KEY_MENU,       "Menu",   NULL,      NULL},
+        {d_getkey,      8,8,522,28,     FG,BG,  0,   D_EXIT,  0,  ELK_SPECIAL_KEY_MENU,       "Menu",   NULL,      NULL},
 
-        {d_getkey,      26,56,28,28,    FG,BG,  0,   D_EXIT,  0,  KEY_ESC,        "ESC",    NULL,      NULL},
-        {d_getkey,      58,56,28,28,    FG,BG,  0,   D_EXIT,  0,  KEY_1,          "1",      NULL,      NULL},
-        {d_getkey,      90,56,28,28,    FG,BG,  0,   D_EXIT,  0,  KEY_2,          "2",      NULL,      NULL},
-        {d_getkey,      122,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_3,          "3",      NULL,      NULL},
-        {d_getkey,      154,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_4,          "4",      NULL,      NULL},
-        {d_getkey,      186,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_5,          "5",      NULL,      NULL},
-        {d_getkey,      218,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_6,          "6",      NULL,      NULL},
-        {d_getkey,      250,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_7,          "7",      NULL,      NULL},
-        {d_getkey,      282,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_8,          "8",      NULL,      NULL},
-        {d_getkey,      314,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_9,          "9",      NULL,      NULL},
-        {d_getkey,      346,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_0,          "0",      NULL,      NULL},
-        {d_getkey,      378,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_MINUS,      "=",      NULL,      NULL},
-        {d_getkey,      410,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_LEFT,       "LFT",    "LEFT",    NULL},
-        {d_getkey,      442,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_RIGHT,      "RGT",    "RIGHT",   NULL},
-        {d_getkey,      474,56,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_F12,        "BRK",    "BREAK",   NULL},
+        {d_getkey,      26,56,28,28,    FG,BG,  0,   D_EXIT,  0,  ELK_KEY_ESCAPE,     "ESC",    NULL,      NULL},
+        {d_getkey,      58,56,28,28,    FG,BG,  0,   D_EXIT,  0,  ELK_KEY_1,          "1",      NULL,      NULL},
+        {d_getkey,      90,56,28,28,    FG,BG,  0,   D_EXIT,  0,  ELK_KEY_2,          "2",      NULL,      NULL},
+        {d_getkey,      122,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_3,          "3",      NULL,      NULL},
+        {d_getkey,      154,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_4,          "4",      NULL,      NULL},
+        {d_getkey,      186,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_5,          "5",      NULL,      NULL},
+        {d_getkey,      218,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_6,          "6",      NULL,      NULL},
+        {d_getkey,      250,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_7,          "7",      NULL,      NULL},
+        {d_getkey,      282,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_8,          "8",      NULL,      NULL},
+        {d_getkey,      314,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_9,          "9",      NULL,      NULL},
+        {d_getkey,      346,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_0,          "0",      NULL,      NULL},
+        {d_getkey,      378,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_EQUALS,     "=",      NULL,      NULL},
+        {d_getkey,      410,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_LEFT,       "LFT",    "LEFT",    NULL},
+        {d_getkey,      442,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_RIGHT,      "RGT",    "RIGHT",   NULL},
+        {d_getkey,      474,56,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_BREAK,      "BRK",    "BREAK",   NULL},
 
-        {d_getkey,      42,88,28,28,    FG,BG,  0,   D_EXIT,  0,  KEY_TAB,        "FN",     NULL,      NULL},
-        {d_getkey,      74,88,28,28,    FG,BG,  0,   D_EXIT,  0,  KEY_Q,          "Q",      NULL,      NULL},
-        {d_getkey,      106,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_W,          "W",      NULL,      NULL},
-        {d_getkey,      138,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_E,          "E",      NULL,      NULL},
-        {d_getkey,      170,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_R,          "R",      NULL,      NULL},
-        {d_getkey,      202,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_T,          "T",      NULL,      NULL},
-        {d_getkey,      234,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_Y,          "Y",      NULL,      NULL},
-        {d_getkey,      266,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_U,          "U",      NULL,      NULL},
-        {d_getkey,      298,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_I,          "I",      NULL,      NULL},
-        {d_getkey,      330,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_O,          "O",      NULL,      NULL},
-        {d_getkey,      362,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_P,          "P",      NULL,      NULL},
-        {d_getkey,      394,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_UP,         "UP",     NULL,      NULL},
-        {d_getkey,      426,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_DOWN,       "DWN",    "DOWN",    NULL},
-        {d_getkey,      458,88,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_END,        "CPY",    "COPY",    NULL},
+        {d_getkey,      42,88,28,28,    FG,BG,  0,   D_EXIT,  0,  ELK_KEY_FUNCTION,   "FN",     NULL,      NULL},
+        {d_getkey,      74,88,28,28,    FG,BG,  0,   D_EXIT,  0,  ELK_KEY_Q,          "Q",      NULL,      NULL},
+        {d_getkey,      106,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_W,          "W",      NULL,      NULL},
+        {d_getkey,      138,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_E,          "E",      NULL,      NULL},
+        {d_getkey,      170,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_R,          "R",      NULL,      NULL},
+        {d_getkey,      202,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_T,          "T",      NULL,      NULL},
+        {d_getkey,      234,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_Y,          "Y",      NULL,      NULL},
+        {d_getkey,      266,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_U,          "U",      NULL,      NULL},
+        {d_getkey,      298,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_I,          "I",      NULL,      NULL},
+        {d_getkey,      330,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_O,          "O",      NULL,      NULL},
+        {d_getkey,      362,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_P,          "P",      NULL,      NULL},
+        {d_getkey,      394,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_UP,         "UP",     NULL,      NULL},
+        {d_getkey,      426,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_DOWN,       "DWN",    "DOWN",    NULL},
+        {d_getkey,      458,88,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_COPY,       "CPY",    "COPY",    NULL},
 
-        {d_getkey,      50,120,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_LCONTROL,   "CTL",    "CTRL",    NULL},
-        {d_getkey,      82,120,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_A,          "A",      NULL,      NULL},
-        {d_getkey,      114,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_S,          "S",      NULL,      NULL},
-        {d_getkey,      146,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_D,          "D",      NULL,      NULL},
-        {d_getkey,      178,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_F,          "F",      NULL,      NULL},
-        {d_getkey,      210,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_G,          "G",      NULL,      NULL},
-        {d_getkey,      242,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_H,          "H",      NULL,      NULL},
-        {d_getkey,      274,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_J,          "J",      NULL,      NULL},
-        {d_getkey,      306,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_K,          "K",      NULL,      NULL},
-        {d_getkey,      338,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_L,          "L",      NULL,      NULL},
-        {d_getkey,      370,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_SEMICOLON,  ";",      NULL,      NULL},
-        {d_getkey,      402,120,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_QUOTE,      ":",      NULL,      NULL},
-        {d_getkey,      434,120,44,28,  FG,BG,  0,   D_EXIT,  0,  KEY_ENTER,      "RET",    "RETURN",  NULL},
+        {d_getkey,      50,120,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_CONTROL,    "CTL",    "CTRL",    NULL},
+        {d_getkey,      82,120,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_A,          "A",      NULL,      NULL},
+        {d_getkey,      114,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_S,          "S",      NULL,      NULL},
+        {d_getkey,      146,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_D,          "D",      NULL,      NULL},
+        {d_getkey,      178,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_F,          "F",      NULL,      NULL},
+        {d_getkey,      210,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_G,          "G",      NULL,      NULL},
+        {d_getkey,      242,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_H,          "H",      NULL,      NULL},
+        {d_getkey,      274,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_J,          "J",      NULL,      NULL},
+        {d_getkey,      306,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_K,          "K",      NULL,      NULL},
+        {d_getkey,      338,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_L,          "L",      NULL,      NULL},
+        {d_getkey,      370,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_SEMICOLON,  ";",      NULL,      NULL},
+        {d_getkey,      402,120,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_COLON,      ":",      NULL,      NULL},
+        {d_getkey,      434,120,44,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_RETURN,     "RET",    "RETURN",  NULL},
 
-        {d_getkey,      50,152,44,28,   FG,BG,  0,   D_EXIT,  0,  KEY_LSHIFT,     "SHIFT",  NULL,      NULL},
-        {d_getkey,      98,152,28,28,   FG,BG,  0,   D_EXIT,  0,  KEY_Z,          "Z",      NULL,      NULL},
-        {d_getkey,      130,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_X,          "X",      NULL,      NULL},
-        {d_getkey,      162,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_C,          "C",      NULL,      NULL},
-        {d_getkey,      194,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_V,          "V",      NULL,      NULL},
-        {d_getkey,      226,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_B,          "B",      NULL,      NULL},
-        {d_getkey,      258,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_N,          "N",      NULL,      NULL},
-        {d_getkey,      290,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_M,          "M",      NULL,      NULL},
-        {d_getkey,      322,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_COMMA,      ",",      NULL,      NULL},
-        {d_getkey,      354,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_STOP,       ".",      NULL,      NULL},
-        {d_getkey,      386,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_SLASH,      "/",      NULL,      NULL},
-        {d_getkey,      418,152,44,28,  FG,BG,  0,   D_EXIT,  0,  KEY_RSHIFT,     "SHIFT",  NULL,      NULL},
-        {d_getkey,      466,152,28,28,  FG,BG,  0,   D_EXIT,  0,  KEY_DEL,        "DEL",    "DELETE",  NULL},
+        {d_getkey,      50,152,44,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_SHIFT,      "SHIFT",  NULL,      NULL},
+        {d_getkey,      98,152,28,28,   FG,BG,  0,   D_EXIT,  0,  ELK_KEY_Z,          "Z",      NULL,      NULL},
+        {d_getkey,      130,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_X,          "X",      NULL,      NULL},
+        {d_getkey,      162,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_C,          "C",      NULL,      NULL},
+        {d_getkey,      194,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_V,          "V",      NULL,      NULL},
+        {d_getkey,      226,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_B,          "B",      NULL,      NULL},
+        {d_getkey,      258,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_N,          "N",      NULL,      NULL},
+        {d_getkey,      290,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_M,          "M",      NULL,      NULL},
+        {d_getkey,      322,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_COMMA,      ",",      NULL,      NULL},
+        {d_getkey,      354,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_FULLSTOP,   ".",      NULL,      NULL},
+        {d_getkey,      386,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_SLASH,      "/",      NULL,      NULL},
+        {d_getkey,      418,152,44,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_SHIFT,      "SHIFT",  NULL,      NULL},
+        {d_getkey,      466,152,28,28,  FG,BG,  0,   D_EXIT,  0,  ELK_KEY_DEL,        "DEL",    "DELETE",  NULL},
 
-        {d_getkey,      146,184,252,28, FG,BG,  0,   D_EXIT,  0,  KEY_SPACE,      "SPACE",  NULL,      NULL},
+        {d_getkey,      146,184,252,28, FG,BG,  0,   D_EXIT,  0,  ELK_KEY_SPACE,      "SPACE",  NULL,      NULL},
 
         {d_yield_proc},
         {0,             0,0,0,0,        0,0,    0,   0,       0,  0,              NULL,     NULL,      NULL}

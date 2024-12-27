@@ -788,7 +788,11 @@ void entergui()
         }*/
         set_color_depth(8);
 
-        while (menu_pressed()) rest(100);
+        while (menu_pressed())
+        {
+                keyhandler_refresh_elkkeys();
+                rest(100);
+        }
 
         video_clearall();
 }

@@ -350,7 +350,6 @@ int main(int argc, char *argv[])
 
                         if (menu_pressed())
                         {
-                                log_debug("Enter GUI!");
                                 entergui();
                         } 
                 }
