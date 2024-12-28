@@ -1,10 +1,33 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * keyboard.c
+ * 
+ * Keyboard handling functions for the elctron (outside of the
+ * host abstraction layer keyboard).
+ * 
+ */
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
+
 #include <string.h>
 #include "config_vars.h"
 #include "keyboard.h"
 #include "logger.h"
 
 
+/******************************************************************************
+* Preprocessor Macros
+*******************************************************************************/
+
 #define NO_ALTERNATE_KEY HOST_KEY_MAX
+
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
 
 typedef struct {
     host_key_t host_keycode_main;
@@ -77,6 +100,10 @@ typedef struct
     const char * config_key_string;
     const char * key_longname;
 } key_strings_t;
+
+/******************************************************************************
+* Private Variable Definitions
+*******************************************************************************/
 
 static key_strings_t elk_keycode_config_string[ELK_KEY_MAX] =
 {
@@ -278,6 +305,19 @@ static const key_strings_t host_key_string_table[HOST_KEY_MAX] =
 // Records if native key is pressed or not (true = pressed, false = not pressed)
 bool elk_key_state[ELK_KEY_MAX];
 
+/******************************************************************************
+* Private Function Definitions
+*******************************************************************************/
+
+/* Key reading control. */
+static bool special_key_pressed(elk_key_id_t elk_keycode)
+{
+    return elk_key_state[elk_keycode];
+}
+
+/******************************************************************************
+* Public Function Definitions
+*******************************************************************************/
 
 void keyboard_makelayout()
 {
@@ -400,12 +440,6 @@ elk_key_id_t keyboard_get_default_elk_key_from_host_key(host_key_t host_key)
     return elk_key;
 }
 
-/* Key reading control. */
-static bool special_key_pressed(elk_key_id_t elk_keycode)
-{
-    return elk_key_state[elk_keycode];
-}
-
 bool break_pressed()
 {
     return special_key_pressed(ELK_KEY_BREAK);
@@ -420,15 +454,9 @@ void keyboard_keydown(host_key_t hostkey)
 {
     elk_key_id_t elkkey = elkConfig.keyboard.host_key_mapping[hostkey];
 
-    log_debug("Host key %s, elk_key %s", keyboard_get_hostkey_longname(hostkey), keyboard_get_elkkey_longname(elkkey));
     if(elkkey != ELK_KEY_MAX)
     {
-        //log_debug("keycode %d, elkkey %s", hostkey, keyboard_get_elkkey_longname(elkkey));
         elk_key_state[elkkey] = true;
-    }
-    else
-    {
-        //log_debug("keycode=%d", hostkey);
     }
 }
 
@@ -438,12 +466,7 @@ void keyboard_keyup(host_key_t hostkey)
 
     if(elkkey != ELK_KEY_MAX)
     {
-//        log_debug("keycode %d, elkkey %s", hostkey, keyboard_get_elkkey_longname(elkkey));
         elk_key_state[elkkey] = false;
-    }
-    else
-    {
-//      log_debug("keycode=%d", hostkey);
     }
 }
 

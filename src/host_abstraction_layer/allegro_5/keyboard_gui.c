@@ -238,7 +238,7 @@ static void *keydef_thread(ALLEGRO_THREAD *thread, void *tdata)
                 {
                     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                         // Verify is mouse click is in our window.
-                        if(event.mouse.display = display)
+                        if(event.mouse.display == display)
                         {
                             if (mouse_within(&event, ok_x, BTNS_Y, BTNS_W, BTNS_H)) 
                             {
