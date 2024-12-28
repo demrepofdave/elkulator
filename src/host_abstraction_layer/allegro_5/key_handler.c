@@ -309,7 +309,7 @@ void key_down_event(ALLEGRO_EVENT *event)
                 host_key_t hostkey = keyhandler_allegro5_key_to_host_key(keycode);
                 if(hostkey != HOST_KEY_NONE)
                 {
-                    callback_handlers.handle_key_up(hostkey);
+                    callback_handlers.handle_key_down(hostkey);
                 }
 //        }
 //    }
