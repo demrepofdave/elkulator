@@ -10,18 +10,24 @@ Elkulator is licensed under the GPL, see COPYING for more details.
 
 # ROMs
 
-The ROMs required by Elkulator can be obtained from the 1.0 release of the
-emulator, available from http://elkulator.acornelectron.co.uk/ElkulatorV1.0Linux.tar.gz
+The basic ROMs for emulation are included with the source.
 
-Simply unpack the contents of the above archive to a new directory and copy
-the `roms` directory it contains to the root of this repository:
+However, if for some reason they are missing the the ROMs required by Elkulator can be
+obtained from the 1.0 release of the emulator, available from 
+http://elkulator.acornelectron.co.uk/ElkulatorV1.0Linux.tar.gz
 
+Once downloaded simply unpack the contents of the above archive to a new 
+directory and copy the `roms` directory it contains to the root of this
+repository:
+
+```
   mkdir temp
   wget http://elkulator.acornelectron.co.uk/ElkulatorV1.0Linux.tar.gz
   cd temp
   tar zxf ../ElkulatorV1.0Linux.tar.gz
   cd ..
   cp -r temp/roms .
+```
 
 # Compiling
 
