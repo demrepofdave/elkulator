@@ -41,6 +41,7 @@
 
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/fileutils.h"
+#include "host_abstraction_layer/hal.h"
 #include "host_abstraction_layer/sound.h"
 #include "host_abstraction_layer/video.h"
 
@@ -262,7 +263,7 @@ void initelk(int argc, char *argv[])
     }
     if (elkConfig.disc.defaultwriteprot) writeprot[0]=writeprot[1]=1;
 
-    video_init_part3(drawitint);
+    hal_install_timer_callback(drawitint);
 
     sound_init_part2();
     initsound();
@@ -335,13 +336,13 @@ void closeelk()
 
 void pauseelk()
 {
-    video_stop_timer();
+    hal_stop_timer();
     elk_state = ELK_STATE_PAUSED;
 }
 
 void resumeelk()
 {
-    video_start_timer();
+    hal_start_timer();
     elk_state = ELK_STATE_RUNNING;
 }
 
@@ -359,7 +360,7 @@ int main(int argc, char *argv[])
     int count = 0;
     //init_config(); TODO: May need this not sure.
     log_msg(__FUNCTION__, "Elkulator has started");
-    int ret = video_init_part1();
+    int ret = hal_init_begin();
     if (ret != 0)
     {
         fprintf(stderr, "Error %d initializing Allegro.\n", ret);
@@ -379,7 +380,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                video_rest(1);
+                hal_timer_rest(1);
             }
 
             if (menu_pressed())

@@ -34,13 +34,13 @@ PALETTE elkpal =
 window_config_t main_window;
 
 // Called from linux.c (main)
-int video_init_part1()
+int video_init_begin()
 {
     return(allegro_init());
 }
 
 // Called from ula.c (ulainit)
-void video_init_part2()
+void video_init_complete()
 {
     b16=create_bitmap(800*2,600);
     b162=create_bitmap(640,256);

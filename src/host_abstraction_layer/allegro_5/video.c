@@ -58,9 +58,6 @@ static ALLEGRO_DISPLAY *display;
 
 //ALLEGRO_LOCKED_REGION *region = NULL; // Region lock on bitmap b (to allow writing of pixels)
 
-static ALLEGRO_TIMER *timer;
-static ALLEGRO_EVENT_SOURCE evsrc;
-
 elk_pallete_t elkpal[8] =
 {
     0xff000000,
@@ -97,7 +94,7 @@ void log_window_config(const char * title)
 *******************************************************************************/
 
 // Called from linux.c (main)
-int video_init_part1()
+int video_init_begin()
 {
     if (!al_init())
     {
@@ -179,39 +176,10 @@ int video_init_part1()
     return 0;
 }
 
-void video_init_part2()
+void video_init_complete()
 {
-    //ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
-    //b = al_create_bitmap(640,616);
-
     menu_init(display);
-
-    if (!(timer = al_create_timer(0.02)))
-    {
-        log_fatal("main: unable to create timer");
-        exit(1);
-    }
-    event_register_event_source(al_get_timer_event_source(timer));
-    al_init_user_event_source(&evsrc);
-    event_register_event_source(&evsrc);
-
-    event_register_event_source(al_get_keyboard_event_source());
-
-    al_install_mouse();
-    event_register_event_source(al_get_mouse_event_source());
-
     initpaltables();
-}
-
-// Called from main.c (initelk)
-void video_init_part3(void (*timer_function)(void))
-{
-    // Nothing to do.
-}
-
-void video_rest(unsigned int period)
-{
-    return;
 }
 
 void video_set_window_title(const char * title)
@@ -557,18 +525,6 @@ void video_clearall()
 void video_shutdown()
 {
     //allegro_exit();
-}
-
-void video_start_timer()
-{
-    //log_debug("video_start_timer: staring timer %p", timer);
-    al_start_timer(timer);
-}
-
-void video_stop_timer()
-{
-    //log_debug("video_start_timer: staring timer %p", timer);
-    al_stop_timer(timer);   
 }
 
 bool video_is_main_display(ALLEGRO_DISPLAY * current_display)

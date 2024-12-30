@@ -15,15 +15,16 @@
 #include <zlib.h>
 #include "elk.h"
 #include "6502.h"
-#include "mem.h"
-#include "ula.h"
 #include "config_vars.h"
+#include "csw.h"
+#include "logger.h"
+#include "mem.h"
+#include "tapenoise.h"
+#include "uef.h"
+#include "ula.h"
+#include "host_abstraction_layer/hal.h"
 #include "host_abstraction_layer/sound.h"
 #include "host_abstraction_layer/video.h"
-#include "logger.h"
-#include "csw.h"
-#include "uef.h"
-#include "tapenoise.h"
 
 #define ELECTRON_MODES_MAX     8
 
@@ -115,10 +116,7 @@ void initula()
 {
         int c;
         coldepth=video_get_desktop_color_depth();
-        video_set_desktop_color_depth();
-        video_set_window_size(640,512,0,0);
-        video_set_gfx_mode_windowed();
-        video_init_part2();
+        hal_init_complete();
         
         for (c=0;c<256;c++)
         {

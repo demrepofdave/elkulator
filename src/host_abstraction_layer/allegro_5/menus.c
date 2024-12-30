@@ -13,12 +13,13 @@
 *******************************************************************************/
 #include <stdint.h>
 #include <allegro5/allegro_native_dialog.h>
-#include "host_abstraction_layer/video.h"
-#include "menu_internal.h"
-#include "logger.h"
 #include "callback_handlers.h"
 #include "config_vars.h"
+#include "logger.h"
+#include "menu_internal.h"
+#include "host_abstraction_layer/hal.h"
 #include "host_abstraction_layer/event_handler.h"
+#include "host_abstraction_layer/video.h"
 #include "event_handler_internal.h"
 
 
@@ -96,11 +97,6 @@ void add_checkbox_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, boo
         register_menu_event_handler(id, menu_handler_function);
     }
 }
-
-//static void add_radio_item(ALLEGRO_MENU *parent, char const *title, uint16_t id, int this_value, int cur_value)
-//{
-//    add_checkbox_item(parent, title, menu_id_num(id, this_value), this_value == cur_value, NULL);
-//}
 
 void add_radio_set(ALLEGRO_MENU *parent, char const **labels, uint16_t id, int cur_value, callback_event_handler_t menu_handler_function)
 {
@@ -323,7 +319,7 @@ elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
     menu_id_t menu_id = menu_get_id(event);
     int num = menu_get_num(event);
 
-    video_stop_timer();
+    hal_stop_timer();
 
     log_debug("menu_handle_event: menu %p, id %d, num %d", menu, menu_id, num);
 
@@ -344,7 +340,7 @@ elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
         log_debug("menu_handle_event: menu event %d detected", menu_id);
     }
 
-    video_start_timer();
+    hal_start_timer();
 
     log_debug("menu_handle_event elkEvent = 0x%02x", elkEvent);
 

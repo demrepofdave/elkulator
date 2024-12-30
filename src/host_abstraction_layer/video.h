@@ -69,21 +69,15 @@ typedef struct
 * Public Function Definitions
 *******************************************************************************/
 
-int  video_init_part1();                                // Called from main() in linux.c
-void video_init_part2();                                // Called from ulainit() in ula.c
-void video_init_part3(void (*timer_function)(void));    // Called from initelk() in main.c
-
 void video_register_close_button_handler(void (*handler_function)(void)); // Only used in allegro4.
 
 int video_set_display_switch_mode_background();
 int video_poll_joystick();
-void video_rest(unsigned int period);  // Only used in allegro4.
 
 void video_update_native_window_size(int w, int h);
 void video_resize_elk_window(bool aspect_ratio);
 void video_set_window_title(const char * title);
 void video_set_window_size(int w, int h, int v_w, int v_h);
-void video_apply_window_size();
 void video_set_gfx_mode_windowed();
 void video_set_gfx_mode_fullscreen();
 void video_set_depth_and_elk_palette();
@@ -99,7 +93,5 @@ void video_clearall();
 
 void video_shutdown();
 
-void video_start_timer();
-void video_stop_timer();
 
 #endif // _VIDEO_H

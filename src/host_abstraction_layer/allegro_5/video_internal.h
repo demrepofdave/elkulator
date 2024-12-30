@@ -12,6 +12,10 @@
 #define uint16 unsigned short
 #define uint8 unsigned char
 
+int  video_init_begin();
+void video_init_complete();
+
+void video_apply_window_size();
 
 bool video_is_main_display(ALLEGRO_DISPLAY * current_display);
 
