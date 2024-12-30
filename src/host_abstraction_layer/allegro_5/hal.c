@@ -77,6 +77,7 @@ int hal_init_begin()
 void hal_init_complete()
 {
     video_init_complete();
+    sound_init_complete();
 
     if (!(timer = al_create_timer(0.02)))
     {
