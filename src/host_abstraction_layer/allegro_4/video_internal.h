@@ -11,6 +11,9 @@
 #define uint16 unsigned short
 #define uint8 unsigned char
 
+int  video_init_begin();
+void video_init_complete();
+
 int Init_2xSaI(int depth);
 void Super2xSaI(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);
 void SuperEagle(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);

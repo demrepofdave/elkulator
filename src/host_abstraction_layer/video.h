@@ -74,18 +74,16 @@ void video_register_close_button_handler(void (*handler_function)(void)); // Onl
 int video_set_display_switch_mode_background();
 int video_poll_joystick();
 
+void video_enterfullscreen();
+void video_leavefullscreen();
+
 void video_update_native_window_size(int w, int h);
 void video_resize_elk_window(bool aspect_ratio);
 void video_set_window_title(const char * title);
 void video_set_window_size(int w, int h, int v_w, int v_h);
-void video_set_gfx_mode_windowed();
-void video_set_gfx_mode_fullscreen();
-void video_set_depth_and_elk_palette();
-void video_set_desktop_color_depth();
-int  video_get_desktop_color_depth();
 
-void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth);
-void video_capture_screenshot(int drawMode, int colDepth);
+void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data);
+void video_capture_screenshot(int drawMode);
 int  video_save_screenshot_bmp(const char * filename);
 void video_destroy_screenshot();
 

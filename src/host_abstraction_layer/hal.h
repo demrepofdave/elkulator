@@ -43,6 +43,6 @@ void hal_shutdown();
 void hal_install_timer_callback(void (*timer_function)(void));    // Called from initelk() in main.c
 void hal_start_timer();
 void hal_stop_timer();
-void video_timer_rest(unsigned int period);  // Only used in allegro4.
+void hal_timer_rest(unsigned int period);  // Only used in allegro4.
 
 #endif // _VIDEO_H

@@ -40,7 +40,7 @@ void check()
         }*/
 }
 
-void sound_init_part1(int argc, char *argv[])
+void sound_init_begin(int argc, char *argv[])
 {
 printf("Start...\n");
         alutInit(0,0);
@@ -58,7 +58,7 @@ void closeal()
 int16_t tempbuf[BUFLEN>>1];
 int16_t tempbufdd[4410*2];
 
-void sound_init_part2()
+void sound_init_complete()
 {
         int c;
         format = AL_FORMAT_STEREO16;

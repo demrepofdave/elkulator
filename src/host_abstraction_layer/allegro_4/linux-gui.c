@@ -370,12 +370,12 @@ int gui_fullscreen()
         if (fullscreen)
         {
                 fullscreen=0;
-                leavefullscreen();
+                video_leavefullscreen();
         }
         else
         {
                 fullscreen=1;
-                enterfullscreen();
+                video_enterfullscreen();
         }
         return D_EXIT;
 }

@@ -98,7 +98,7 @@ void closeal()
 * Public Function Definitions
 *******************************************************************************/
 
-void sound_init_part1(int argc, char *argv[])
+void sound_init_begin(int argc, char *argv[])
 {
     log_debug("Start...");
     alutInit(0,0);
@@ -108,7 +108,7 @@ void sound_init_part1(int argc, char *argv[])
 }
 
 
-void sound_init_part2()
+void sound_init_complete()
 {
     int c;
     format = AL_FORMAT_STEREO16;

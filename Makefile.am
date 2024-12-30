@@ -29,6 +29,7 @@ elkulator_hal_src = src/host_abstraction_layer/allegro_4/2xsai.c \
                     src/host_abstraction_layer/allegro_4/scale2x.c \
                     src/host_abstraction_layer/allegro_4/soundopenal.c \
                     src/host_abstraction_layer/allegro_4/firstbyte.c \
+                    src/host_abstraction_layer/allegro_4/hal.c \
                     src/host_abstraction_layer/allegro_4/linux-gui.c \
                     src/host_abstraction_layer/allegro_4/linux-keydefine.c \
                     src/host_abstraction_layer/allegro_4/video.c \

@@ -82,6 +82,11 @@ int sndstreamindex = 0;
 int sndstreamcount = 0;
 // If elkulator is runnning to slowly on native machine we may want to occasionally pause video rendering to catch-up.
 bool video_blit_enabled = true;
+
+int wantsavescrshot=0;
+int wantmovieframe=0;
+FILE *moviefile;
+
 char scrshotname[260];
 char moviename[260];
 uint8_t electron_screen[640*256];
@@ -106,8 +111,6 @@ struct
         uint8_t tapelatch;
 } ula;
 
-int coldepth;
-
 uint8_t pal[16];
 int palwritenum=0,palwritenum2=0;
 
@@ -115,7 +118,6 @@ uint8_t ulalookup[256];
 void initula()
 {
         int c;
-        coldepth=video_get_desktop_color_depth();
         hal_init_complete();
         
         for (c=0;c<256;c++)
@@ -126,52 +128,9 @@ void initula()
                 if (c&0x20) ulalookup[c]|=4;
                 if (c&0x80) ulalookup[c]|=8;
         }
-        video_set_desktop_color_depth();
 
         /* Clear the sound stream buffer before we start filling it. */
         memset(sndstreambuf, 0, sizeof(sndstreambuf));
-}
-
-int fullblit=0;
-
-void enterfullscreen()
-{
-        video_set_desktop_color_depth();
-        video_set_window_size(800,600, 0, 0);
-        video_set_gfx_mode_fullscreen();
-        video_set_depth_and_elk_palette();
-        video_set_window_size(800,600, 0, 0);
-}
-
-void leavefullscreen()
-{
-//        #ifdef WIN32
-//        remove_mouse();
-//        destroy_bitmap(vidb);
-//        destroy_bitmap(vp2);
-//        destroy_bitmap(vp1);
-//        #endif
-        video_set_desktop_color_depth();
-//        #ifdef WIN32
-//        video_set_gfx_mode_windowed(048,2048,0,0);
-//        vidb=create_video_bitmap(800,300);
-//        #else
-        video_set_window_size(640,512,0,0);
-        video_set_gfx_mode_windowed();
-//        #endif
-        video_set_depth_and_elk_palette();
-}
-
-void put_pixel(int y, int x, uint8_t color)
-{
-    if(x >= 640 || y >= 256)
-    {
-        log_debug("Overflow %d, %d", x, y);
-    }
-    else
-    {
-        *(electron_screen + (y * 640) + x) = color;
-    }
 }
 
 void put_pixel_line(int y, int x, int width, uint8_t color)
@@ -554,11 +513,6 @@ void reallyfasttapepoll()
         }
 }
 
-int nextulapoll;
-int wantsavescrshot=0;
-int wantmovieframe=0;
-FILE *moviefile;
-
 void yield()
 {
         uint8_t temp;
@@ -566,7 +520,6 @@ void yield()
         uint16_t tempaddr;
         int col;
         int oldcycles;
-//        if (nextulapoll) printf("Beginning poll %i ",ula.x);
 
         // How the following loop works.
         // We run for as many CPU cycles as it takes for the ULA to keep in 
@@ -592,10 +545,7 @@ void yield()
                         // black scanlines in between character rows.
                         if (ula.sc&8)
                         {
-                                for (x=0;x<8;x++)
-                                {
-                                    put_pixel(ula.y, (ula.x+x), 0);
-                                }
+                                put_pixel_line(ula.y, ula.x, 8, 0);
                         }
                         else if (!(ula.x&8) || !(ula.mode&4))
                         {
@@ -672,10 +622,7 @@ void yield()
                 {
                         // Display is disabled, but we are drawing a line, so
                         // make this blank.,
-                        for (x=0;x<8;x++)
-                        {
-                            put_pixel(ula.y, (ula.x+x), 0);
-                        }
+                        put_pixel_line(ula.y, ula.x, 8, 0);
                         ula.x+=8;
                         ulacycles++;
                 }
@@ -769,18 +716,14 @@ void yield()
                                         ula.dispon=1;
                                         ula.sc=0;
                                         ula.addr=(ula.addrlo<<1)|(ula.addrhi<<9);
-//                                        rpclog("ULA addr %04X\n",ula.addr);
                                         if (!ula.addr) ula.addr=0x8000-modeInfo[ula.mode].modelens;
                                         
                                         if (ula.draw && video_blit_enabled)
                                         {
-                                                video_blit_to_screen(elkConfig.display.drawmode, electron_screen, coldepth);
-                                                //startblit()
+                                                video_blit_to_screen(elkConfig.display.drawmode, electron_screen);
                                                 if (wantsavescrshot) dosavescrshot();
                                                 if (wantmovieframe) saveframe();
-                                                //endblit();
                                         }
-//                                        wait50();
                                         ula.addrback=ula.addr;
                                         ula.framecount++;
                                         if (ula.framecount==25) ula.framecount=0;
@@ -790,11 +733,6 @@ void yield()
                         ulacycles++;
                 }
         }
-/*        if (nextulapoll)
-        {
-                nextulapoll=0;
-                printf("%i\n",ula.x);
-        }*/
 }
 
 void waitforramsync()
@@ -936,7 +874,7 @@ void savescrshot(const char * filename)
 void dosavescrshot()
 {
         log_debug("name='%s'", scrshotname);
-        video_capture_screenshot(elkConfig.display.drawmode, coldepth);
+        video_capture_screenshot(elkConfig.display.drawmode);
         video_save_screenshot_bmp(scrshotname);
         video_destroy_screenshot();
         wantsavescrshot=0;

@@ -89,6 +89,35 @@ void log_window_config(const char * title)
     log_debug("- Current Elk  : %d, %d", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
 }
 
+void video_set_gfx_mode_fullscreen()
+{
+    ALLEGRO_DISPLAY *display = al_get_current_display();
+    //save_winsizex = al_get_display_width(display);
+    //save_winsizey = al_get_display_height(display);
+    if (al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true)) 
+    {
+//#ifdef WIN32
+//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
+//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
+//#endif
+    }
+}
+
+void video_set_gfx_mode_windowed()
+{
+    ALLEGRO_DISPLAY *display;
+    display = al_get_current_display();
+
+    video_apply_window_size();
+
+    al_resize_display(display, main_window.current_elk.winsizex,  main_window.current_elk.winsizey);
+    al_set_display_flag(display, ALLEGRO_MAXIMIZED, false);
+    al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
+    al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
+//    al_set_display_flag
+//    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
+}
+
 /******************************************************************************
 * Public Function Definitions
 *******************************************************************************/
@@ -178,6 +207,9 @@ int video_init_begin()
 
 void video_init_complete()
 {
+    video_set_window_size(640,512,0,0);
+    video_set_gfx_mode_windowed();
+
     menu_init(display);
     initpaltables();
 }
@@ -251,21 +283,6 @@ void video_apply_window_size()
     al_draw_filled_rectangle(0,0, main_window.actual_window.winsizex, main_window.actual_window.winsizey, blue);
 }
 
-void video_set_gfx_mode_windowed()
-{
-    ALLEGRO_DISPLAY *display;
-    display = al_get_current_display();
-
-    video_apply_window_size();
-
-    al_resize_display(display, main_window.current_elk.winsizex,  main_window.current_elk.winsizey);
-    al_set_display_flag(display, ALLEGRO_MAXIMIZED, false);
-    al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
-    al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
-//    al_set_display_flag
-//    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
-}
-
 void video_register_close_button_handler(void (*handler_function)(void))
 {
     // Nothing to do with allegro 5.
@@ -281,35 +298,29 @@ int video_poll_joystick()
     return 0;
 }
 
-void video_set_gfx_mode_fullscreen()
+void video_enterfullscreen()
 {
-    ALLEGRO_DISPLAY *display = al_get_current_display();
-    //save_winsizex = al_get_display_width(display);
-    //save_winsizey = al_get_display_height(display);
-    if (al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true)) 
-    {
-//#ifdef WIN32
-//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
-//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
-//#endif
-    }
+        video_set_window_size(800,600, 0, 0);
+        video_set_gfx_mode_fullscreen();
+        video_set_window_size(800,600, 0, 0);
 }
 
-void video_set_depth_and_elk_palette()
+void video_leavefullscreen()
 {
-    // Nothing to do in allegro5
+//        #ifdef WIN32
+//        remove_mouse();
+//        destroy_bitmap(vidb);
+//        destroy_bitmap(vp2);
+//        destroy_bitmap(vp1);
+//        #endif
+//        #ifdef WIN32
+//        video_set_gfx_mode_windowed(048,2048,0,0);
+//        vidb=create_video_bitmap(800,300);
+//        #else
+        video_set_window_size(640,512,0,0);
+        video_set_gfx_mode_windowed();
+//        #endif
 }
-
-void video_set_desktop_color_depth()
-{
-    // Nothing to do in allegro5
-}
-
-int video_get_desktop_color_depth()
-{
-    return(8); // TODO: probably won't need this in allegro5
-}
-
 
 //#ifdef WIN32
 //CRITICAL_SECTION cs;
@@ -380,7 +391,7 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 }
 
 
-void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth)
+void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 {
     //log_timer_begin();
     //log_time_mark("video_blit_to_screen - start");
@@ -457,7 +468,7 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth)
     endblit();
 }
 
-void video_capture_screenshot(int drawMode, int colDepth)
+void video_capture_screenshot(int drawMode)
 {
     bm_screenshot = al_create_bitmap(640,512);
     // NOTE: No need to run any filtering (e.g. palfilt) here as
