@@ -646,8 +646,8 @@ void yield()
                                                         soundcount-=soundlimit;
                                                         soundstat^=0x7F;
                                                 }
-                                                if (soundlimit<0x20000) addsnd((soundon)?0x7F:0);
-                                                else                    addsnd((soundon)?soundstat:0);
+                                                if (soundlimit<0x20000) sound_add((soundon)?0x7F:0);
+                                                else                    sound_add((soundon)?soundstat:0);
 
                                                 /* Add values to the stream buffer if we are making a movie. */
                                                 if (wantmovieframe)

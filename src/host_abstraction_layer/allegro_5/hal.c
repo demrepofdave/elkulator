@@ -22,9 +22,9 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_primitives.h>
-#include "host_abstraction_layer/sound.h"
+#include "sound_internal.h"
 #include "host_abstraction_layer/video.h"
-#include "host_abstraction_layer/allegro_5//menu_internal.h"
+#include "host_abstraction_layer/allegro_5/menu_internal.h"
 #include "logger.h"
 #include "elk.h"
 #include "video_internal.h"
@@ -68,7 +68,7 @@ int hal_init_begin()
     if(result == 0)
     {
         // Continue with initialization
-        sound_init_begin(0,NULL);
+        sound_init_begin();
     }
 
     return result;

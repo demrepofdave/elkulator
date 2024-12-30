@@ -240,7 +240,6 @@ void initelk(int argc, char *argv[])
         if (tapenext) tapenext--;
     }
 
-    //sound_init_begin(0,NULL);
     loadroms();
     reset6502();
     initula();
@@ -265,7 +264,6 @@ void initelk(int argc, char *argv[])
 
     hal_install_timer_callback(drawitint);
 
-    //sound_init_complete();
     initsound();
     loaddiscsamps();
     maketapenoise();

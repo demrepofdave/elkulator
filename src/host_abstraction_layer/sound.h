@@ -40,8 +40,6 @@
 * Public Function Definitions
 *******************************************************************************/
 
-void sound_init_begin(int argc, char *argv[]);
-void sound_init_complete();
-void addsnd(uint8_t dat);
-void mixbuffer(int16_t *d);
+void sound_add(uint8_t dat);
+void sound_mixbuffer(int16_t *d);
 void sound_givealbufferdd(int16_t *buf);

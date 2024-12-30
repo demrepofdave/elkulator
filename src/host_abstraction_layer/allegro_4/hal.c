@@ -17,8 +17,8 @@
 
 #include "logger.h"
 #include "elk.h"
+#include "sound_internal.h"
 #include "video_internal.h"
-#include "host_abstraction_layer/sound.h"
 #include "host_abstraction_layer/video.h"
 
 /******************************************************************************
@@ -54,7 +54,7 @@ int hal_init_begin()
     int result = video_init_begin();
     if(result == 0)
     {
-        sound_init_begin(0,NULL);
+        sound_init_begin();
     }
     return result;
 }
