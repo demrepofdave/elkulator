@@ -10,14 +10,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "elk.h"
-#include "mem.h"
-#include "6502.h"
 #include "1770.h"
-#include "ula.h"
+#include "6502.h"
 #include "config_vars.h"
-#include "host_abstraction_layer/keyboard.h"
 #include "debugger.h"
+#include "elk.h"
+#include "host_abstraction_layer/keyutils.h"
+#include "keyboard.h"
+#include "mem.h"
+#include "ula.h"
+
+
+
 
 static const char * roms = "roms";   // Name of directory containing rom files
 
@@ -444,7 +448,7 @@ uint8_t readkeys(uint16_t addr)
 
         for (d=0;d<ELK_KEY_MAX;d++)
         {
-            if (keyhandler_elk_key_state(d) && keyl[d]&0x80 && !(addr&(1<<(keyl[d]&15)))) temp|=1<<((keyl[d]&0x30)>>4);
+            if (keyboard_elk_key_state(d) && keyl[d]&0x80 && !(addr&(1<<(keyl[d]&15)))) temp|=1<<((keyl[d]&0x30)>>4);
         }
 
         return temp;

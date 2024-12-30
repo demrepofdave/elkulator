@@ -79,9 +79,9 @@ bool register_main_event_handlers()
     result &= register_event_handler(ALLEGRO_EVENT_TIMER,         handle_event_timer_expiry);
     result &= register_event_handler(ALLEGRO_EVENT_MENU_CLICK,    menu_handle_event);
 
-    result &= register_event_handler(ALLEGRO_EVENT_KEY_DOWN, keyboard_handle_event);
-    result &= register_event_handler(ALLEGRO_EVENT_KEY_CHAR, keyboard_handle_event);
-    result &= register_event_handler(ALLEGRO_EVENT_KEY_UP,   keyboard_handle_event);
+    result &= register_event_handler(ALLEGRO_EVENT_KEY_DOWN, key_handler_handle_event);
+    result &= register_event_handler(ALLEGRO_EVENT_KEY_CHAR, key_handler_handle_event);
+    result &= register_event_handler(ALLEGRO_EVENT_KEY_UP,   key_handler_handle_event);
 
     // TODO: Events we acknowledge but are not yet handled by specific code.
     result &= register_event_handler(ALLEGRO_EVENT_MOUSE_AXES,          handle_null_event);

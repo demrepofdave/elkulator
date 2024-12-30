@@ -1,7 +1,31 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * keyboard.h
+ * 
+ * Keyboard handling functions for the elctron (outside of the
+ * host abstraction layer keyboard).
+ * 
+ */
+
 #ifndef _KEYBOARD_H
 #define _KEYBOARD_H
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
+
 #include <stdint.h>
 #include <stdbool.h>
+
+/******************************************************************************
+* Preprocessor Macros
+*******************************************************************************/
+
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
 
 // There are 56 keys in the Elk keyboard, here we defined them in
 // order as laid out on the electron from top to bottom, left to right
@@ -62,7 +86,7 @@ typedef enum {
     ELK_KEY_RETURN,
     ELK_KEY_ESCAPE,
     ELK_KEY_BREAK,
-    ELK_SPECIAL_KEY_MENU,  // NOTE: This is not a actual elektron key, but provides a way for the
+    ELK_SPECIAL_KEY_MENU,  // NOTE: This is not an actual electron key, but provides a way for the
                            //       elkulator menu key to be utilized (for libraries such as allegro 4 
                            //       that do not support native menus on their windows).
     ELK_KEY_MAX
@@ -207,11 +231,24 @@ typedef enum {
 
 } host_key_t;
 
+/******************************************************************************
+* Public Function Definitions
+*******************************************************************************/
+
 void keyboard_makelayout();
 uint8_t keyboard_read(uint16_t addr);
 void keyboard_debug_dump();
-void keyhandler_refresh_elkkeys();
-bool keyhandler_elk_key_state(elk_key_id_t elk_key_code);
-elk_key_id_t kayboard_get_default_elk_key_from_host_key(host_key_t host_key);
+bool keyboard_elk_key_state(elk_key_id_t elk_key_code);
+elk_key_id_t keyboard_get_default_elk_key_from_host_key(host_key_t host_key);
+
+const char * keyboard_get_hostkey_longname(host_key_t host_key);
+const char * keyboard_get_hostkey_config_string(host_key_t host_key);
+const char * keyboard_get_elkkey_longname(elk_key_id_t elk_key);
+const char * keyboard_get_elkkey_config_string(elk_key_id_t elk_key);
+
+elk_key_id_t keyboard_config_string_to_elk_key_id(const char * host_config_str);
+
+void keyboard_keydown(host_key_t hostkey);
+void keyboard_keyup(host_key_t hostkey);
 
 #endif // _KEYBOARD_H

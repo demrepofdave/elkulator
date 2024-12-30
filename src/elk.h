@@ -27,7 +27,7 @@ extern "C" {
 
 #define printf rpclog
 
-#define VERSION_STR "Elkulator v2.00a-1214"
+#define VERSION_STR "Elkulator v2.00a-1228"
 
 void rpclog(char *format, ...);
 

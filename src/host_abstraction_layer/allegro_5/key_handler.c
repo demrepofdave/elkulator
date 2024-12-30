@@ -1,84 +1,13 @@
 #include <allegro5/allegro.h>
-#include "host_abstraction_layer/keyboard.h"
-#include "host_abstraction_layer/keyutils.h"
-#include "video_internal.h"
-#include "keyboard_internal.h"
+#include "callback_handlers.h"
+#include "config_vars.h"
 #include "elk.h"
 #include "host_abstraction_layer/event_handler.h"
+#include "host_abstraction_layer/keyutils.h"
+#include "keyboard.h"
+#include "keyboard_internal.h"
 #include "logger.h"
-#include "config_vars.h"
-
-#define NO_ALTERNATE_KEY HOST_KEY_MAX
-typedef struct {
-    host_key_t host_keycode_main;
-    host_key_t host_keycode_alternate;
-} elk_key_defaults_t;
-
-// Key defaults, if no alternative config is present in elk.cfg
- static const elk_key_defaults_t elk_keycode_defaults[ELK_KEY_MAX] = {
-    { NO_ALTERNATE_KEY,   NO_ALTERNATE_KEY   }, // ELK_KEY_NONE,
-    { HOST_KEY_0,         NO_ALTERNATE_KEY   }, // ELK_KEY_0,
-    { HOST_KEY_1,         NO_ALTERNATE_KEY   }, // ELK_KEY_1,
-    { HOST_KEY_2,         NO_ALTERNATE_KEY   }, // ELK_KEY_2,
-    { HOST_KEY_3,         NO_ALTERNATE_KEY   }, // ELK_KEY_3,
-    { HOST_KEY_4,         NO_ALTERNATE_KEY   }, // ELK_KEY_4,
-    { HOST_KEY_5,         NO_ALTERNATE_KEY   }, // ELK_KEY_5,
-    { HOST_KEY_6,         NO_ALTERNATE_KEY   }, // ELK_KEY_6,
-    { HOST_KEY_7,         NO_ALTERNATE_KEY   }, // ELK_KEY_7,
-    { HOST_KEY_8,         NO_ALTERNATE_KEY   }, // ELK_KEY_8,
-    { HOST_KEY_9,         NO_ALTERNATE_KEY   }, // ELK_KEY_9,
-    { HOST_KEY_A,         NO_ALTERNATE_KEY   }, // ELK_KEY_A,
-    { HOST_KEY_B,         NO_ALTERNATE_KEY   }, // ELK_KEY_B,
-    { HOST_KEY_C,         NO_ALTERNATE_KEY   }, // ELK_KEY_C,
-    { HOST_KEY_D,         NO_ALTERNATE_KEY   }, // ELK_KEY_D,
-    { HOST_KEY_E,         NO_ALTERNATE_KEY   }, // ELK_KEY_E,
-    { HOST_KEY_F,         NO_ALTERNATE_KEY   }, // ELK_KEY_F,
-    { HOST_KEY_G,         NO_ALTERNATE_KEY   }, // ELK_KEY_G,
-    { HOST_KEY_H,         NO_ALTERNATE_KEY   }, // ELK_KEY_H,
-    { HOST_KEY_I,         NO_ALTERNATE_KEY   }, // ELK_KEY_I,
-    { HOST_KEY_J,         NO_ALTERNATE_KEY   }, // ELK_KEY_J,
-    { HOST_KEY_K,         NO_ALTERNATE_KEY   }, // ELK_KEY_K,
-    { HOST_KEY_L,         NO_ALTERNATE_KEY   }, // ELK_KEY_L,
-    { HOST_KEY_M,         NO_ALTERNATE_KEY   }, // ELK_KEY_M,
-    { HOST_KEY_N,         NO_ALTERNATE_KEY   }, // ELK_KEY_N,
-    { HOST_KEY_O,         NO_ALTERNATE_KEY   }, // ELK_KEY_O,
-    { HOST_KEY_P,         NO_ALTERNATE_KEY   }, // ELK_KEY_P,
-    { HOST_KEY_Q,         NO_ALTERNATE_KEY   }, // ELK_KEY_Q,
-    { HOST_KEY_R,         NO_ALTERNATE_KEY   }, // ELK_KEY_R,
-    { HOST_KEY_S,         NO_ALTERNATE_KEY   }, // ELK_KEY_S,
-    { HOST_KEY_T,         NO_ALTERNATE_KEY   }, // ELK_KEY_T,
-    { HOST_KEY_U,         NO_ALTERNATE_KEY   }, // ELK_KEY_U,
-    { HOST_KEY_V,         NO_ALTERNATE_KEY   }, // ELK_KEY_V,
-    { HOST_KEY_W,         NO_ALTERNATE_KEY   }, // ELK_KEY_W,
-    { HOST_KEY_X,         NO_ALTERNATE_KEY   }, // ELK_KEY_X,
-    { HOST_KEY_Y,         NO_ALTERNATE_KEY   }, // ELK_KEY_Y,
-    { HOST_KEY_Z,         NO_ALTERNATE_KEY   }, // ELK_KEY_Z,
-    { HOST_KEY_MINUS,     HOST_KEY_EQUALS    }, // ELK_KEY_EQUALS,
-    { HOST_KEY_COMMA,     NO_ALTERNATE_KEY   }, // ELK_KEY_COMMA,
-    { HOST_KEY_FULLSTOP,  NO_ALTERNATE_KEY   }, // ELK_KEY_FULLSTOP,
-    { HOST_KEY_SLASH,     NO_ALTERNATE_KEY   }, // ELK_KEY_SLASH,
-    { HOST_KEY_SEMICOLON, NO_ALTERNATE_KEY   }, // ELK_KEY_SEMICOLON,
-    { HOST_KEY_APOSTROPHE,NO_ALTERNATE_KEY   }, // ELK_KEY_COLON,
-    { HOST_KEY_LEFT,      HOST_KEY_PAD_4     }, // ELK_KEY_LEFT,
-    { HOST_KEY_RIGHT,     HOST_KEY_PAD_6     }, // ELK_KEY_RIGHT,
-    { HOST_KEY_UP,        HOST_KEY_PAD_8     }, // ELK_KEY_UP,
-    { HOST_KEY_DOWN,      HOST_KEY_PAD_2     }, // ELK_KEY_DOWN,
-    { HOST_KEY_TAB,       NO_ALTERNATE_KEY   }, // ELK_KEY_FUNCTION,
-    { HOST_KEY_END,       NO_ALTERNATE_KEY   }, // ELK_KEY_COPY,
-    { HOST_KEY_CAPSLOCK,  NO_ALTERNATE_KEY   }, // ELK_KEY_CONTROL,
-    { HOST_KEY_LSHIFT,    HOST_KEY_RSHIFT    }, // ELK_KEY_SHIFT,
-    { HOST_KEY_BACKSPACE, HOST_KEY_DELETE    }, // ELK_KEY_DEL,
-    { HOST_KEY_SPACE,     NO_ALTERNATE_KEY   }, // ELK_KEY_SPACE,
-    { HOST_KEY_ENTER,     HOST_KEY_PAD_ENTER }, // ELK_KEY_RETURN,
-    { HOST_KEY_ESCAPE,    NO_ALTERNATE_KEY   }, // ELK_KEY_ESCAPE,
-    { HOST_KEY_F12,       NO_ALTERNATE_KEY   }, // ELK_KEY_BREAK,
-    { NO_ALTERNATE_KEY,   NO_ALTERNATE_KEY   }  // ELK_SPECIAL_KEY_MENU (not used as native menus supported in allegro 5).
-};
-
-
-// Host key to allegro key and string lookup?
-// HOST_KEY_xx=ELK_KEY_xx
-//
+#include "video_internal.h"
 
 // HOST_KEY get mapped to ALLEGRO_KEY.
 // 
@@ -338,12 +267,9 @@ static const uint8_t allegro_key_to_host_key_mapping[ALLEGRO_KEY_MAX] =
     HOST_KEY_CAPSLOCK        // ALLEGRO_KEY_CAPSLOCK
 };
 
-// Records if native key is pressed or not (true = pressed, false = not pressed)
-bool elk_key_state[ELK_KEY_MAX];
-
 bool keydefining = false;
 
-uint8_t keyboard_allegro5_key_to_host_key(uint8_t allegro_key)
+uint8_t keyhandler_allegro5_key_to_host_key(uint8_t allegro_key)
 {
     uint8_t host_key = HOST_KEY_NONE;
     if(allegro_key < ALLEGRO_KEY_MAX)
@@ -353,95 +279,11 @@ uint8_t keyboard_allegro5_key_to_host_key(uint8_t allegro_key)
     return host_key;
 }
 
-void keyboard_makelayout()
-{
-    int c;
-
-    // Config will aleady have any redefined keys in it prior to entering
-    // this function.  We fill in the remaining defaults.
-    log_debug("Make layout");
-
-    // Now assign defaults.
-    for(c = 0; c < ELK_KEY_MAX; c++)
-    {
-        elk_key_state[c] = false;
-        
-        // Map default
-        if(elkConfig.keyboard.host_key_mapping[elk_keycode_defaults[c].host_keycode_main] == ELK_KEY_NONE)
-        {
-            elkConfig.keyboard.host_key_mapping[elk_keycode_defaults[c].host_keycode_main] = c;
-        }
-
-        // Map alternate if it exists
-        if(elk_keycode_defaults[c].host_keycode_alternate != NO_ALTERNATE_KEY &&
-           elkConfig.keyboard.host_key_mapping[elk_keycode_defaults[c].host_keycode_alternate] == ELK_KEY_NONE)
-        {
-            elkConfig.keyboard.host_key_mapping[elk_keycode_defaults[c].host_keycode_alternate] = c;
-        }
-    }
-
-    // Now assign any keyboard changes made in the config file.
-    //for(c = 0; c < HOST_KEY_MAX; c++)
-    //{
-    //    if(elkConfig.keyboard.host_key_mapping[c] != ELK_KEY_NONE)
-    //    {
-    //        log_debug("%s=%s", keyutils_get_hostkey_config_string(c), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[c]));
-    //    }
-    //}
-}
-
-elk_key_id_t kayboard_get_default_elk_key_from_host_key(host_key_t host_key)
-{
-    elk_key_id_t elk_key = ELK_KEY_NONE;
-    int index = 0;
-    for(index = 0; index < ELK_KEY_MAX; index++)
-    {
-        if(elk_keycode_defaults[index].host_keycode_main == host_key || 
-           elk_keycode_defaults[index].host_keycode_alternate == host_key)
-        {
-            elk_key = index;
-        }
-    }
-    return elk_key;
-}
-
-void keyboard_debug_dump()
-{
-    int c;
-    for(c = 0; c< HOST_KEY_MAX; c++)
-    {
-        if(elkConfig.keyboard.host_key_mapping[c] != ELK_KEY_NONE)
-        {
-            log_debug("%s=%s", keyutils_get_hostkey_config_string(c), keyutils_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[c]));
-        }
-    }
-}
-
 void keyhandler_refresh_elkkeys()
 {
     // Nothing to do in allegro5 (keys always have the correct state)
 }
 
-bool keyhandler_elk_key_state(elk_key_id_t elk_key_code)
-{
-    return(elk_key_state[elk_key_code]);
-}
-
-
-void key_down(host_key_t hostkey)
-{
-    elk_key_id_t elkkey = elkConfig.keyboard.host_key_mapping[hostkey];
-
-    if(elkkey != ELK_KEY_MAX)
-    {
-        //log_debug("keycode %d, elkkey %s", hostkey, keyutils_get_elkkey_longname(elkkey));
-        elk_key_state[elkkey] = true;
-    }
-    else
-    {
-        //log_debug("keycode=%d", hostkey);
-    }
-}
 
 void key_down_event(ALLEGRO_EVENT *event)
 {
@@ -464,28 +306,13 @@ void key_down_event(ALLEGRO_EVENT *event)
 //            if (keylogical)
 //                set_logical_shift_ctrl_if_idle();
 //            else
-                host_key_t hostkey = keyboard_allegro5_key_to_host_key(keycode);
+                host_key_t hostkey = keyhandler_allegro5_key_to_host_key(keycode);
                 if(hostkey != HOST_KEY_NONE)
                 {
-                    key_down(hostkey);
+                    callback_handlers.handle_key_down(hostkey);
                 }
 //        }
 //    }
-}
-
-void key_up(host_key_t hostkey)
-{
-    elk_key_id_t elkkey = elkConfig.keyboard.host_key_mapping[hostkey];
-
-    if(elkkey != ELK_KEY_MAX)
-    {
-//        log_debug("keycode %d, elkkey %s", hostkey, keyutils_get_elkkey_longname(elkkey));
-        elk_key_state[elkkey] = false;
-    }
-    else
-    {
-//      log_debug("keycode=%d", hostkey);
-    }
 }
 
 void key_up_event(ALLEGRO_EVENT *event)
@@ -493,10 +320,10 @@ void key_up_event(ALLEGRO_EVENT *event)
     int keycode = event->keyboard.keycode;
     if (keycode < ALLEGRO_KEY_MAX)
     { 
-        host_key_t hostkey = keyboard_allegro5_key_to_host_key(keycode);
+        host_key_t hostkey = keyhandler_allegro5_key_to_host_key(keycode);
         if(hostkey != HOST_KEY_NONE)
         {
-            key_up(hostkey);
+            callback_handlers.handle_key_up(hostkey);
         }
 //        if (keycode == ALLEGRO_KEY_ALT || keycode == ALLEGRO_KEY_ALTGR)
 //            hostalt = false;
@@ -548,7 +375,7 @@ void key_up_event(ALLEGRO_EVENT *event)
 
 
 // Main event handling Code
-elk_event_t keyboard_handle_event(ALLEGRO_EVENT *event)
+elk_event_t key_handler_handle_event(ALLEGRO_EVENT *event)
 {
     elk_event_t elkEvent = 0;
 

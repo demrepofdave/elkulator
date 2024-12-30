@@ -43,7 +43,6 @@ elkulator_hal_src = src/host_abstraction_layer/allegro_5/adc.c  \
                     src/host_abstraction_layer/allegro_5/firstbyte.c \
                     src/host_abstraction_layer/allegro_5/fileutils.c \
                     src/host_abstraction_layer/allegro_5/key_handler.c \
-                    src/host_abstraction_layer/allegro_5/linux-keydefine.c \
                     src/host_abstraction_layer/allegro_5/menus.c \
                     src/host_abstraction_layer/allegro_5/menu_file.c \
                     src/host_abstraction_layer/allegro_5/menu_tape.c \
@@ -70,6 +69,7 @@ elkulator_SOURCES = src/1770.c \
                     src/disc.c \
                     src/fdi2raw.c \
                     src/fdi.c \
+                    src/keyboard.c \
                     src/logger.c \
                     src/main.c \
                     src/mem.c \

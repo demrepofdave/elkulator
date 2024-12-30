@@ -17,7 +17,7 @@
 *******************************************************************************/
 #include <stdbool.h>
 #include <stdint.h>
-#include "host_abstraction_layer/keyboard.h"
+#include "keyboard.h"
 
 /******************************************************************************
 * Preprocessor Macros
