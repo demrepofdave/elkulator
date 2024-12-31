@@ -279,7 +279,7 @@ uint8_t keyhandler_allegro5_key_to_host_key(uint8_t allegro_key)
     return host_key;
 }
 
-void keyhandler_refresh_elkkeys()
+void keyutils_refresh_elkkeys()
 {
     // Nothing to do in allegro5 (keys always have the correct state)
 }

@@ -2,7 +2,7 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * ula.c - ULA and video emulation
+ * ula.c - Main electron ULA chip emulation code.
  * 
  */
 

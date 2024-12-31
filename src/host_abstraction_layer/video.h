@@ -77,10 +77,7 @@ int video_poll_joystick();
 void video_enterfullscreen();
 void video_leavefullscreen();
 
-void video_update_native_window_size(int w, int h);
-void video_resize_elk_window(bool aspect_ratio);
 void video_set_window_title(const char * title);
-void video_set_window_size(int w, int h, int v_w, int v_h);
 
 void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data);
 void video_capture_screenshot(int drawMode);

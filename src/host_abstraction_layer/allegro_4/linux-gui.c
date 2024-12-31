@@ -733,7 +733,7 @@ void entergui()
 
         while (menu_pressed())
         {
-                keyhandler_refresh_elkkeys();
+                keyutils_refresh_elkkeys();
                 rest(100);
         } 
 
@@ -777,7 +777,7 @@ void entergui()
                         allegro_gl_flip();
                 }*/
 //              updatelinuxgui();
-                keyhandler_refresh_elkkeys();
+                keyutils_refresh_elkkeys();
         }
         shutdown_dialog(dp);
         show_mouse(NULL);
@@ -790,7 +790,7 @@ void entergui()
 
         while (menu_pressed())
         {
-                keyhandler_refresh_elkkeys();
+                keyutils_refresh_elkkeys();
                 rest(100);
         }
 

@@ -11,7 +11,6 @@
  * and if require will use callback functions setup (in callback_handler.c)
  * to allow the electron code to respond accordingly.
  * 
- *
  */
 
 #ifndef _EVENT_HANDLER_H

@@ -15,7 +15,8 @@
 int  video_init_begin();
 void video_init_complete();
 
-void video_apply_window_size();
+void video_resize_elk_window(bool aspect_ratio);
+void video_update_native_window_size(int w, int h);
 
 bool video_is_main_display(ALLEGRO_DISPLAY * current_display);
 

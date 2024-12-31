@@ -15,9 +15,10 @@
 #include <allegro5/allegro_native_dialog.h>
 
 #include "config_vars.h"
+#include "keyboard_gui.h"
 #include "logger.h"
 #include "menu_internal.h"
-#include "keyboard_gui.h"
+#include "video_internal.h"
 
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/video.h"

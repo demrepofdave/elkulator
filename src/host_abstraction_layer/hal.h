@@ -34,15 +34,15 @@
 * Public Function Definitions
 *******************************************************************************/
 
-int  hal_init_begin();                                // Called from main() in linux.c
-void hal_init_complete();                                // Called from ulainit() in ula.c
+// Initialisation functions.
+int  hal_init_begin();
+void hal_init_complete();
 void hal_shutdown();
 
 // Timer functions
-
-void hal_install_timer_callback(void (*timer_function)(void));    // Called from initelk() in main.c
+void hal_install_timer_callback(void (*timer_function)(void));
 void hal_start_timer();
 void hal_stop_timer();
-void hal_timer_rest(unsigned int period);  // Only used in allegro4.
+void hal_timer_rest(unsigned int period);
 
 #endif // _VIDEO_H

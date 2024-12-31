@@ -103,6 +103,13 @@ void video_set_gfx_mode_fullscreen()
     }
 }
 
+void video_apply_window_size()
+{
+    log_window_config("video_apply_window_size");
+    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
+    al_draw_filled_rectangle(0,0, main_window.actual_window.winsizex, main_window.actual_window.winsizey, blue);
+}
+
 void video_set_gfx_mode_windowed()
 {
     ALLEGRO_DISPLAY *display;
@@ -116,6 +123,13 @@ void video_set_gfx_mode_windowed()
     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
 //    al_set_display_flag
 //    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
+}
+
+void video_set_window_size(int w, int h, int v_w, int v_h)
+{
+    log_debug("Set window size %d, %d", w, h);
+    main_window.current_elk.winsizex = w;
+    main_window.current_elk.winsizey = h;
 }
 
 /******************************************************************************
@@ -158,7 +172,6 @@ int video_init_begin()
         al_set_new_display_option(ALLEGRO_VSYNC, 2, ALLEGRO_SUGGEST);
         log_debug("video: config vsync=%d, actual=%d", vsync, al_get_new_display_option(ALLEGRO_VSYNC, &temp));
     }
-    //video_set_window_size(true);
 
     if ((display = al_create_display(main_window.current_elk.winsizex, main_window.current_elk.winsizey)) == NULL) {
         log_fatal("video: unable to create display");
@@ -219,13 +232,6 @@ void video_set_window_title(const char * title)
     al_set_window_title(display, title);
 }
 
-void video_set_window_size(int w, int h, int v_w, int v_h)
-{
-    log_debug("Set window size %d, %d", w, h);
-    main_window.current_elk.winsizex = w;
-    main_window.current_elk.winsizey = h;
-}
-
 void video_update_native_window_size(int w, int h)
 {
     main_window.actual_window.winsizex = w;
@@ -271,16 +277,6 @@ void video_resize_elk_window(bool aspect_ratio)
 
     video_set_window_size(winsizeX, winsizeY, 0,0);
     video_apply_window_size();
-}
-
-static bool first_bits = true;
-
-void video_apply_window_size()
-{
-    first_bits = true;
-    log_window_config("video_apply_window_size");
-    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
-    al_draw_filled_rectangle(0,0, main_window.actual_window.winsizex, main_window.actual_window.winsizey, blue);
 }
 
 void video_register_close_button_handler(void (*handler_function)(void))

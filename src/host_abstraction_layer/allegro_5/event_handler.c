@@ -3,12 +3,14 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
 #include "host_abstraction_layer/event_handler.h"
+#include "config_vars.h"
 #include "event_handler_internal.h"
 #include "logger.h"
 #include "host_abstraction_layer/video.h"
 #include "menu_internal.h"
 #include "keyboard_internal.h"
-#include "config_vars.h"
+#include "video_internal.h"
+
 
 
 bool register_main_event_handlers();

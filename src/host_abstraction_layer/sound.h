@@ -13,8 +13,6 @@
  * future in order to allow maximum cross platform support and 
  * long term durability.
  *
- * This is the openAL implementation of the abstraction layer.
- * 
  * TODO: The above description is not completely true as
  *       some sound code still exist in the electron emulation
  *       main code.  This should change in future.
