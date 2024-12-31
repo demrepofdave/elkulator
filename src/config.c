@@ -190,6 +190,9 @@ void loadconfig()
         
         elkConfig.display.videoresize = getintcfg("win_resize",0);
         elkConfig.display.maintain_aspect_ratio = getintcfg("win_aspectratio", 1);
+        elkConfig.display.maintain_pixel_ratio  = getintcfg("win_pixelratio", 0);
+        elkConfig.display.native_window_width   = getintcfg("win_width", 640);
+        elkConfig.display.native_window_height  = getintcfg("win_height", 512);
         
         elkConfig.expansion.firstbyte = getintcfg("joy_firstbyte",0);
         elkConfig.expansion.joffset   = getintcfg("joy_offset",0);
@@ -291,6 +294,9 @@ void saveconfig()
 
         writeintcfg("win_resize",elkConfig.display.videoresize);
         writeintcfg("win_aspectratio", elkConfig.display.maintain_aspect_ratio);
+        writeintcfg("win_pixelratio", elkConfig.display.maintain_pixel_ratio);
+        writeintcfg("win_width", elkConfig.display.native_window_width);
+        writeintcfg("win_height", elkConfig.display.native_window_height);
         
         writeintcfg("joy_firstbyte", elkConfig.expansion.firstbyte);
         writeintcfg("joy_offset",    elkConfig.expansion.joffset);
@@ -316,11 +322,23 @@ void saveconfig()
 
 void log_config_vars()
 {
+        uint8_t drawmode;
+    uint8_t videoresize;
+    uint8_t maintain_aspect_ratio;
+    uint8_t maintain_pixel_ratio;
+    uint32_t native_window_width;
+    uint32_t native_window_height;
+
     log_debug("Config vars");
     log_debug("===========");
     log_debug("- display:");
     log_debug("  - drawmode    : %d", elkConfig.display.drawmode);
-    log_debug("  - videoresize : %d", elkConfig.display.drawmode);
+    log_debug("  - videoresize : %d", elkConfig.display.videoresize);
+    log_debug("  - aspectratio : %d", elkConfig.display.maintain_aspect_ratio);
+    log_debug("  - pixelratio  : %d", elkConfig.display.maintain_pixel_ratio);
+    log_debug("  - win width   : %d", elkConfig.display.native_window_width);
+    log_debug("  - win height  : %d", elkConfig.display.native_window_height);
+
     log_debug("- expansion:");
     log_debug("  - plus1                : %d", elkConfig.expansion.plus1);
     log_debug("  - plus3                : %d", elkConfig.expansion.plus3);
