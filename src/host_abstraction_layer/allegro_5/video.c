@@ -220,10 +220,12 @@ int video_init_begin()
 
 void video_init_complete()
 {
-    video_set_window_size(640,512,0,0);
-    video_set_gfx_mode_windowed();
+    //video_set_window_size(640,512,0,0);
+    //video_set_gfx_mode_windowed();
 
     menu_init(display);
+    video_set_window_size(640,512,0,0);
+    video_set_gfx_mode_windowed();
     initpaltables();
 }
 
@@ -236,7 +238,7 @@ void video_update_native_window_size(int w, int h)
 {
     main_window.actual_window.winsizex = w;
     main_window.actual_window.winsizey = h;
-    log_window_config("video_update_native_window_size");
+    log_debug("video_update_native_window_size(%d, %d)", w, h);
     //main_window.actual_window.maintain_aspect = false;
 }
 
