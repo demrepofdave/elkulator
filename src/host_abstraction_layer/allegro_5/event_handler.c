@@ -99,7 +99,7 @@ elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
 {
     // if not fullscreen!
     al_acknowledge_resize(event->display.source);
-    video_update_native_window_size(event->display.width, event->display.height);
+    video_update_native_window_size(event->display.width, event->display.height +26);
     video_resize_elk_window((elkConfig.display.maintain_aspect_ratio == 1));
     //video_clearall();
     // endif

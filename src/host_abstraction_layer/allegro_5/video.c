@@ -31,6 +31,7 @@
 #include "host_abstraction_layer/video.h"
 #include "host_abstraction_layer/allegro_5//menu_internal.h"
 #include "logger.h"
+#include "config_vars.h"
 #include "elk.h"
 #include "video_internal.h"
 #include "event_handler_internal.h"
@@ -85,7 +86,7 @@ void log_window_config(const char * title)
 {
     log_debug("Window status (%s)", title);
     log_debug("-------------");
-    log_debug("- Actual window: %d, %d", main_window.actual_window.winsizex, main_window.actual_window.winsizey);
+    log_debug("- Actual window: %d, %d", elkConfig.display.native_window_width, elkConfig.display.native_window_height);
     log_debug("- Current Elk  : %d, %d", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
 }
 
@@ -107,7 +108,7 @@ void video_apply_window_size()
 {
     log_window_config("video_apply_window_size");
     ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
-    al_draw_filled_rectangle(0,0, main_window.actual_window.winsizex, main_window.actual_window.winsizey, blue);
+    al_draw_filled_rectangle(0,0, elkConfig.display.native_window_width, elkConfig.display.native_window_height, blue);
 }
 
 void video_set_gfx_mode_windowed()
@@ -220,12 +221,13 @@ int video_init_begin()
 
 void video_init_complete()
 {
-    //video_set_window_size(640,512,0,0);
-    //video_set_gfx_mode_windowed();
+    video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
+    video_set_gfx_mode_windowed();
 
     menu_init(display);
-    video_set_window_size(640,512,0,0);
-    video_set_gfx_mode_windowed();
+    video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
+    //video_set_window_size(640,512,0,0);
+    //video_set_gfx_mode_windowed();
     initpaltables();
 }
 
@@ -236,8 +238,8 @@ void video_set_window_title(const char * title)
 
 void video_update_native_window_size(int w, int h)
 {
-    main_window.actual_window.winsizex = w;
-    main_window.actual_window.winsizey = h;
+    elkConfig.display.native_window_width = w;
+    elkConfig.display.native_window_height = h;
     log_debug("video_update_native_window_size(%d, %d)", w, h);
     //main_window.actual_window.maintain_aspect = false;
 }
@@ -245,36 +247,39 @@ void video_update_native_window_size(int w, int h)
 void video_resize_elk_window(bool aspect_ratio)
 {
     // Now we resize the screen based upon the above.
-    int winsizeX = main_window.actual_window.winsizex;
-    int winsizeY = main_window.actual_window.winsizey;
+    int winsizeX = elkConfig.display.native_window_width;
+    int winsizeY = elkConfig.display.native_window_height;
+    main_window.current_elk.startx = 0;
+    main_window.current_elk.starty = 0;
 
     log_window_config("video_resize_elk_window");
 
+    // Maintain pixel ratio experimental code
+
+    if(winsizeX > 640 && winsizeY > 512)
+    {
+        winsizeX = (winsizeX / 320) * 320;
+        winsizeY = (winsizeY / 256) * 256;
+    }
+
     if(aspect_ratio)
     {
-        int adjusted_width = ((main_window.actual_window.winsizex * 4) / 5) + 1;
+        int adjusted_width = ((elkConfig.display.native_window_width * 4) / 5) + 1;
         log_debug("Adjusted width = %d", adjusted_width);
-        if(adjusted_width > main_window.actual_window.winsizey)
+        if(adjusted_width > winsizeY)
         {
             // Resize based on height
-            winsizeX = ((main_window.actual_window.winsizey * 5) / 4) + 1;
-            winsizeY = main_window.actual_window.winsizey;
+            winsizeX = ((winsizeY * 5) / 4);
             log_debug("w > h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
         else
         {
-            winsizeX = main_window.actual_window.winsizex;
-            winsizeY = ((main_window.actual_window.winsizex * 3) / 4) + 1;
+            winsizeY = ((winsizeX * 4) / 5);
             log_debug("w <= h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
         // Calculate startx and starty offsets.
-        main_window.current_elk.startx = (main_window.actual_window.winsizex - winsizeX) / 2;
-        main_window.current_elk.starty = (main_window.actual_window.winsizey - winsizeY) / 2;
-    }
-    else
-    {
-        main_window.current_elk.startx = 0;
-        main_window.current_elk.starty = 0;
+        main_window.current_elk.startx = (elkConfig.display.native_window_width - winsizeX) / 2;
+        main_window.current_elk.starty = (elkConfig.display.native_window_height - winsizeY) / 2;
     }
 
     video_set_window_size(winsizeX, winsizeY, 0,0);
