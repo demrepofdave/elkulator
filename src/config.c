@@ -365,7 +365,7 @@ void log_config_vars()
 
     for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
     {
-        if(elkConfig.keyboard.host_key_mapping[host_key] != ELK_KEY_NONE)
+        if(elkConfig.keyboard.host_key_mapping[host_key] != keyboard_get_default_elk_key_from_host_key(host_key))
         {
             log_debug(" - %s       : %s", keyboard_get_hostkey_config_string(host_key), keyboard_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[host_key]));
         }

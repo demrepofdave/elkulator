@@ -37,7 +37,8 @@ elkulator_hal_src = src/host_abstraction_layer/allegro_4/2xsai.c \
                     src/host_abstraction_layer/allegro_4/samples.c \
                     src/host_abstraction_layer/allegro_4/fileutils.c \
                     src/host_abstraction_layer/allegro_4/allegro_icon.c \
-                    src/host_abstraction_layer/common/keyutils.c                    
+                    src/host_abstraction_layer/common/keyutils.c \
+                    src/host_abstraction_layer/common/native_time.c
 else
 elkulator_hal_src = src/host_abstraction_layer/allegro_5/adc.c  \
                     src/host_abstraction_layer/allegro_5/event_handler.c \
@@ -58,7 +59,8 @@ elkulator_hal_src = src/host_abstraction_layer/allegro_5/adc.c  \
                     src/host_abstraction_layer/allegro_5/soundopenal.c \
                     src/host_abstraction_layer/allegro_5/video.c \
                     src/host_abstraction_layer/allegro_5/keyboard_gui.c \
-                    src/host_abstraction_layer/common/keyutils.c
+                    src/host_abstraction_layer/common/keyutils.c \
+                    src/host_abstraction_layer/common/native_time.c
 endif
 
 elkulator_SOURCES = src/1770.c \

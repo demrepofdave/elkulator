@@ -42,12 +42,15 @@
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/fileutils.h"
 #include "host_abstraction_layer/hal.h"
+#include "host_abstraction_layer/native_time.h"
 #include "host_abstraction_layer/sound.h"
 #include "host_abstraction_layer/video.h"
 
 /******************************************************************************
 * Preprocessor Macros
 *******************************************************************************/
+
+#define RUNELK_AVERAGE_PERIOD  50
 
 /******************************************************************************
 * Typedefs
@@ -282,7 +285,7 @@ elkstate_t elk_state = ELK_STATE_INITIALIZING;
 
 native_timediff_t runelk()
 {       
-    native_timestamp_t timestamp_start = log_get_timestamp();
+    native_timestamp_t timestamp_start = native_timestamp_get();
     native_timediff_t  timestamp_diff  = 0;
     int c;
     //log_time_mark("=== runelk begin ===");
@@ -321,7 +324,7 @@ native_timediff_t runelk()
     // Record how long elkrun took (this will allow the calling
     // function to make adjustments if this function took too
     // long (e.g. rendering took longer than expected)
-    timestamp_diff = log_get_timestamp() - timestamp_start;
+    timestamp_diff = native_timestamp_get() - timestamp_start;
 
     return timestamp_diff;
 }
@@ -388,13 +391,15 @@ int main(int argc, char *argv[])
         }
     #else       
         resumeelk();
+        uint16_t current_runelk_entries = 0;
+        native_timediff_t cumulated_timediff = 0;
         char elk_timediff_str[28];
         char elk_cumulated_timediff_str[28];
         elk_event_t elkEvent = 0;
         native_timediff_t elk_runtime = 0;
         native_timediff_t native_timer_diff = 0;
         native_timediff_t native_cummulative_time_diff = 0;
-        native_timestamp_t native_timestamp_last_trigger = log_get_timestamp();
+        native_timestamp_t native_timestamp_last_trigger = native_timestamp_get();
         native_timestamp_t native_timestamp_current = 0;
         while (!(elkEvent & ELK_EVENT_EXIT))
         {
@@ -409,7 +414,7 @@ int main(int argc, char *argv[])
             //log_debug("elkEvent=%04x", elkEvent);
             if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
             {
-                native_timestamp_current = log_get_timestamp();
+                native_timestamp_current = native_timestamp_get();
                 native_timer_diff = native_timestamp_current - native_timestamp_last_trigger;
                 native_timestamp_last_trigger = native_timestamp_current;
                 native_cummulative_time_diff = native_cumulative_time_adjust(20000, native_cummulative_time_diff, native_timer_diff);
@@ -424,6 +429,9 @@ int main(int argc, char *argv[])
                     log_debug("elkruntime = %s (%s)", elk_timediff_str, elk_cumulated_timediff_str);
                 }
                 elk_runtime = runelk();
+
+                cumulated_timediff = cumulated_timediff + elk_runtime;
+                current_runelk_entries++;
 
                 // If tape is running and its speed is fast or really fast
                 // We need to runelk another 19 times (or until tape is
@@ -448,7 +456,19 @@ int main(int argc, char *argv[])
             else if(elkEvent & ELK_EVENT_HANDLED)
             {
                 // Menu may have been accessed, reset timing.
-                native_timestamp_last_trigger = log_get_timestamp();
+                native_timestamp_last_trigger = native_timestamp_get();
+            }
+            // Calculate average if triggered.
+            if(current_runelk_entries >= RUNELK_AVERAGE_PERIOD)
+            {
+                native_timediff_t average_timediff = cumulated_timediff / RUNELK_AVERAGE_PERIOD;
+                native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), average_timediff);
+                current_runelk_entries = 0;
+                cumulated_timediff = 0;
+
+                char window_title[128];
+                snprintf(window_title, 128, VERSION_STR "  (%s)", elk_timediff_str);
+                video_set_window_title(window_title);
             }
         }
     #endif // HAL_ALLEGRO_4

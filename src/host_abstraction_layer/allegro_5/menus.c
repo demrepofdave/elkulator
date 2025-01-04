@@ -321,7 +321,7 @@ elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
 
     hal_stop_timer();
 
-    log_debug("menu_handle_event: menu %p, id %d, num %d", menu, menu_id, num);
+    log_debug("menu %p, id %d, num %d", menu, menu_id, num);
 
     // Handle menu events.
     while(count < menu_registered_handlers && !(elkEvent & ELK_EVENT_HANDLED))
@@ -337,12 +337,12 @@ elk_event_t menu_handle_event(ALLEGRO_EVENT *event)
 
     if(!(elkEvent & ELK_EVENT_HANDLED))
     {
-        log_debug("menu_handle_event: menu event %d detected", menu_id);
+        log_debug("menu event %d detected", menu_id);
     }
 
     hal_start_timer();
 
-    log_debug("menu_handle_event elkEvent = 0x%02x", elkEvent);
+    log_debug("elkEvent = 0x%02x", elkEvent);
 
     return(elkEvent);
 }

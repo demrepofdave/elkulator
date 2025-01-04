@@ -71,7 +71,7 @@ elk_pallete_t elkpal[8] =
     0xffffffff
 };
 
-window_config_t main_window;
+window_info_elk_t current_elk_window;
 
 /******************************************************************************
 * Function Prototypes
@@ -87,7 +87,7 @@ void log_window_config(const char * title)
     log_debug("Window status (%s)", title);
     log_debug("-------------");
     log_debug("- Actual window: %d, %d", elkConfig.display.native_window_width, elkConfig.display.native_window_height);
-    log_debug("- Current Elk  : %d, %d", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
+    log_debug("- Current Elk  : %d, %d", current_elk_window.winsizex, current_elk_window.winsizey);
 }
 
 void video_set_gfx_mode_fullscreen()
@@ -118,7 +118,7 @@ void video_set_gfx_mode_windowed()
 
     video_apply_window_size();
 
-    al_resize_display(display, main_window.current_elk.winsizex,  main_window.current_elk.winsizey);
+    al_resize_display(display, current_elk_window.winsizex,  current_elk_window.winsizey);
     al_set_display_flag(display, ALLEGRO_MAXIMIZED, false);
     al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
@@ -129,8 +129,8 @@ void video_set_gfx_mode_windowed()
 void video_set_window_size(int w, int h, int v_w, int v_h)
 {
     log_debug("Set window size %d, %d", w, h);
-    main_window.current_elk.winsizex = w;
-    main_window.current_elk.winsizey = h;
+    current_elk_window.winsizex = w;
+    current_elk_window.winsizey = h;
 }
 
 /******************************************************************************
@@ -146,10 +146,10 @@ int video_init_begin()
         exit(-1);
     }
 
-    main_window.current_elk.winsizex = 800; // TODO: Will be configured in future
-    main_window.current_elk.winsizey = 600; // TODO: Will be configured in future
-    main_window.current_elk.startx = 0;
-    main_window.current_elk.starty = 0;
+    current_elk_window.winsizex = 800; // TODO: Will be configured in future
+    current_elk_window.winsizey = 600; // TODO: Will be configured in future
+    current_elk_window.startx = 0;
+    current_elk_window.starty = 0;
 
     al_init_native_dialog_addon();
     al_set_new_window_title(VERSION_STR);
@@ -174,7 +174,7 @@ int video_init_begin()
         log_debug("video: config vsync=%d, actual=%d", vsync, al_get_new_display_option(ALLEGRO_VSYNC, &temp));
     }
 
-    if ((display = al_create_display(main_window.current_elk.winsizex, main_window.current_elk.winsizey)) == NULL) {
+    if ((display = al_create_display(current_elk_window.winsizex, current_elk_window.winsizey)) == NULL) {
         log_fatal("video: unable to create display");
         exit(1);
     }
@@ -241,7 +241,6 @@ void video_update_native_window_size(int w, int h)
     elkConfig.display.native_window_width = w;
     elkConfig.display.native_window_height = h;
     log_debug("video_update_native_window_size(%d, %d)", w, h);
-    //main_window.actual_window.maintain_aspect = false;
 }
 
 void video_resize_elk_window(bool aspect_ratio)
@@ -249,18 +248,17 @@ void video_resize_elk_window(bool aspect_ratio)
     // Now we resize the screen based upon the above.
     int winsizeX = elkConfig.display.native_window_width;
     int winsizeY = elkConfig.display.native_window_height;
-    main_window.current_elk.startx = 0;
-    main_window.current_elk.starty = 0;
+    current_elk_window.startx = 0;
+    current_elk_window.starty = 0;
 
     log_window_config("video_resize_elk_window");
 
     // Maintain pixel ratio experimental code
-
-    if(winsizeX > 640 && winsizeY > 512)
-    {
-        winsizeX = (winsizeX / 320) * 320;
-        winsizeY = (winsizeY / 256) * 256;
-    }
+    //if(winsizeX > 640 && winsizeY > 512)
+    //{
+    //    winsizeX = (winsizeX / 320) * 320;
+    //    winsizeY = (winsizeY / 256) * 256;
+    //}
 
     if(aspect_ratio)
     {
@@ -278,8 +276,8 @@ void video_resize_elk_window(bool aspect_ratio)
             log_debug("w <= h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
         // Calculate startx and starty offsets.
-        main_window.current_elk.startx = (elkConfig.display.native_window_width - winsizeX) / 2;
-        main_window.current_elk.starty = (elkConfig.display.native_window_height - winsizeY) / 2;
+        current_elk_window.startx = (elkConfig.display.native_window_width - winsizeX) / 2;
+        current_elk_window.starty = (elkConfig.display.native_window_height - winsizeY) / 2;
     }
 
     video_set_window_size(winsizeX, winsizeY, 0,0);
@@ -407,24 +405,24 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
             blit_scanlines(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,512,
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
 
         case LINEDBL:
             blit_normal(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
 
         case _2XSAI:  // TODO: Get filter working for allegro5
             blit_normal(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             //blit(b,b162,0,0,0,0,640,256);
             //Super2xSaI(elk_screen_data,b,0,0,0,0,640,256);
             //al_set_target_backbuffer(al_get_current_display());
@@ -437,16 +435,16 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
             scale2x(elk_screen_data, b16, 640,256);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b16, 0,0,1280,512, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
 
         case EAGLE: // TODO: Get filter working for allegro5
             blit_normal(b, elk_screen_data);
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             //blit(b,b162,0,0,0,0,640,256);
             //SuperEagle(b162,b16,0,0,0,0,320,256);
             //al_set_target_backbuffer(al_get_current_display());
@@ -461,8 +459,8 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
             //log_time_mark("video_blit_to_screen - pmid");
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,512, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
         }
     }

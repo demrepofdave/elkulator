@@ -53,7 +53,7 @@ PALETTE elkpal =
 
 int coldepth;
 
-window_config_t main_window;
+window_info_elk_t current_elk_window;
 
 /******************************************************************************
 * Private Function Definitions
@@ -72,12 +72,12 @@ void video_set_desktop_color_depth()
 
 void video_set_gfx_mode_fullscreen()
 {
-    set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, main_window.current_elk.winsizex, main_window.current_elk.winsizey, 0, 0);
+    set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, current_elk_window.winsizex, current_elk_window.winsizey, 0, 0);
 }
 
 void video_set_gfx_mode_windowed()
 {
-    set_gfx_mode(GFX_AUTODETECT_WINDOWED, main_window.current_elk.winsizex, main_window.current_elk.winsizey, 0,0);
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED, current_elk_window.winsizex, current_elk_window.winsizey, 0,0);
 }
 
 /******************************************************************************
@@ -156,8 +156,8 @@ void video_leavefullscreen()
 
 void video_set_window_size(int w, int h, int v_w, int v_h)
 {
-    main_window.current_elk.winsizex = w;
-    main_window.current_elk.winsizey = h;
+    current_elk_window.winsizex = w;
+    current_elk_window.winsizey = h;
 }
 
 
@@ -225,39 +225,39 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
     {
         case SCANLINES:
             blit_scanlines(b, elk_screen_data);
-            blit(b,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
+            blit(b,screen,0,0,(current_elk_window.winsizex-640)/2,(current_elk_window.winsizey-512)/2,640,512);
             break;
 
         case LINEDBL:
             blit_normal(b, elk_screen_data);
-            blit(b,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
+            blit(b,screen,0,0,(current_elk_window.winsizex-640)/2,(current_elk_window.winsizey-512)/2,640,512);
             break;
 
         case _2XSAI:
             blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             Super2xSaI(b162,b16,0,0,0,0,320,256);
-            blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
+            blit(b16,screen,0,0,(current_elk_window.winsizex-640)/2,(current_elk_window.winsizey-512)/2,640,512);
             break;
 
         case SCALE2X:
             blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             scale2x(b162,b16,320,256);
-            blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
+            blit(b16,screen,0,0,(current_elk_window.winsizex-640)/2,(current_elk_window.winsizey-512)/2,640,512);
             break;
 
         case EAGLE:
             blit_normal(b, elk_screen_data);
             blit(b,b162,0,0,0,0,640,256);
             SuperEagle(b162,b16,0,0,0,0,320,256);
-            blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
+            blit(b16,screen,0,0,(current_elk_window.winsizex-640)/2,(current_elk_window.winsizey-512)/2,640,512);
             break;
 
         case PAL: // TODO: Not currently working (blank screen)
             blit_normal(b, elk_screen_data);
             palfilter(b,b16,coldepth);
-            blit(b16,screen,0,0,(main_window.current_elk.winsizex-640)/2,(main_window.current_elk.winsizey-512)/2,640,512);
+            blit(b16,screen,0,0,(current_elk_window.winsizex-640)/2,(current_elk_window.winsizey-512)/2,640,512);
             break;
     }
     set_color_depth(8);

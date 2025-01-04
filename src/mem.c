@@ -434,7 +434,7 @@ void makekeyl()
 
         // Rest of keyboard intialisation.
         keyboard_makelayout();
-        keyboard_debug_dump();
+        //keyboard_debug_dump();
 }
 
 uint8_t readkeys(uint16_t addr)

@@ -39,31 +39,6 @@
 #define EAGLE     4
 #define PAL       5 
 
-/******************************************************************************
-* Typedefs
-*******************************************************************************/
-
-// This structure will all information related to the native window state
-// and coordinates.
-
-typedef struct
-{
-    int winsizex;         // Current window size in pixels
-    int winsizey;         // Current window size in pixels
-} window_info_native_t;
-typedef struct
-{
-    int startx;           // Start position within the native window for the electron window.
-    int starty;           // Start position within the native window for the electron window.
-    int winsizex;         // Current window size in pixels
-    int winsizey;         // Current window size in pixels
-} window_info_elk_t;
-
-typedef struct
-{
-    window_info_native_t actual_window;  // Main window size
-    window_info_elk_t current_elk;    // Window size electron
-} window_config_t;
 
 /******************************************************************************
 * Public Function Definitions
