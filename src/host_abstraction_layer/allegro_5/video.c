@@ -231,9 +231,14 @@ void video_init_complete()
     initpaltables();
 }
 
-void video_set_window_title(const char * title)
+void video_set_window_title(char * format, ...)
 {
-    al_set_window_title(display, title);
+    char window_title_buffer[256];
+    va_list args;
+    va_start (args, format);
+    vsnprintf (window_title_buffer, sizeof(window_title_buffer), format, args);
+    va_end (args);
+    al_set_window_title(display, window_title_buffer);
 }
 
 void video_update_native_window_size(int w, int h)

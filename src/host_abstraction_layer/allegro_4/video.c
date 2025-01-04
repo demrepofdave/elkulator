@@ -346,7 +346,7 @@ void video_stop_timer()
     // For allegro4 there is nothing to do.
 }
 
-void video_set_window_title(const char * title)
+void video_set_window_title(char * format, ...)
 {
     // TODO: Allegro4 version.
 }

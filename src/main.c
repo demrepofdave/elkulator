@@ -465,10 +465,7 @@ int main(int argc, char *argv[])
                 native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), average_timediff);
                 current_runelk_entries = 0;
                 cumulated_timediff = 0;
-
-                char window_title[128];
-                snprintf(window_title, 128, VERSION_STR "  (%s)", elk_timediff_str);
-                video_set_window_title(window_title);
+                video_set_window_title(VERSION_STR "  (%s)", elk_timediff_str);
             }
         }
     #endif // HAL_ALLEGRO_4
