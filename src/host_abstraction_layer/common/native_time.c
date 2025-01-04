@@ -15,9 +15,12 @@
 *******************************************************************************/
 #include <time.h>
 #include <sys/time.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "host_abstraction_layer/native_time.h"
+#include "logger.h"
 
 
 /******************************************************************************
@@ -38,7 +41,6 @@ typedef struct
 static t_timeEntry log_timing_list[1024];
 
 static int timeEntryIndex = 0;
-
 
 /******************************************************************************
 * Public Function Definitions
@@ -114,5 +116,64 @@ void log_time_display()
                                                                (diff_last / 1000), (diff_last %1000), 
                                                                log_timing_list[count].msg);
         previous_timestamp = log_timing_list[count].timestamp;
+    }
+}
+
+// Average performance statistic functions
+void native_time_init_average(t_timeDiffAverage *timediffavg, uint16_t max_samples)
+{
+    if(timediffavg)
+    {
+        timediffavg->max_samples = max_samples;
+        timediffavg->current_sample = 0;
+        timediffavg->cumulated_timediff = 0;
+    }
+}
+
+void native_time_add_sample(t_timeDiffAverage *timediffavg, native_timediff_t timediff)
+{
+    if(timediffavg && timediffavg->current_sample < timediffavg->max_samples)
+    {
+        timediffavg->current_sample++;
+        timediffavg->cumulated_timediff += timediff;
+    }
+}
+
+bool native_time_all_samples_collected(t_timeDiffAverage *timediffavg)
+{
+    bool result = false;
+    if(timediffavg && timediffavg->current_sample == timediffavg->max_samples)
+    {
+        result = true;
+    }
+    return(result);
+}
+
+void native_time_log_average(t_timeDiffAverage *timediffavg, const char * label)
+{
+    if(timediffavg)
+    {
+        char elk_timediff_str[28];
+        native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), native_time_get_average(timediffavg));
+        log_debug("%s - %s",elk_timediff_str, label);
+    }
+}
+
+native_timediff_t native_time_get_average(t_timeDiffAverage *timediffavg)
+{
+    native_timediff_t average_timediff = 0;
+    if(timediffavg)
+    {
+        average_timediff = timediffavg->cumulated_timediff / timediffavg->current_sample;
+    }
+    return (average_timediff);
+}
+
+void native_time_reset_samples(t_timeDiffAverage *timediffavg)
+{
+    if(timediffavg)
+    {
+        timediffavg->current_sample = 0;
+        timediffavg->cumulated_timediff = 0;
     }
 }

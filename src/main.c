@@ -83,6 +83,8 @@ int fullscreen=0;
 extern int wantloadstate;
 extern int wantsavestate;
 
+t_timeDiffAverage runelk_runtime_average;
+
 /******************************************************************************
 * Private Function Definitions
 *******************************************************************************/
@@ -391,8 +393,7 @@ int main(int argc, char *argv[])
         }
     #else       
         resumeelk();
-        uint16_t current_runelk_entries = 0;
-        native_timediff_t cumulated_timediff = 0;
+        native_time_init_average(&runelk_runtime_average, RUNELK_AVERAGE_PERIOD);
         char elk_timediff_str[28];
         char elk_cumulated_timediff_str[28];
         elk_event_t elkEvent = 0;
@@ -430,8 +431,7 @@ int main(int argc, char *argv[])
                 }
                 elk_runtime = runelk();
 
-                cumulated_timediff = cumulated_timediff + elk_runtime;
-                current_runelk_entries++;
+                native_time_add_sample(&runelk_runtime_average, elk_runtime);
 
                 // If tape is running and its speed is fast or really fast
                 // We need to runelk another 19 times (or until tape is
@@ -459,13 +459,11 @@ int main(int argc, char *argv[])
                 native_timestamp_last_trigger = native_timestamp_get();
             }
             // Calculate average if triggered.
-            if(current_runelk_entries >= RUNELK_AVERAGE_PERIOD)
+            if(native_time_all_samples_collected(&runelk_runtime_average))
             {
-                native_timediff_t average_timediff = cumulated_timediff / RUNELK_AVERAGE_PERIOD;
-                native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), average_timediff);
-                current_runelk_entries = 0;
-                cumulated_timediff = 0;
+                native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), native_time_get_average(&runelk_runtime_average));
                 video_set_window_title(VERSION_STR "  (%s)", elk_timediff_str);
+                native_time_reset_samples(&runelk_runtime_average);
             }
         }
     #endif // HAL_ALLEGRO_4

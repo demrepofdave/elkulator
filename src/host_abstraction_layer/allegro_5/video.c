@@ -31,6 +31,7 @@
 #include "host_abstraction_layer/video.h"
 #include "host_abstraction_layer/allegro_5//menu_internal.h"
 #include "logger.h"
+#include "host_abstraction_layer/native_time.h"
 #include "config_vars.h"
 #include "elk.h"
 #include "video_internal.h"
@@ -397,17 +398,26 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 }
 
 
+t_timeDiffAverage video_blit_average;
+t_timeDiffAverage video_scaled_draw_average;
+
 void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 {
     //log_timer_begin();
     //log_time_mark("video_blit_to_screen - start");
 
+    native_time_init_average(&video_blit_average, 50);
+    native_time_init_average(&video_scaled_draw_average, 50);
+
+    native_timestamp_t timestamp = native_timestamp_get();
     startblit();
 
     switch (drawMode)
     {
         case SCANLINES:
             blit_scanlines(b, elk_screen_data);
+            native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+            timestamp = native_timestamp_get();
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,512,
                                      current_elk_window.startx, current_elk_window.starty,
@@ -416,6 +426,8 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 
         case LINEDBL:
             blit_normal(b, elk_screen_data);
+            native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+            timestamp = native_timestamp_get();
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
                                      current_elk_window.startx, current_elk_window.starty,
@@ -424,6 +436,9 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 
         case _2XSAI:  // TODO: Get filter working for allegro5
             blit_normal(b, elk_screen_data);
+            native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+            timestamp = native_timestamp_get();
+
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
                                      current_elk_window.startx, current_elk_window.starty,
@@ -438,6 +453,8 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 
         case SCALE2X:
             scale2x(elk_screen_data, b16, 640,256);
+            native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+            timestamp = native_timestamp_get();
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b16, 0,0,1280,512, 
                                      current_elk_window.startx, current_elk_window.starty,
@@ -446,6 +463,8 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 
         case EAGLE: // TODO: Get filter working for allegro5
             blit_normal(b, elk_screen_data);
+            native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+            timestamp = native_timestamp_get();
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
                                      current_elk_window.startx, current_elk_window.starty,
@@ -461,6 +480,8 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
         case PAL:
         {
             palfilter(b, elk_screen_data);
+            native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+            timestamp = native_timestamp_get();
             //log_time_mark("video_blit_to_screen - pmid");
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,512, 
@@ -472,6 +493,20 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 
     al_flip_display();
     endblit();
+    native_time_add_sample(&video_scaled_draw_average, native_timestamp_get() - timestamp);
+
+    log_debug("avgct=%d, %d", video_blit_average.current_sample, video_blit_average.max_samples);
+    if(native_time_all_samples_collected(&video_blit_average))
+    {
+        native_time_log_average(&video_blit_average, "blit average");
+        native_time_reset_samples(&video_blit_average);
+    }
+
+    if(native_time_all_samples_collected(&video_scaled_draw_average))
+    {
+        native_time_log_average(&video_scaled_draw_average, "scaled draw average");
+        native_time_reset_samples(&video_scaled_draw_average);
+    }
 }
 
 void video_capture_screenshot(int drawMode)
