@@ -359,19 +359,24 @@ void blit_normal(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
     int x = 0;
     int color = 0;
     char * region_data = NULL;
+    char * region_data_line = NULL;
+    uint8_t * elk_pixel = elk_screen_data;
     
     ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+
+    region_data_line = (char *)destRegion->data;
 
     // Here we create B from the memory data we have assembled.
     for(y=0; y<256; y++)
     {
-        region_data = (char *)destRegion->data + (destRegion->pitch * y);
+        region_data = region_data_line;
         for(x=0; x<640; x++)
         {
-            color = *(elk_screen_data + (y * 640) + x);
+            color = *elk_pixel++;
             *((uint32_t *)((char *)region_data)) = elkpal[color];
             region_data += destRegion->pixel_size;
         }
+        region_data_line += destRegion->pitch;
     }
     al_unlock_bitmap(destBitmap);
 }
