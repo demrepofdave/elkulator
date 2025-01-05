@@ -51,6 +51,7 @@
 *******************************************************************************/
 
 #define RUNELK_AVERAGE_PERIOD  50
+#define ACCEPTABLE_CUMULATED_TIMEDIFF 5000
 
 /******************************************************************************
 * Typedefs
@@ -421,7 +422,7 @@ int main(int argc, char *argv[])
                 native_cummulative_time_diff = native_cumulative_time_adjust(20000, native_cummulative_time_diff, native_timer_diff);
 
                 //drawit++;
-                if(native_cummulative_time_diff > 20000)
+                if(native_cummulative_time_diff > ACCEPTABLE_CUMULATED_TIMEDIFF)
                 {
                     pause_video_blit();
                     // Print out some stats for debug purposes.
@@ -445,7 +446,7 @@ int main(int argc, char *argv[])
                 bool skip_video_refresh = false;
                 while(count && is_tapeon() && (is_csw() || is_uef()) && elkConfig.tape.speed)
                 {
-                    if(elk_runtime > 20000 && !skip_video_refresh)
+                    if(elk_runtime > ACCEPTABLE_CUMULATED_TIMEDIFF && !skip_video_refresh)
                     {
                         log_debug("!!tape skip video refresh disabled!!");
                         skip_video_refresh = true;

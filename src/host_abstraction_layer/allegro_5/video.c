@@ -404,7 +404,6 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
             *((uint32_t *)((char *)region_data)) = elkpal[color];
             *((uint32_t *)((char *)region_data + destRegion->pitch)) = 0xff000000;
             region_data += destRegion->pixel_size;
-            //region_scan += destRegion->pixel_size;
         }
         region_data_line += (destRegion->pitch * 2);
     }
@@ -415,6 +414,8 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 {
     native_timestamp_t timestamp = native_timestamp_get();
+    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
+    al_draw_filled_rectangle(0,0, elkConfig.display.native_window_width, elkConfig.display.native_window_height, blue);
     startblit();
 
     switch (drawMode)
