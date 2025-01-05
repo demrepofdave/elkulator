@@ -132,7 +132,8 @@ void native_time_init_average(t_timeDiffAverage *timediffavg, uint16_t max_sampl
 
 void native_time_add_sample(t_timeDiffAverage *timediffavg, native_timediff_t timediff)
 {
-    if(timediffavg && timediffavg->current_sample < timediffavg->max_samples)
+    
+    if(timediffavg && (timediffavg->current_sample < timediffavg->max_samples))
     {
         timediffavg->current_sample++;
         timediffavg->cumulated_timediff += timediff;

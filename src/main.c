@@ -431,7 +431,10 @@ int main(int argc, char *argv[])
                 }
                 elk_runtime = runelk();
 
-                native_time_add_sample(&runelk_runtime_average, elk_runtime);
+                if(elkConfig.stats.titlebar_performance_stats)
+                {
+                    native_time_add_sample(&runelk_runtime_average, elk_runtime);
+                }
 
                 // If tape is running and its speed is fast or really fast
                 // We need to runelk another 19 times (or until tape is
@@ -459,11 +462,14 @@ int main(int argc, char *argv[])
                 native_timestamp_last_trigger = native_timestamp_get();
             }
             // Calculate average if triggered.
-            if(native_time_all_samples_collected(&runelk_runtime_average))
+            if(elkConfig.stats.titlebar_performance_stats)
             {
-                native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), native_time_get_average(&runelk_runtime_average));
-                video_set_window_title(VERSION_STR "  (%s)", elk_timediff_str);
-                native_time_reset_samples(&runelk_runtime_average);
+                if(native_time_all_samples_collected(&runelk_runtime_average))
+                {
+                    native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), native_time_get_average(&runelk_runtime_average));
+                    video_set_window_title(VERSION_STR "  (%s)", elk_timediff_str);
+                    native_time_reset_samples(&runelk_runtime_average);
+                }
             }
         }
     #endif // HAL_ALLEGRO_4

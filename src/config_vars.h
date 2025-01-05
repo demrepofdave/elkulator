@@ -86,6 +86,14 @@ typedef struct
     uint32_t native_window_height;
 } display_config_t;
 
+// Enable/disable various elkulator performance monitoring statistics
+typedef struct 
+{
+    bool titlebar_performance_stats;
+    bool blitting_performance_stats;
+} stats_config_t;
+
+
 typedef struct
 {
     elk_key_id_t host_key_mapping[HOST_KEY_MAX]; // Host key to elk key mapping (0 = use default)
@@ -99,6 +107,7 @@ typedef struct
     keyboard_config_t  keyboard;
     tape_config_t      tape;
     disc_config_t      disc;
+    stats_config_t     stats;
 } elk_config_t;
 
 extern elk_config_t elkConfig;

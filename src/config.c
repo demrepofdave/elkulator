@@ -252,6 +252,10 @@ void loadconfig()
         elkConfig.expansion.enable_mgc                = getboolcfg("enable_mgc", false);
         elkConfig.expansion.enable_db_flash_cartridge = getboolcfg("enable_db_flash_cartridge", false);
 
+        /* Elkulator specific performance statistics */
+        elkConfig.stats.titlebar_performance_stats = getboolcfg("enable_titlebar_stats", true);
+        elkConfig.stats.blitting_performance_stats = getboolcfg("enable_blitting_stats", false);
+
         fclose(cfgfile);
 }
 
@@ -317,6 +321,10 @@ void saveconfig()
         writeboolcfg("enable_mgc",                elkConfig.expansion.enable_mgc);
         writeboolcfg("enable_db_flash_cartridge", elkConfig.expansion.enable_db_flash_cartridge);
 
+        /* Elkulator specific performance statistics */
+        writeboolcfg("enable_titlebar_stats", elkConfig.stats.titlebar_performance_stats);
+        writeboolcfg("enable_blitting_stats", elkConfig.stats.blitting_performance_stats);
+
         fclose(cfgfile);
 }
 
@@ -376,4 +384,9 @@ void log_config_vars()
     log_debug("  - defaultwriteprot : %d", elkConfig.disc.defaultwriteprot);
     log_debug("  - discname         : %s", elkConfig.disc.discname);
     log_debug("  - discname2        : %s", elkConfig.disc.discname2);
+
+    log_debug("- stats:");
+    log_debug("  - titlebar_performance_stats : %d", elkConfig.stats.titlebar_performance_stats);
+    log_debug("  - blitting_performance_stats : %d", elkConfig.stats.blitting_performance_stats);
+
  }

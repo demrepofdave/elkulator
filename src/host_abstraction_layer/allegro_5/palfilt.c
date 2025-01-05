@@ -5,7 +5,7 @@
  * palfilt.c
  * 
  * Contains all functions to initialize and use the palfilter for
- * electrn video output.
+ * electron video output.
  * 
  * This is the allegro 5 implementation of the pal filter.
  *
