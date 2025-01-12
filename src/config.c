@@ -155,6 +155,8 @@ void loadconfig()
         elkConfig.expansion.enable_jim = getboolcfg("enable_jim", false);
 
         elkConfig.display.drawmode=getintcfg("filter",0);
+
+        elkConfig.display.fullscreen = 0; // Currently this is not saved in the elk.cfg file.
         
         s=getstringcfg("discname_0");
         if (s)

@@ -24,6 +24,8 @@
 #include "host_abstraction_layer/video.h"
 
 elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_video_fullscreen(ALLEGRO_EVENT * event);
+
 elk_event_t menu_handle_toggle_aspect_ratio(ALLEGRO_EVENT * event);
 
 elk_event_t menu_handle_toggle_internal_sound(ALLEGRO_EVENT * event);
@@ -103,7 +105,8 @@ static ALLEGRO_MENU *create_settings_video_menu(void)
 
     add_radio_set(sub_menu_display_type, settings_video_display_type, IDM_SETTINGS_VIDEO_DISPLAY, elkConfig.display.drawmode, menu_handle_video_display_set);
 
-    al_append_menu_item(menu, "Fullscreen",            IDM_SETTINGS_VIDEO_FULLSCREEN, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+    add_checkbox_item(menu, "Fullscreen",    IDM_SETTINGS_VIDEO_FULLSCREEN, elkConfig.display.fullscreen,      menu_handle_video_fullscreen);
+
     return menu;
 }
 
@@ -207,12 +210,28 @@ elk_event_t menu_handle_video_display_set(ALLEGRO_EVENT * event)
     return(ELK_EVENT_NONE);
 }
 
+// Called when IDM_SETTINGS_VIDEO_DISPLAY event is recieved.
+elk_event_t menu_handle_video_fullscreen(ALLEGRO_EVENT * event)
+{
+    log_debug("Fullscreen!");
+    elkConfig.display.fullscreen=!elkConfig.display.fullscreen;
+    if(elkConfig.display.fullscreen)
+    {
+        video_enterfullscreen();
+    }
+    else
+    {
+        video_leavefullscreen();
+    }
+    return(ELK_EVENT_NONE);
+}
+
 // Called when IDM_SETTINGS_SOUND_INTERNAL_SPEAKER event is recieved.
 elk_event_t menu_handle_toggle_aspect_ratio(ALLEGRO_EVENT * event)
 {
     elkConfig.display.maintain_aspect_ratio=!elkConfig.display.maintain_aspect_ratio;
-    video_resize_elk_window((elkConfig.display.maintain_aspect_ratio == 1));
-return(ELK_EVENT_NONE);
+    video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, (elkConfig.display.maintain_aspect_ratio == 1));
+    return(ELK_EVENT_NONE);
 }
 
 // Called when IDM_SETTINGS_SOUND_INTERNAL_SPEAKER event is recieved.

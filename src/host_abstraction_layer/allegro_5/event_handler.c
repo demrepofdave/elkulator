@@ -104,7 +104,9 @@ elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
     al_acknowledge_resize(event->display.source);
     log_debug("ALLEGRO_EVENT_DISPLAY_RESIZE - received");
     video_update_native_window_size(event->display.width, event->display.height +26);
-    video_resize_elk_window((elkConfig.display.maintain_aspect_ratio == 1));
+    ALLEGRO_DISPLAY *display = al_get_current_display();
+    log_debug("coords %d, %d", al_get_display_width(display), al_get_display_height(display));
+    video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, (elkConfig.display.maintain_aspect_ratio == 1));
     //video_clearall();
     // endif
     return 0;

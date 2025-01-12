@@ -82,8 +82,9 @@ typedef struct
     uint8_t videoresize;
     uint8_t maintain_aspect_ratio;
     uint8_t maintain_pixel_ratio;
-    uint32_t native_window_width;
-    uint32_t native_window_height;
+    uint32_t native_window_width;           // Non-fullscreen mode window width.
+    uint32_t native_window_height;          // Non-fullscreen mode window height.
+    uint8_t fullscreen;
 } display_config_t;
 
 // Enable/disable various elkulator performance monitoring statistics

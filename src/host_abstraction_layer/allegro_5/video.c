@@ -73,6 +73,7 @@ elk_pallete_t elkpal[8] =
 };
 
 window_info_elk_t current_elk_window;
+window_info_elk_t non_fullscreen_elk_window;
 
 t_timeDiffAverage video_blit_average;
 t_timeDiffAverage video_scaled_draw_average;
@@ -89,7 +90,7 @@ t_timeDiffAverage video_scaled_draw_average;
 void log_window_config(const char * title)
 {
     log_debug("Window status (%s)", title);
-    log_debug("- Actual window:%6d,%6d  Current Elk:%6d,%6d", 
+    log_debug("Actual window:%6d,%6d  Current Elk:%6d,%6d", 
                     elkConfig.display.native_window_width, elkConfig.display.native_window_height,
                     current_elk_window.winsizex, current_elk_window.winsizey);
 }
@@ -108,9 +109,9 @@ void video_set_gfx_mode_fullscreen()
     }
 }
 
-void video_apply_window_size()
+void video_update_write_border()
 {
-    log_window_config("video_apply_window_size");
+    log_window_config("video_update_write_border");
     ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
     al_draw_filled_rectangle(0,0, elkConfig.display.native_window_width, elkConfig.display.native_window_height, blue);
 }
@@ -120,12 +121,12 @@ void video_set_gfx_mode_windowed()
     ALLEGRO_DISPLAY *display;
     display = al_get_current_display();
 
-    video_apply_window_size();
-
     al_resize_display(display, current_elk_window.winsizex,  current_elk_window.winsizey);
     al_set_display_flag(display, ALLEGRO_MAXIMIZED, false);
     al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
+
+    video_update_write_border();
 //    al_set_display_flag
 //    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
 }
@@ -135,6 +136,11 @@ void video_set_window_size(int w, int h, int v_w, int v_h)
     log_debug("Set window size %d, %d", w, h);
     current_elk_window.winsizex = w;
     current_elk_window.winsizey = h;
+    if(!elkConfig.display.fullscreen)
+    {
+        non_fullscreen_elk_window.winsizex = w;
+        non_fullscreen_elk_window.winsizey = h;
+    }
 }
 
 /******************************************************************************
@@ -255,11 +261,11 @@ void video_update_native_window_size(int w, int h)
     //log_debug("video_update_native_window_size(%d, %d)", w, h);
 }
 
-void video_resize_elk_window(bool aspect_ratio)
+void video_resize_elk_window(int width, int height, bool aspect_ratio)
 {
     // Now we resize the screen based upon the above.
-    int winsizeX = elkConfig.display.native_window_width;
-    int winsizeY = elkConfig.display.native_window_height;
+    int winsizeX = width;
+    int winsizeY = height;
     current_elk_window.startx = 0;
     current_elk_window.starty = 0;
 
@@ -274,7 +280,7 @@ void video_resize_elk_window(bool aspect_ratio)
 
     if(aspect_ratio)
     {
-        int adjusted_width = ((elkConfig.display.native_window_width * 4) / 5) + 1;
+        int adjusted_width = ((width * 4) / 5) + 1;
         //log_debug("Adjusted width = %d", adjusted_width);
         if(adjusted_width > winsizeY)
         {
@@ -288,12 +294,12 @@ void video_resize_elk_window(bool aspect_ratio)
             //log_debug("w <= h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
         // Calculate startx and starty offsets.
-        current_elk_window.startx = (elkConfig.display.native_window_width - winsizeX) / 2;
-        current_elk_window.starty = (elkConfig.display.native_window_height - winsizeY) / 2;
+        current_elk_window.startx = (width - winsizeX) / 2;
+        current_elk_window.starty = (height - winsizeY) / 2;
     }
 
     video_set_window_size(winsizeX, winsizeY, 0,0);
-    video_apply_window_size();
+    video_update_write_border();
 }
 
 void video_register_close_button_handler(void (*handler_function)(void))
@@ -315,7 +321,10 @@ void video_enterfullscreen()
 {
         video_set_window_size(800,600, 0, 0);
         video_set_gfx_mode_fullscreen();
-        video_set_window_size(800,600, 0, 0);
+        ALLEGRO_DISPLAY *display = al_get_current_display();
+        log_debug("fullscreen mode coords %d, %d", al_get_display_width(display), al_get_display_height(display));
+        video_set_window_size(al_get_display_width(display), al_get_display_height(display), 0, 0);
+        video_resize_elk_window(current_elk_window.winsizex, current_elk_window.winsizey, elkConfig.display.maintain_aspect_ratio);
 }
 
 void video_leavefullscreen()
@@ -330,7 +339,8 @@ void video_leavefullscreen()
 //        video_set_gfx_mode_windowed(048,2048,0,0);
 //        vidb=create_video_bitmap(800,300);
 //        #else
-        video_set_window_size(640,512,0,0);
+        video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
+        video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, elkConfig.display.maintain_aspect_ratio);
         video_set_gfx_mode_windowed();
 //        #endif
 }
