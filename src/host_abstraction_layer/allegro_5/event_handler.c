@@ -91,6 +91,9 @@ bool register_main_event_handlers()
     result &= register_event_handler(ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY, handle_null_event);
     result &= register_event_handler(ALLEGRO_EVENT_DISPLAY_RESIZE,      handle_window_resize_event);
 
+    // Events that we always ignore.
+
+
     return result;
 }
 
@@ -99,6 +102,7 @@ elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
 {
     // if not fullscreen!
     al_acknowledge_resize(event->display.source);
+    log_debug("ALLEGRO_EVENT_DISPLAY_RESIZE - received");
     video_update_native_window_size(event->display.width, event->display.height +26);
     video_resize_elk_window((elkConfig.display.maintain_aspect_ratio == 1));
     //video_clearall();
@@ -152,14 +156,14 @@ uint32_t event_await()
             count++;
         }
 
-        //if(!(elkEvent & ELK_EVENT_HANDLED))
-        //{
-        //    log_debug("event_await: event %d handled", event.type);
-        //}
-        //else if(event.type != ALLEGRO_EVENT_TIMER && event.type != ALLEGRO_EVENT_MOUSE_AXES)
-        //{
-        //    log_debug("event_await: event %d detected", event.type);
-        //}
+        if(!(elkEvent & ELK_EVENT_HANDLED))
+        {
+            //log_debug("event_await: event %d handled", event.type);
+        }
+        else if(!(elkEvent & ELK_EVENT_HANDLED) && (event.type != ALLEGRO_EVENT_TIMER))
+        {
+            log_debug("event_await: event %d detected", event.type);
+        }
     }
 
     if(elkEvent & ELK_EVENT_RESET)

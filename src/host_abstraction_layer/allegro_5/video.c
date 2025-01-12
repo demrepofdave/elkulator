@@ -89,9 +89,9 @@ t_timeDiffAverage video_scaled_draw_average;
 void log_window_config(const char * title)
 {
     log_debug("Window status (%s)", title);
-    log_debug("-------------");
-    log_debug("- Actual window: %d, %d", elkConfig.display.native_window_width, elkConfig.display.native_window_height);
-    log_debug("- Current Elk  : %d, %d", current_elk_window.winsizex, current_elk_window.winsizey);
+    log_debug("- Actual window:%6d,%6d  Current Elk:%6d,%6d", 
+                    elkConfig.display.native_window_width, elkConfig.display.native_window_height,
+                    current_elk_window.winsizex, current_elk_window.winsizey);
 }
 
 void video_set_gfx_mode_fullscreen()
@@ -252,7 +252,7 @@ void video_update_native_window_size(int w, int h)
 {
     elkConfig.display.native_window_width = w;
     elkConfig.display.native_window_height = h;
-    log_debug("video_update_native_window_size(%d, %d)", w, h);
+    //log_debug("video_update_native_window_size(%d, %d)", w, h);
 }
 
 void video_resize_elk_window(bool aspect_ratio)
@@ -263,7 +263,7 @@ void video_resize_elk_window(bool aspect_ratio)
     current_elk_window.startx = 0;
     current_elk_window.starty = 0;
 
-    log_window_config("video_resize_elk_window");
+    //log_window_config("video_resize_elk_window");
 
     // Maintain pixel ratio experimental code
     //if(winsizeX > 640 && winsizeY > 512)
@@ -275,17 +275,17 @@ void video_resize_elk_window(bool aspect_ratio)
     if(aspect_ratio)
     {
         int adjusted_width = ((elkConfig.display.native_window_width * 4) / 5) + 1;
-        log_debug("Adjusted width = %d", adjusted_width);
+        //log_debug("Adjusted width = %d", adjusted_width);
         if(adjusted_width > winsizeY)
         {
             // Resize based on height
             winsizeX = ((winsizeY * 5) / 4);
-            log_debug("w > h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
+            //log_debug("w > h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
         else
         {
             winsizeY = ((winsizeX * 4) / 5);
-            log_debug("w <= h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
+            //log_debug("w <= h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
         // Calculate startx and starty offsets.
         current_elk_window.startx = (elkConfig.display.native_window_width - winsizeX) / 2;
