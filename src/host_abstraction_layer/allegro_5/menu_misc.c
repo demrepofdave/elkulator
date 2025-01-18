@@ -17,6 +17,7 @@
 #include "callback_handlers.h"
 #include "menu_internal.h"
 #include "logger.h"
+#include "host_abstraction_layer/video.h"
 
 elk_event_t menu_handle_screenshot(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_startmovie(ALLEGRO_EVENT * event);
@@ -112,6 +113,12 @@ elk_event_t menu_handle_stopmovie (ALLEGRO_EVENT * event)
 // Called when IDM_SETTINGS_MISC_START_DEBUGGING event is recieved.
 elk_event_t menu_handle_enable_debugger (ALLEGRO_EVENT * event)
 {
+    // To run the debugger we must leave fullscreen mode.
+    if(elkConfig.display.fullscreen)
+    {
+        elkConfig.display.fullscreen = 0;
+        video_leavefullscreen();
+    }
     callback_handlers.handle_enable_debugger();
     return(ELK_EVENT_NONE);
 }
