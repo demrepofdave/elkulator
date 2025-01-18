@@ -78,6 +78,9 @@ window_info_elk_t non_fullscreen_elk_window;
 t_timeDiffAverage video_blit_average;
 t_timeDiffAverage video_scaled_draw_average;
 
+uint8_t refreshBorder = 2;
+uint32_t menutimer = 0;
+
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
@@ -107,13 +110,13 @@ void video_set_gfx_mode_fullscreen()
 //        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
 //#endif
     }
+    menu_destroy(display);
+    al_hide_mouse_cursor(display);
 }
 
-void video_update_write_border()
+void video_refresh_border()
 {
-    log_window_config("video_update_write_border");
-    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
-    al_draw_filled_rectangle(0,0, elkConfig.display.native_window_width, elkConfig.display.native_window_height, blue);
+    refreshBorder = 2;
 }
 
 void video_set_gfx_mode_windowed()
@@ -126,7 +129,7 @@ void video_set_gfx_mode_windowed()
     al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
 
-    video_update_write_border();
+    video_refresh_border();
 //    al_set_display_flag
 //    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
 }
@@ -234,6 +237,7 @@ int video_init_begin()
 
 void video_init_complete()
 {
+    ALLEGRO_DISPLAY *display = al_get_current_display();
     video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
     video_set_gfx_mode_windowed();
 
@@ -258,7 +262,30 @@ void video_update_native_window_size(int w, int h)
 {
     elkConfig.display.native_window_width = w;
     elkConfig.display.native_window_height = h;
+    //if(menutimer && elkConfig.display.fullscreen)
+    //{
+        // Adjust for menu bar (there does not seem
+        // to be a way to discover the menu bar height
+        // so we make a guess).
+    //    elkConfig.display.native_window_height+=26;
+    //}
     //log_debug("video_update_native_window_size(%d, %d)", w, h);
+}
+
+void video_mouse_event()
+{
+    ALLEGRO_DISPLAY *display = al_get_current_display();
+    // TODO: display menu if mouse event.
+    if(elkConfig.display.fullscreen)
+    {
+        if(menutimer == 0)
+        {
+            ALLEGRO_DISPLAY *display = al_get_current_display();
+            menu_init(display); // Menu is hidden, show now.
+            al_show_mouse_cursor(display);
+        }
+        menutimer = 300;  // Display for a further 6 seconds
+    }
 }
 
 void video_resize_elk_window(int width, int height, bool aspect_ratio)
@@ -299,7 +326,7 @@ void video_resize_elk_window(int width, int height, bool aspect_ratio)
     }
 
     video_set_window_size(winsizeX, winsizeY, 0,0);
-    video_update_write_border();
+    video_refresh_border();
 }
 
 void video_register_close_button_handler(void (*handler_function)(void))
@@ -319,6 +346,7 @@ int video_poll_joystick()
 
 void video_enterfullscreen()
 {
+        menutimer = 0;
         video_set_window_size(800,600, 0, 0);
         video_set_gfx_mode_fullscreen();
         ALLEGRO_DISPLAY *display = al_get_current_display();
@@ -342,6 +370,12 @@ void video_leavefullscreen()
         video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
         video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, elkConfig.display.maintain_aspect_ratio);
         video_set_gfx_mode_windowed();
+        if(menutimer > 0)
+        {
+            menutimer = 0;
+            ALLEGRO_DISPLAY *display = al_get_current_display();
+            menu_init(display);
+        }
 //        #endif
 }
 
@@ -424,8 +458,13 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 {
     native_timestamp_t timestamp = native_timestamp_get();
-    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
-    al_draw_filled_rectangle(0,0, elkConfig.display.native_window_width, elkConfig.display.native_window_height, blue);
+    ALLEGRO_DISPLAY *display = al_get_current_display();
+    if(refreshBorder)
+    {
+        ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
+        al_draw_filled_rectangle(0,0, al_get_display_width(display), al_get_display_height(display), blue);
+        refreshBorder--;
+    }
     startblit();
 
     switch (drawMode)
@@ -542,6 +581,19 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
         {
             native_time_log_average(&video_scaled_draw_average, "scaled draw average");
             native_time_reset_samples(&video_scaled_draw_average);
+        }
+    }
+
+    // If in fullscreen mode, check if menu is active and needs to be hidden
+    if(menutimer)
+    {
+        menutimer--;
+        log_debug("menutimer %d", menutimer);
+        if(!menutimer && elkConfig.display.fullscreen)
+        {
+            // Timer expired, if fullscreen is active we remove the menu.
+            menu_destroy(display);
+            al_hide_mouse_cursor(display);
         }
     }
 }

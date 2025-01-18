@@ -17,6 +17,7 @@ bool register_main_event_handlers();
 elk_event_t handle_event_display_close(ALLEGRO_EVENT * event);
 elk_event_t handle_event_timer_expiry(ALLEGRO_EVENT * event);
 elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event);
+elk_event_t handle_mouse_event(ALLEGRO_EVENT * event);
 elk_event_t handle_null_event(ALLEGRO_EVENT * event);
 
 #define MAX_CALLBACK_EVENT_HANDLERS      128
@@ -86,7 +87,7 @@ bool register_main_event_handlers()
     result &= register_event_handler(ALLEGRO_EVENT_KEY_UP,   key_handler_handle_event);
 
     // TODO: Events we acknowledge but are not yet handled by specific code.
-    result &= register_event_handler(ALLEGRO_EVENT_MOUSE_AXES,          handle_null_event);
+    result &= register_event_handler(ALLEGRO_EVENT_MOUSE_AXES,          handle_mouse_event);
     result &= register_event_handler(ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY, handle_null_event);
     result &= register_event_handler(ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY, handle_null_event);
     result &= register_event_handler(ALLEGRO_EVENT_DISPLAY_RESIZE,      handle_window_resize_event);
@@ -103,7 +104,7 @@ elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
     // if not fullscreen!
     al_acknowledge_resize(event->display.source);
     log_debug("ALLEGRO_EVENT_DISPLAY_RESIZE - received");
-    video_update_native_window_size(event->display.width, event->display.height +26);
+    video_update_native_window_size(event->display.width, event->display.height);
     ALLEGRO_DISPLAY *display = al_get_current_display();
     log_debug("coords %d, %d", al_get_display_width(display), al_get_display_height(display));
     video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, (elkConfig.display.maintain_aspect_ratio == 1));
@@ -112,10 +113,19 @@ elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
     return 0;
 }
 
+// Called when ALLEGRO_EVENT_DISPLAY_RESIZE event is recieved.
+elk_event_t handle_mouse_event(ALLEGRO_EVENT * event)
+{
+    // Notify video (if in fullscreen mode a mouse movement or click will 
+    // cause the main menu to be displayed for a short while)
+    video_mouse_event();
+    return ELK_EVENT_HANDLED;
+}
+
 // Handler for events we want to acknowledge but are not yet implemented
 elk_event_t handle_null_event(ALLEGRO_EVENT * event)
 {
-    return 0;
+    return ELK_EVENT_NONE;
 }
 
 // Called when ALLEGRO_EVENT_DISPLAY_CLOSE event is recieved.
