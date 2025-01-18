@@ -78,7 +78,6 @@ window_info_elk_t non_fullscreen_elk_window;
 t_timeDiffAverage video_blit_average;
 t_timeDiffAverage video_scaled_draw_average;
 
-uint8_t refreshBorder = 2;
 uint32_t menutimer = 0;
 
 /******************************************************************************
@@ -114,11 +113,6 @@ void video_set_gfx_mode_fullscreen()
     al_hide_mouse_cursor(display);
 }
 
-void video_refresh_border()
-{
-    refreshBorder = 2;
-}
-
 void video_set_gfx_mode_windowed()
 {
     ALLEGRO_DISPLAY *display;
@@ -129,7 +123,6 @@ void video_set_gfx_mode_windowed()
     al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
     al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
 
-    video_refresh_border();
 //    al_set_display_flag
 //    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
 }
@@ -326,7 +319,6 @@ void video_resize_elk_window(int width, int height, bool aspect_ratio)
     }
 
     video_set_window_size(winsizeX, winsizeY, 0,0);
-    video_refresh_border();
 }
 
 void video_register_close_button_handler(void (*handler_function)(void))
@@ -459,12 +451,9 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 {
     native_timestamp_t timestamp = native_timestamp_get();
     ALLEGRO_DISPLAY *display = al_get_current_display();
-    if(refreshBorder)
-    {
-        ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
-        al_draw_filled_rectangle(0,0, al_get_display_width(display), al_get_display_height(display), blue);
-        refreshBorder--;
-    }
+    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 0); // TODO: Now black - make configurable.
+    al_draw_filled_rectangle(0,0, al_get_display_width(display), al_get_display_height(display), blue);
+
     startblit();
 
     switch (drawMode)
