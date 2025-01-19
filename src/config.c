@@ -104,6 +104,32 @@ bool getboolcfg(char *name, bool def)
         return(c!=0?true:false);
 }
 
+void getrgbcfg(cfg_rgb_t *rgb, char *name, cfg_rgb_t def)
+{
+   char *s=getstringcfg(name);
+   int red;
+   int green;
+   int blue;
+   int retval;
+   // Set to default in case we cannot decode
+   rgb->red   = def.red;
+   rgb->green = def.green;
+   rgb->blue  = def.blue;
+
+   if(s)
+   {
+        retval = sscanf(s,"%i,%i,%i", &red, &green, &blue);
+
+        if(retval ==3 && red <= 255 && green <= 255 && blue <= 255)
+        {
+                rgb->red   = red;
+                rgb->green = green;
+                rgb->blue  = blue;
+        }
+
+   }
+}
+
 void writecommentcfg(const char *comment)
 {
     fprintf(cfgfile,"# %s\n",comment);    
@@ -111,17 +137,22 @@ void writecommentcfg(const char *comment)
 
 void writestringcfg(const char *name, const char *s)
 {
-        if (s[0]) fprintf(cfgfile,"%s = %s\n",name,s);
+    if (s[0]) fprintf(cfgfile,"%s = %s\n",name,s);
 }
 
 void writeintcfg(char *name, int i)
 {
-        fprintf(cfgfile,"%s = %i\n",name,i);
+    fprintf(cfgfile,"%s = %i\n",name,i);
 }
 
 void writeboolcfg(char *name, bool b)
 {
-        writeintcfg(name, (b!=true?0:1));
+    writeintcfg(name, (b!=true?0:1));
+}
+
+void writergbcfg(char *name, cfg_rgb_t rgb)
+{
+    fprintf(cfgfile,"%s=%d,%d,%d\n", name, rgb.red, rgb.green, rgb.blue);
 }
 
 
@@ -133,6 +164,13 @@ void loadconfig()
 {
         char *s;
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
+        cfg_rgb_t border_rgb_default;
+
+        // Default border colour is black.
+        border_rgb_default.red = 0;
+        border_rgb_default.green = 0;
+        border_rgb_default.blue = 0;
+
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"rt");
         printf("config file handle %s %d\n", fn, cfgfile);
@@ -201,6 +239,7 @@ void loadconfig()
         elkConfig.display.maintain_pixel_ratio  = getintcfg("win_pixelratio", 0);
         elkConfig.display.native_window_width   = getintcfg("win_width", 640);
         elkConfig.display.native_window_height  = getintcfg("win_height", 512);
+        getrgbcfg(&elkConfig.display.border, "border_col", border_rgb_default);
         
         elkConfig.expansion.firstbyte = getintcfg("joy_firstbyte",0);
         elkConfig.expansion.joffset   = getintcfg("joy_offset",0);
@@ -309,6 +348,7 @@ void saveconfig()
         writeintcfg("win_pixelratio", elkConfig.display.maintain_pixel_ratio);
         writeintcfg("win_width", elkConfig.display.native_window_width);
         writeintcfg("win_height", elkConfig.display.native_window_height);
+        writergbcfg("border_col", elkConfig.display.border);
         
         writeintcfg("joy_firstbyte", elkConfig.expansion.firstbyte);
         writeintcfg("joy_offset",    elkConfig.expansion.joffset);

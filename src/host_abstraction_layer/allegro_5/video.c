@@ -435,8 +435,8 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 {
     native_timestamp_t timestamp = native_timestamp_get();
     ALLEGRO_DISPLAY *display = al_get_current_display();
-    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 0); // TODO: Now black - make configurable.
-    al_draw_filled_rectangle(0,0, al_get_display_width(display), al_get_display_height(display), blue);
+    ALLEGRO_COLOR bordercol = al_map_rgb(elkConfig.display.border.red, elkConfig.display.border.green, elkConfig.display.border.blue); // TODO: Optimise this (store, don't recalculate every blit).
+    al_draw_filled_rectangle(0,0, al_get_display_width(display), al_get_display_height(display), bordercol);
 
     startblit();
 

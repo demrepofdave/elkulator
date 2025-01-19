@@ -33,6 +33,13 @@
 * Typedefs
 *******************************************************************************/
 
+typedef struct config_vars
+{
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+} cfg_rgb_t;
+
 typedef struct 
 {
     bool plus1;
@@ -86,6 +93,7 @@ typedef struct
     uint32_t native_window_width;           // Non-fullscreen mode window width.
     uint32_t native_window_height;          // Non-fullscreen mode window height.
     uint8_t fullscreen;
+    cfg_rgb_t border;
 } display_config_t;
 
 // Enable/disable various elkulator performance monitoring statistics
