@@ -101,23 +101,18 @@ bool register_main_event_handlers()
 // Called when ALLEGRO_EVENT_DISPLAY_RESIZE event is recieved.
 elk_event_t handle_window_resize_event(ALLEGRO_EVENT * event)
 {
-    // if not fullscreen!
     al_acknowledge_resize(event->display.source);
     log_debug("ALLEGRO_EVENT_DISPLAY_RESIZE - received");
     video_update_native_window_size(event->display.width, event->display.height);
-    ALLEGRO_DISPLAY *display = al_get_current_display();
-    log_debug("coords %d, %d", al_get_display_width(display), al_get_display_height(display));
-    video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, (elkConfig.display.maintain_aspect_ratio == 1));
-    //video_clearall();
-    // endif
-    return 0;
+    video_resize_elk_window(event->display.width, event->display.height, (elkConfig.display.maintain_aspect_ratio == 1));
+    return ELK_EVENT_HANDLED;
 }
 
 // Called when ALLEGRO_EVENT_DISPLAY_RESIZE event is recieved.
+// Notify video (if in fullscreen mode a mouse movement or click will 
+// cause the main menu to be displayed for a short while)
 elk_event_t handle_mouse_event(ALLEGRO_EVENT * event)
 {
-    // Notify video (if in fullscreen mode a mouse movement or click will 
-    // cause the main menu to be displayed for a short while)
     video_mouse_event();
     return ELK_EVENT_HANDLED;
 }
@@ -170,7 +165,7 @@ uint32_t event_await()
 
         if(!(elkEvent & ELK_EVENT_HANDLED))
         {
-            //log_debug("event_await: event %d handled", event.type);
+            log_debug("event_await: event %d handled", event.type);
         }
         else if(!(elkEvent & ELK_EVENT_HANDLED) && (event.type != ALLEGRO_EVENT_TIMER))
         {

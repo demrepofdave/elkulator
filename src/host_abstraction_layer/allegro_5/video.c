@@ -253,22 +253,17 @@ void video_set_window_title(char * format, ...)
 
 void video_update_native_window_size(int w, int h)
 {
-    elkConfig.display.native_window_width = w;
-    elkConfig.display.native_window_height = h;
-    //if(menutimer && elkConfig.display.fullscreen)
-    //{
-        // Adjust for menu bar (there does not seem
-        // to be a way to discover the menu bar height
-        // so we make a guess).
-    //    elkConfig.display.native_window_height+=26;
-    //}
-    //log_debug("video_update_native_window_size(%d, %d)", w, h);
+    if(!elkConfig.display.fullscreen)
+    {
+        elkConfig.display.native_window_width = w;
+        elkConfig.display.native_window_height = h + 27; // Adjusted for menu bar in windowed mode.
+    }
 }
 
 void video_mouse_event()
 {
-    ALLEGRO_DISPLAY *display = al_get_current_display();
-    // TODO: display menu if mouse event.
+    // Display menu if in full screen mode and mouse
+    // is moved.
     if(elkConfig.display.fullscreen)
     {
         if(menutimer == 0)
@@ -277,7 +272,7 @@ void video_mouse_event()
             menu_init(display); // Menu is hidden, show now.
             al_show_mouse_cursor(display);
         }
-        menutimer = 300;  // Display for a further 6 seconds
+        menutimer = 400;  // Display for a further 8 seconds
     }
 }
 
@@ -338,37 +333,26 @@ int video_poll_joystick()
 
 void video_enterfullscreen()
 {
-        menutimer = 0;
-        video_set_window_size(800,600, 0, 0);
-        video_set_gfx_mode_fullscreen();
-        ALLEGRO_DISPLAY *display = al_get_current_display();
-        log_debug("fullscreen mode coords %d, %d", al_get_display_width(display), al_get_display_height(display));
-        video_set_window_size(al_get_display_width(display), al_get_display_height(display), 0, 0);
-        video_resize_elk_window(current_elk_window.winsizex, current_elk_window.winsizey, elkConfig.display.maintain_aspect_ratio);
+    menutimer = 0;
+    video_set_window_size(800,600, 0, 0);
+    video_set_gfx_mode_fullscreen();
+    ALLEGRO_DISPLAY *display = al_get_current_display();
+    log_debug("fullscreen mode coords %d, %d", al_get_display_width(display), al_get_display_height(display));
+    video_set_window_size(al_get_display_width(display), al_get_display_height(display), 0, 0);
+    video_resize_elk_window(current_elk_window.winsizex, current_elk_window.winsizey, elkConfig.display.maintain_aspect_ratio);
 }
 
 void video_leavefullscreen()
 {
-//        #ifdef WIN32
-//        remove_mouse();
-//        destroy_bitmap(vidb);
-//        destroy_bitmap(vp2);
-//        destroy_bitmap(vp1);
-//        #endif
-//        #ifdef WIN32
-//        video_set_gfx_mode_windowed(048,2048,0,0);
-//        vidb=create_video_bitmap(800,300);
-//        #else
-        video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
-        video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, elkConfig.display.maintain_aspect_ratio);
-        video_set_gfx_mode_windowed();
-        if(menutimer > 0)
-        {
-            menutimer = 0;
-            ALLEGRO_DISPLAY *display = al_get_current_display();
-            menu_init(display);
-        }
-//        #endif
+    video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
+    video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, elkConfig.display.maintain_aspect_ratio);
+    video_set_gfx_mode_windowed();
+    if(menutimer > 0)
+    {
+        menutimer = 0;
+        ALLEGRO_DISPLAY *display = al_get_current_display();
+        menu_init(display);
+    }
 }
 
 //#ifdef WIN32
@@ -577,7 +561,6 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
     if(menutimer)
     {
         menutimer--;
-        log_debug("menutimer %d", menutimer);
         if(!menutimer && elkConfig.display.fullscreen)
         {
             // Timer expired, if fullscreen is active we remove the menu.

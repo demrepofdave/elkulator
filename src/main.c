@@ -139,12 +139,6 @@ void initelk(int argc, char *argv[])
     int parallelnext=0;
     int serialnext=0;
     int serialdebugnext=0;
-    fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-    #ifdef HAL_ALLEGRO_4
-        // TODO: Tidy-up.
-        char *p = fileutils_get_filename(exedir);
-        p[0] = 0;
-    #endif
     elkConfig.disc.discname[0]  = 0;
     elkConfig.disc.discname2[0] = 0;
     tapename[0] = 0;
@@ -153,7 +147,6 @@ void initelk(int argc, char *argv[])
     {
         romnames[i][0] = 0;
     }
-    loadconfig();
 
     for (c=1;c<argc;c++)
     {
@@ -363,7 +356,17 @@ int main(int argc, char *argv[])
 {
     int count = 0;
     //init_config(); TODO: May need this not sure.
-    log_msg(__FUNCTION__, "Elkulator has started");
+    fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+    #ifdef HAL_ALLEGRO_4
+        // TODO: Tidy-up.
+        char *p = fileutils_get_filename(exedir);
+        p[0] = 0;
+    #endif
+
+    loadconfig(); // Note: Also sets logging level from config file.
+
+    log_info("Elkulator has started");
+
     int ret = hal_init_begin();
     if (ret != 0)
     {
@@ -475,7 +478,7 @@ int main(int argc, char *argv[])
         }
     #endif // HAL_ALLEGRO_4
     closeelk();
-    log_msg(__FUNCTION__, "Elkulator has ended");
+    log_info("Elkulator has ended");
     return 0;
 }
 

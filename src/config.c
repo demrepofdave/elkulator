@@ -135,10 +135,16 @@ void loadconfig()
         char fn[MAX_PATH_FILENAME_BUFFER_SIZE + strlen(elk_cfg_filename)];
         sprintf(fn,"%s%s",exedir, elk_cfg_filename);
         cfgfile=fopen(fn,"rt");
+        printf("config file handle %s %d\n", fn, cfgfile);
+        fflush(stdout);
 
+        // Read and set log level first.
+        elkConfig.stats.log_level = (log_level_t) getintcfg("log_level", (int) LOG_ERROR);
+        log_set_level(elkConfig.stats.log_level);
+        
         int api_version = getintcfg("api_version", 1);  // Assume old config file unless apiversion is present (2 is latest).
 
-        log_debug("Api version = %d", api_version);
+        log_info("Config file Api version = %d", api_version);
 
         elkConfig.tape.speed            = getintcfg("tapespeed",0);
 
@@ -326,69 +332,65 @@ void saveconfig()
         /* Elkulator specific performance statistics */
         writeboolcfg("enable_titlebar_stats", elkConfig.stats.titlebar_performance_stats);
         writeboolcfg("enable_blitting_stats", elkConfig.stats.blitting_performance_stats);
+        writecommentcfg("Logging level (0 = ERRORS - default, 1 = WARNINGS, 2 = INFO, 3 = DEBUG)");
+        writeintcfg("log_level", (int) elkConfig.stats.log_level);
 
         fclose(cfgfile);
 }
 
 void log_config_vars()
 {
-        uint8_t drawmode;
-    uint8_t videoresize;
-    uint8_t maintain_aspect_ratio;
-    uint8_t maintain_pixel_ratio;
-    uint32_t native_window_width;
-    uint32_t native_window_height;
+    log_info("Config vars");
+    log_info("===========");
+    log_info("- display:");
+    log_info("  - drawmode    : %d", elkConfig.display.drawmode);
+    log_info("  - videoresize : %d", elkConfig.display.videoresize);
+    log_info("  - aspectratio : %d", elkConfig.display.maintain_aspect_ratio);
+    log_info("  - pixelratio  : %d", elkConfig.display.maintain_pixel_ratio);
+    log_info("  - win width   : %d", elkConfig.display.native_window_width);
+    log_info("  - win height  : %d", elkConfig.display.native_window_height);
 
-    log_debug("Config vars");
-    log_debug("===========");
-    log_debug("- display:");
-    log_debug("  - drawmode    : %d", elkConfig.display.drawmode);
-    log_debug("  - videoresize : %d", elkConfig.display.videoresize);
-    log_debug("  - aspectratio : %d", elkConfig.display.maintain_aspect_ratio);
-    log_debug("  - pixelratio  : %d", elkConfig.display.maintain_pixel_ratio);
-    log_debug("  - win width   : %d", elkConfig.display.native_window_width);
-    log_debug("  - win height  : %d", elkConfig.display.native_window_height);
-
-    log_debug("- expansion:");
-    log_debug("  - plus1                : %d", elkConfig.expansion.plus1);
-    log_debug("  - plus3                : %d", elkConfig.expansion.plus3);
-    log_debug("  - firstbyte            : %d", elkConfig.expansion.firstbyte);
-    log_debug("  - joffset              : %d", elkConfig.expansion.joffset);
-    log_debug("  - dfsena               : %d", elkConfig.expansion.dfsena);
-    log_debug("  - adfsena              : %d", elkConfig.expansion.adfsena);
-    log_debug("  - mrb                  : %d", elkConfig.expansion.mrb);
-    log_debug("  - mrbmode              : %d", elkConfig.expansion.mrbmode);
-    log_debug("  - turbo                : %d", elkConfig.expansion.turbo);
-    log_debug("  - ulamode              : %d", elkConfig.expansion.ulamode);
-    log_debug("  - enable_jim           : %d", elkConfig.expansion.enable_jim);
-    log_debug("  - enable_mgc           : %d", elkConfig.expansion.enable_mgc);
-    log_debug("  - enable_db_flash_cart : %d", elkConfig.expansion.enable_db_flash_cartridge);
-    log_debug("- sound:");
-    log_debug("  - sndint     : %d", elkConfig.sound.sndint);
-    log_debug("  - sndex      : %d", elkConfig.sound.sndex);
-    log_debug("  - sndddnoise : %d", elkConfig.sound.sndddnoise);
-    log_debug("  - ddvol      : %d", elkConfig.sound.ddvol);
-    log_debug("  - ddtype     : %d", elkConfig.sound.ddtype);
-    log_debug("  - sndtape    : %d", elkConfig.sound.sndtape);
-    log_debug("  - sndex      : %d", elkConfig.sound.sndex);
-    log_debug("- keyboard:");
+    log_info("- expansion:");
+    log_info("  - plus1                : %d", elkConfig.expansion.plus1);
+    log_info("  - plus3                : %d", elkConfig.expansion.plus3);
+    log_info("  - firstbyte            : %d", elkConfig.expansion.firstbyte);
+    log_info("  - joffset              : %d", elkConfig.expansion.joffset);
+    log_info("  - dfsena               : %d", elkConfig.expansion.dfsena);
+    log_info("  - adfsena              : %d", elkConfig.expansion.adfsena);
+    log_info("  - mrb                  : %d", elkConfig.expansion.mrb);
+    log_info("  - mrbmode              : %d", elkConfig.expansion.mrbmode);
+    log_info("  - turbo                : %d", elkConfig.expansion.turbo);
+    log_info("  - ulamode              : %d", elkConfig.expansion.ulamode);
+    log_info("  - enable_jim           : %d", elkConfig.expansion.enable_jim);
+    log_info("  - enable_mgc           : %d", elkConfig.expansion.enable_mgc);
+    log_info("  - enable_db_flash_cart : %d", elkConfig.expansion.enable_db_flash_cartridge);
+    log_info("- sound:");
+    log_info("  - sndint     : %d", elkConfig.sound.sndint);
+    log_info("  - sndex      : %d", elkConfig.sound.sndex);
+    log_info("  - sndddnoise : %d", elkConfig.sound.sndddnoise);
+    log_info("  - ddvol      : %d", elkConfig.sound.ddvol);
+    log_info("  - ddtype     : %d", elkConfig.sound.ddtype);
+    log_info("  - sndtape    : %d", elkConfig.sound.sndtape);
+    log_info("  - sndex      : %d", elkConfig.sound.sndex);
+    log_info("- keyboard:");
 
     for(int host_key = 0; host_key < HOST_KEY_MAX; host_key++)
     {
         if(elkConfig.keyboard.host_key_mapping[host_key] != keyboard_get_default_elk_key_from_host_key(host_key))
         {
-            log_debug(" - %s       : %s", keyboard_get_hostkey_config_string(host_key), keyboard_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[host_key]));
+            log_info(" - %s       : %s", keyboard_get_hostkey_config_string(host_key), keyboard_get_elkkey_config_string(elkConfig.keyboard.host_key_mapping[host_key]));
         }
     }
-    log_debug("- tape:");
-    log_debug("  - speed      : %d", elkConfig.tape.speed);
-    log_debug("- disc:");
-    log_debug("  - defaultwriteprot : %d", elkConfig.disc.defaultwriteprot);
-    log_debug("  - discname         : %s", elkConfig.disc.discname);
-    log_debug("  - discname2        : %s", elkConfig.disc.discname2);
+    log_info("- tape:");
+    log_info("  - speed      : %d", elkConfig.tape.speed);
+    log_info("- disc:");
+    log_info("  - defaultwriteprot : %d", elkConfig.disc.defaultwriteprot);
+    log_info("  - discname         : %s", elkConfig.disc.discname);
+    log_info("  - discname2        : %s", elkConfig.disc.discname2);
 
-    log_debug("- stats:");
-    log_debug("  - titlebar_performance_stats : %d", elkConfig.stats.titlebar_performance_stats);
-    log_debug("  - blitting_performance_stats : %d", elkConfig.stats.blitting_performance_stats);
+    log_info("- stats:");
+    log_info("  - titlebar_performance_stats : %d", elkConfig.stats.titlebar_performance_stats);
+    log_info("  - blitting_performance_stats : %d", elkConfig.stats.blitting_performance_stats);
+    log_info("  - Log level                  : %d", (int)elkConfig.stats.log_level);
 
  }

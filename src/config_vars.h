@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "keyboard.h"
+#include "logger.h"
 
 /******************************************************************************
 * Preprocessor Macros
@@ -92,6 +93,7 @@ typedef struct
 {
     bool titlebar_performance_stats;
     bool blitting_performance_stats;
+    log_level_t log_level;
 } stats_config_t;
 
 
