@@ -104,10 +104,10 @@ void video_set_gfx_mode_fullscreen()
     //save_winsizey = al_get_display_height(display);
     if (al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true)) 
     {
-//#ifdef WIN32
-//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
-//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
-//#endif
+#ifdef WIN32
+        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
+        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
+#endif
     }
     menu_destroy(display);
     al_hide_mouse_cursor(display);
