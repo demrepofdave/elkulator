@@ -145,7 +145,7 @@ void logvols()
                 sndbuf[c]^=0x8000;
         }
 //                printf("2 count %i\n",sncount[3]);
-                mixbuffer(sndbuf);
+                sound_mixbuffer(sndbuf);
 //                printf("3 count %i\n",sncount[3]);
         }
 }

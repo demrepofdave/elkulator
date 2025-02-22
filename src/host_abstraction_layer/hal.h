@@ -2,31 +2,27 @@
  * Elkulator - An electron emulator originally written 
  *             by Sarah Walker
  *
- * soundopenal.c
+ * hal.h
  * 
- * Sound abstration layer (OpenAL)
- *
- * Allows actual sound libraries and sound used for the emulation
- * to be abstracted from the actual electron code
+ * Main initialisation, timer, and other general functions to do with 
+ * the overall host abstraction layer.
  * 
- * This allows easier porting to different sound libraries in 
- * future in order to allow maximum cross platform support and 
- * long term durability.
- *
- * TODO: The above description is not completely true as
- *       some sound code still exist in the electron emulation
- *       main code.  This should change in future.
  */
 
+#ifndef _HAL_H
+#define _HAL_H
 
 /******************************************************************************
 * Include files
 *******************************************************************************/
+
 #include <stdint.h>
+#include <stdbool.h>
 
 /******************************************************************************
 * Preprocessor Macros
 *******************************************************************************/
+
 
 
 /******************************************************************************
@@ -38,6 +34,15 @@
 * Public Function Definitions
 *******************************************************************************/
 
-void sound_add(uint8_t dat);
-void sound_mixbuffer(int16_t *d);
-void sound_givealbufferdd(int16_t *buf);
+// Initialisation functions.
+int  hal_init_begin();
+void hal_init_complete();
+void hal_shutdown();
+
+// Timer functions
+void hal_install_timer_callback(void (*timer_function)(void));
+void hal_start_timer();
+void hal_stop_timer();
+void hal_timer_rest(unsigned int period);
+
+#endif // _VIDEO_H

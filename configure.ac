@@ -16,10 +16,10 @@ AC_MSG_CHECKING([whether to enable debugging])
 AC_ARG_ENABLE(debug,
 	      AC_HELP_STRING([--enable-debug], [build debug executable]))
 if test "$enable_debug" = "yes"; then
-   CFLAGS="$CFLAGS -Wall -O0 -g -D_DEBUG"
+   CFLAGS="$CFLAGS -Wall -O0 -g -D_DEBUG -fno-math-errno -fno-trapping-math"
    AC_MSG_RESULT([yes])
 else
-   CFLAGS="$CFLAGS -O3"
+   CFLAGS="$CFLAGS -O3 -fno-math-errno -fno-trapping-math"
    AC_MSG_RESULT([no])
 fi
 

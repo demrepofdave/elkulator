@@ -434,7 +434,7 @@ void makekeyl()
 
         // Rest of keyboard intialisation.
         keyboard_makelayout();
-        keyboard_debug_dump();
+        //keyboard_debug_dump();
 }
 
 uint8_t readkeys(uint16_t addr)
@@ -444,7 +444,7 @@ uint8_t readkeys(uint16_t addr)
 
         // Allegro4 has a array called key which indicates which allegro keys are being pressed.
         // We need to convert that to pressed elk keys prior to "reading" the elk keyboard.
-        keyhandler_refresh_elkkeys();
+        keyutils_refresh_elkkeys();
 
         for (d=0;d<ELK_KEY_MAX;d++)
         {

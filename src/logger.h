@@ -3,23 +3,24 @@
 
 #include <stdio.h>
 
-// Quick and dirty implementation of logger messages to the screen.
+// Quick and simple implementation of logger messages to the screen.
 
-#define log_fatal(f_, ...) fprintf(stderr,(f_), ##__VA_ARGS__)      // TODO: stderr? to file?
-#define log_debug(f_, ...) log_msg(__FUNCTION__,(f_), ##__VA_ARGS__) // TODO: stdout? to file?
+typedef enum
+{
+    LOG_ERROR,
+    LOG_WARNING,
+    LOG_INFO,
+    LOG_DEBUG,
+    MAX_LOG_ENTRIES
+} log_level_t;
 
-// The following tyedefs are interchangeable,
-// however have two types allow clearer
-// intent in variable naming.
+#define log_fatal(f_, ...)   fprintf(stderr,(f_), ##__VA_ARGS__)      // TODO: stderr? to file?
+#define log_error(f_, ...)   log_msg(LOG_ERROR, __FUNCTION__,(f_), ##__VA_ARGS__) // TODO: stdout? to file?
+#define log_warning(f_, ...) log_msg(LOG_WARNING, __FUNCTION__,(f_), ##__VA_ARGS__) // TODO: stdout? to file?
+#define log_info(f_, ...)    log_msg(LOG_INFO, __FUNCTION__,(f_), ##__VA_ARGS__) // TODO: stdout? to file?
+#define log_debug(f_, ...)   log_msg(LOG_DEBUG, __FUNCTION__,(f_), ##__VA_ARGS__) // TODO: stdout? to file?
 
-typedef long native_timestamp_t;
-typedef long native_timediff_t;
+void log_set_level(log_level_t log_level);
+void log_msg(log_level_t log_level, const char * function, char *format, ...);
 
-native_timediff_t native_cumulative_time_adjust(native_timediff_t offset, native_timediff_t cumulative_total, native_timediff_t current_timediff);
-void native_timediff_sprintf(char * diff_string, size_t diff_string_length, native_timediff_t timediff);
-native_timestamp_t log_get_timestamp();
-void log_msg(const char * function, char *format, ...);
-void log_timer_begin();
-void log_time_mark(const char *msg);
-void log_time_display();
 #endif // _LOGGER_H

@@ -98,7 +98,7 @@ void closeal()
 * Public Function Definitions
 *******************************************************************************/
 
-void sound_init_part1(int argc, char *argv[])
+void sound_init_begin()
 {
     log_debug("Start...");
     alutInit(0,0);
@@ -108,7 +108,7 @@ void sound_init_part1(int argc, char *argv[])
 }
 
 
-void sound_init_part2()
+void sound_init_complete()
 {
     int c;
     format = AL_FORMAT_STEREO16;
@@ -204,7 +204,7 @@ void sound_givealbuffer(int16_t *buf)
 uint16_t sndbufi[BUFLEN>>2];
 int sndbufpos=0;
 
-void addsnd(uint8_t dat)
+void sound_add(uint8_t dat)
 {
     if (sndbufpos<2000)
     {
@@ -219,7 +219,7 @@ void addsnd(uint8_t dat)
 
 FILE *f;
 
-void mixbuffer(int16_t *d)
+void sound_mixbuffer(int16_t *d)
 {
         int c;
         sndbufpos=0;

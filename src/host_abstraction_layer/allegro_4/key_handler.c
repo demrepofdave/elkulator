@@ -174,7 +174,7 @@ void keyhandler_init()
     }
 }
 
-void keyhandler_refresh_elkkeys()
+void keyutils_refresh_elkkeys()
 {
     int allegro4_key;
     host_key_t hostkeyid;

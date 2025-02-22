@@ -5,7 +5,7 @@
  * palfilt.c
  * 
  * Contains all functions to initialize and use the palfilter for
- * electrn video output.
+ * electron video output.
  * 
  * This is the allegro 5 implementation of the pal filter.
  *
@@ -127,13 +127,16 @@ void palfilter(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
     float red,green,blue;
     float paly, palry, palby;
     char * region_data = NULL;
+    char * region_data_line = NULL;
+    uint8_t * elk_pixel;
 
     ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
-    //log_time_mark("palfilt - locked");
+    region_data_line = (char *)destRegion->data;
 
     for (y=0;y<512;y++)
     {
-        region_data = (char *)destRegion->data + (destRegion->pitch * y);
+        region_data = region_data_line;
+        elk_pixel = elk_screen_data + ((y >> 1) * 640);
 
         yx[2]=yx[1]=yx[0]=0;
         yy[2]=yy[1]=yy[0]=0;
@@ -141,7 +144,7 @@ void palfilter(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
         bx[0]=by[0]=bx[1]=by[1]=0;
         for (x=0;x<640;x++)
         {
-            c = *(elk_screen_data + ((y >> 1) * 640) + x);
+            c = *elk_pixel++;
 
             red = (c & 1)?255:0; 
             green = (c & 2)?255:0; 
@@ -178,7 +181,7 @@ void palfilter(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 
             region_data += destRegion->pixel_size;
         }
+        region_data_line += destRegion->pitch;
     }
     al_unlock_bitmap(destBitmap);
-    //log_time_mark("palfilt - unlock and end");
 }

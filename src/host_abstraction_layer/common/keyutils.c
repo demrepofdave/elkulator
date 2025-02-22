@@ -1,7 +1,28 @@
+/*
+ * Elkulator - An electron emulator originally written 
+ *             by Sarah Walker
+ *
+ * keyutils.h
+ * 
+ * A collection of keyboard utilities common to both the 
+ * hardware abstraction layer and the main electron code.
+ *
+ * Helps with things like string to legacy key id 
+ * conversion.
+ * 
+ */
+
+/******************************************************************************
+* Include files
+*******************************************************************************/
 
 #include <string.h>
 #include "keyboard.h"
 #include "logger.h"
+
+/******************************************************************************
+* Private Variable Definitions
+*******************************************************************************/
 
 // see https://planet.racket-lang.org/package-source/kazzmir/allegro.plt/1/6/allegro-4.2.0/examples/exkeys.c
 static const int old_config_keys_to_new_host_keys_table[128] =
@@ -150,6 +171,10 @@ static const int old_config_keys_to_new_host_keys_table[128] =
     HOST_KEY_MAX,           // key_define_127,
 
 };
+
+/******************************************************************************
+* Public Function Definitions
+*******************************************************************************/
 
 host_key_t keyutils_get_hostkey_from_legacy_keyid(uint8_t old_key_id)
 {

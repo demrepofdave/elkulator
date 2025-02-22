@@ -31,6 +31,8 @@
 #include "host_abstraction_layer/video.h"
 #include "host_abstraction_layer/allegro_5//menu_internal.h"
 #include "logger.h"
+#include "host_abstraction_layer/native_time.h"
+#include "config_vars.h"
 #include "elk.h"
 #include "video_internal.h"
 #include "event_handler_internal.h"
@@ -58,9 +60,6 @@ static ALLEGRO_DISPLAY *display;
 
 //ALLEGRO_LOCKED_REGION *region = NULL; // Region lock on bitmap b (to allow writing of pixels)
 
-static ALLEGRO_TIMER *timer;
-static ALLEGRO_EVENT_SOURCE evsrc;
-
 elk_pallete_t elkpal[8] =
 {
     0xff000000,
@@ -73,7 +72,13 @@ elk_pallete_t elkpal[8] =
     0xffffffff
 };
 
-window_config_t main_window;
+window_info_elk_t current_elk_window;
+window_info_elk_t non_fullscreen_elk_window;
+
+t_timeDiffAverage video_blit_average;
+t_timeDiffAverage video_scaled_draw_average;
+
+uint32_t menutimer = 0;
 
 /******************************************************************************
 * Function Prototypes
@@ -87,9 +92,51 @@ window_config_t main_window;
 void log_window_config(const char * title)
 {
     log_debug("Window status (%s)", title);
-    log_debug("-------------");
-    log_debug("- Actual window: %d, %d", main_window.actual_window.winsizex, main_window.actual_window.winsizey);
-    log_debug("- Current Elk  : %d, %d", main_window.current_elk.winsizex, main_window.current_elk.winsizey);
+    log_debug("Actual window:%6d,%6d  Current Elk:%6d,%6d", 
+                    elkConfig.display.native_window_width, elkConfig.display.native_window_height,
+                    current_elk_window.winsizex, current_elk_window.winsizey);
+}
+
+void video_set_gfx_mode_fullscreen()
+{
+    ALLEGRO_DISPLAY *display = al_get_current_display();
+    //save_winsizex = al_get_display_width(display);
+    //save_winsizey = al_get_display_height(display);
+    if (al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true)) 
+    {
+#ifdef WIN32
+        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
+        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
+#endif
+    }
+    menu_destroy(display);
+    al_hide_mouse_cursor(display);
+}
+
+void video_set_gfx_mode_windowed()
+{
+    ALLEGRO_DISPLAY *display;
+    display = al_get_current_display();
+
+    al_resize_display(display, current_elk_window.winsizex,  current_elk_window.winsizey);
+    al_set_display_flag(display, ALLEGRO_MAXIMIZED, false);
+    al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
+    al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
+
+//    al_set_display_flag
+//    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
+}
+
+void video_set_window_size(int w, int h, int v_w, int v_h)
+{
+    log_debug("Set window size %d, %d", w, h);
+    current_elk_window.winsizex = w;
+    current_elk_window.winsizey = h;
+    if(!elkConfig.display.fullscreen)
+    {
+        non_fullscreen_elk_window.winsizex = w;
+        non_fullscreen_elk_window.winsizey = h;
+    }
 }
 
 /******************************************************************************
@@ -97,7 +144,7 @@ void log_window_config(const char * title)
 *******************************************************************************/
 
 // Called from linux.c (main)
-int video_init_part1()
+int video_init_begin()
 {
     if (!al_init())
     {
@@ -105,10 +152,10 @@ int video_init_part1()
         exit(-1);
     }
 
-    main_window.current_elk.winsizex = 800; // TODO: Will be configured in future
-    main_window.current_elk.winsizey = 600; // TODO: Will be configured in future
-    main_window.current_elk.startx = 0;
-    main_window.current_elk.starty = 0;
+    current_elk_window.winsizex = 800; // TODO: Will be configured in future
+    current_elk_window.winsizey = 600; // TODO: Will be configured in future
+    current_elk_window.startx = 0;
+    current_elk_window.starty = 0;
 
     al_init_native_dialog_addon();
     al_set_new_window_title(VERSION_STR);
@@ -132,9 +179,8 @@ int video_init_part1()
         al_set_new_display_option(ALLEGRO_VSYNC, 2, ALLEGRO_SUGGEST);
         log_debug("video: config vsync=%d, actual=%d", vsync, al_get_new_display_option(ALLEGRO_VSYNC, &temp));
     }
-    //video_set_window_size(true);
 
-    if ((display = al_create_display(main_window.current_elk.winsizex, main_window.current_elk.winsizey)) == NULL) {
+    if ((display = al_create_display(current_elk_window.winsizex, current_elk_window.winsizey)) == NULL) {
         log_fatal("video: unable to create display");
         exit(1);
     }
@@ -175,127 +221,99 @@ int video_init_part1()
         exit(1);
     }
 
+    // Initialise debug statistics, in case they are configured.
+    native_time_init_average(&video_blit_average, 50);
+    native_time_init_average(&video_scaled_draw_average, 50);
 
     return 0;
 }
 
-void video_init_part2()
+void video_init_complete()
 {
-    //ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
-    //b = al_create_bitmap(640,616);
+    ALLEGRO_DISPLAY *display = al_get_current_display();
+    video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
+    video_set_gfx_mode_windowed();
 
     menu_init(display);
-
-    if (!(timer = al_create_timer(0.02)))
-    {
-        log_fatal("main: unable to create timer");
-        exit(1);
-    }
-    event_register_event_source(al_get_timer_event_source(timer));
-    al_init_user_event_source(&evsrc);
-    event_register_event_source(&evsrc);
-
-    event_register_event_source(al_get_keyboard_event_source());
-
-    al_install_mouse();
-    event_register_event_source(al_get_mouse_event_source());
-
+    video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
+    //video_set_window_size(640,512,0,0);
+    //video_set_gfx_mode_windowed();
     initpaltables();
 }
 
-// Called from main.c (initelk)
-void video_init_part3(void (*timer_function)(void))
+void video_set_window_title(char * format, ...)
 {
-    // Nothing to do.
-}
-
-void video_rest(unsigned int period)
-{
-    return;
-}
-
-void video_set_window_title(const char * title)
-{
-    al_set_window_title(display, title);
-}
-
-void video_set_window_size(int w, int h, int v_w, int v_h)
-{
-    log_debug("Set window size %d, %d", w, h);
-    main_window.current_elk.winsizex = w;
-    main_window.current_elk.winsizey = h;
+    char window_title_buffer[256];
+    va_list args;
+    va_start (args, format);
+    vsnprintf (window_title_buffer, sizeof(window_title_buffer), format, args);
+    va_end (args);
+    al_set_window_title(display, window_title_buffer);
 }
 
 void video_update_native_window_size(int w, int h)
 {
-    main_window.actual_window.winsizex = w;
-    main_window.actual_window.winsizey = h;
-    log_window_config("video_update_native_window_size");
-    //main_window.actual_window.maintain_aspect = false;
+    if(!elkConfig.display.fullscreen)
+    {
+        elkConfig.display.native_window_width = w;
+        elkConfig.display.native_window_height = h + 27; // Adjusted for menu bar in windowed mode.
+    }
 }
 
-void video_resize_elk_window(bool aspect_ratio)
+void video_mouse_event()
+{
+    // Display menu if in full screen mode and mouse
+    // is moved.
+    if(elkConfig.display.fullscreen)
+    {
+        if(menutimer == 0)
+        {
+            ALLEGRO_DISPLAY *display = al_get_current_display();
+            menu_init(display); // Menu is hidden, show now.
+            al_show_mouse_cursor(display);
+        }
+        menutimer = 400;  // Display for a further 8 seconds
+    }
+}
+
+void video_resize_elk_window(int width, int height, bool aspect_ratio)
 {
     // Now we resize the screen based upon the above.
-    int winsizeX = main_window.actual_window.winsizex;
-    int winsizeY = main_window.actual_window.winsizey;
+    int winsizeX = width;
+    int winsizeY = height;
+    current_elk_window.startx = 0;
+    current_elk_window.starty = 0;
 
-    log_window_config("video_resize_elk_window");
+    //log_window_config("video_resize_elk_window");
+
+    // Maintain pixel ratio experimental code
+    //if(winsizeX > 640 && winsizeY > 512)
+    //{
+    //    winsizeX = (winsizeX / 320) * 320;
+    //    winsizeY = (winsizeY / 256) * 256;
+    //}
 
     if(aspect_ratio)
     {
-        int adjusted_width = ((main_window.actual_window.winsizex * 4) / 5) + 1;
-        log_debug("Adjusted width = %d", adjusted_width);
-        if(adjusted_width > main_window.actual_window.winsizey)
+        int adjusted_width = ((width * 4) / 5) + 1;
+        //log_debug("Adjusted width = %d", adjusted_width);
+        if(adjusted_width > winsizeY)
         {
             // Resize based on height
-            winsizeX = ((main_window.actual_window.winsizey * 5) / 4) + 1;
-            winsizeY = main_window.actual_window.winsizey;
-            log_debug("w > h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
+            winsizeX = ((winsizeY * 5) / 4);
+            //log_debug("w > h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
         else
         {
-            winsizeX = main_window.actual_window.winsizex;
-            winsizeY = ((main_window.actual_window.winsizex * 3) / 4) + 1;
-            log_debug("w <= h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
+            winsizeY = ((winsizeX * 4) / 5);
+            //log_debug("w <= h aspect ratio x, y: %d, %d", winsizeX, winsizeY);
         }
         // Calculate startx and starty offsets.
-        main_window.current_elk.startx = (main_window.actual_window.winsizex - winsizeX) / 2;
-        main_window.current_elk.starty = (main_window.actual_window.winsizey - winsizeY) / 2;
-    }
-    else
-    {
-        main_window.current_elk.startx = 0;
-        main_window.current_elk.starty = 0;
+        current_elk_window.startx = (width - winsizeX) / 2;
+        current_elk_window.starty = (height - winsizeY) / 2;
     }
 
     video_set_window_size(winsizeX, winsizeY, 0,0);
-    video_apply_window_size();
-}
-
-static bool first_bits = true;
-
-void video_apply_window_size()
-{
-    first_bits = true;
-    log_window_config("video_apply_window_size");
-    ALLEGRO_COLOR blue = al_map_rgb(0, 0, 64);
-    al_draw_filled_rectangle(0,0, main_window.actual_window.winsizex, main_window.actual_window.winsizey, blue);
-}
-
-void video_set_gfx_mode_windowed()
-{
-    ALLEGRO_DISPLAY *display;
-    display = al_get_current_display();
-
-    video_apply_window_size();
-
-    al_resize_display(display, main_window.current_elk.winsizex,  main_window.current_elk.winsizey);
-    al_set_display_flag(display, ALLEGRO_MAXIMIZED, false);
-    al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
-    al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
-//    al_set_display_flag
-//    set_gfx_mode(GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h);
 }
 
 void video_register_close_button_handler(void (*handler_function)(void))
@@ -313,35 +331,29 @@ int video_poll_joystick()
     return 0;
 }
 
-void video_set_gfx_mode_fullscreen()
+void video_enterfullscreen()
 {
+    menutimer = 0;
+    video_set_window_size(800,600, 0, 0);
+    video_set_gfx_mode_fullscreen();
     ALLEGRO_DISPLAY *display = al_get_current_display();
-    //save_winsizex = al_get_display_width(display);
-    //save_winsizey = al_get_display_height(display);
-    if (al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true)) 
+    log_debug("fullscreen mode coords %d, %d", al_get_display_width(display), al_get_display_height(display));
+    video_set_window_size(al_get_display_width(display), al_get_display_height(display), 0, 0);
+    video_resize_elk_window(current_elk_window.winsizex, current_elk_window.winsizey, elkConfig.display.maintain_aspect_ratio);
+}
+
+void video_leavefullscreen()
+{
+    video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
+    video_resize_elk_window(elkConfig.display.native_window_width, elkConfig.display.native_window_height, elkConfig.display.maintain_aspect_ratio);
+    video_set_gfx_mode_windowed();
+    if(menutimer > 0)
     {
-//#ifdef WIN32
-//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
-//        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
-//#endif
+        menutimer = 0;
+        ALLEGRO_DISPLAY *display = al_get_current_display();
+        menu_init(display);
     }
 }
-
-void video_set_depth_and_elk_palette()
-{
-    // Nothing to do in allegro5
-}
-
-void video_set_desktop_color_depth()
-{
-    // Nothing to do in allegro5
-}
-
-int video_get_desktop_color_depth()
-{
-    return(8); // TODO: probably won't need this in allegro5
-}
-
 
 //#ifdef WIN32
 //CRITICAL_SECTION cs;
@@ -367,19 +379,24 @@ void blit_normal(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
     int x = 0;
     int color = 0;
     char * region_data = NULL;
+    char * region_data_line = NULL;
+    uint8_t * elk_pixel = elk_screen_data;
     
     ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+
+    region_data_line = (char *)destRegion->data;
 
     // Here we create B from the memory data we have assembled.
     for(y=0; y<256; y++)
     {
-        region_data = (char *)destRegion->data + (destRegion->pitch * y);
+        region_data = region_data_line;
         for(x=0; x<640; x++)
         {
-            color = *(elk_screen_data + (y * 640) + x);
+            color = *elk_pixel++;
             *((uint32_t *)((char *)region_data)) = elkpal[color];
             region_data += destRegion->pixel_size;
         }
+        region_data_line += destRegion->pitch;
     }
     al_unlock_bitmap(destBitmap);
 }
@@ -390,32 +407,36 @@ void blit_scanlines(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
     int x = 0;
     int color = 0;
     char * region_data = NULL;
-    char * region_scan = NULL;
+    char * region_data_line = NULL;
+    uint8_t * elk_pixel = elk_screen_data;
 
     ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(destBitmap, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+
+    region_data_line = (char *)destRegion->data;
 
     // Here we create B from the memory data we have assembled.
     for(y=0; y<256; y++)
     {
-        region_data = (char *)destRegion->data + (destRegion->pitch * (y * 2));
-        region_scan = (char *)destRegion->data + (destRegion->pitch * ((y * 2) + 1));
+        region_data = region_data_line;
         for(x=0; x<640; x++)
         {
-            color = *(elk_screen_data + (y * 640) + x);
+            color = *elk_pixel++;
             *((uint32_t *)((char *)region_data)) = elkpal[color];
-            *((uint32_t *)((char *)region_scan)) = 0xff000000;
+            *((uint32_t *)((char *)region_data + destRegion->pitch)) = 0xff000000;
             region_data += destRegion->pixel_size;
-            region_scan += destRegion->pixel_size;
         }
+        region_data_line += (destRegion->pitch * 2);
     }
     al_unlock_bitmap(destBitmap);
 }
 
 
-void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth)
+void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
 {
-    //log_timer_begin();
-    //log_time_mark("video_blit_to_screen - start");
+    native_timestamp_t timestamp = native_timestamp_get();
+    ALLEGRO_DISPLAY *display = al_get_current_display();
+    ALLEGRO_COLOR bordercol = al_map_rgb(elkConfig.display.border.red, elkConfig.display.border.green, elkConfig.display.border.blue); // TODO: Optimise this (store, don't recalculate every blit).
+    al_draw_filled_rectangle(0,0, al_get_display_width(display), al_get_display_height(display), bordercol);
 
     startblit();
 
@@ -423,26 +444,42 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth)
     {
         case SCANLINES:
             blit_scanlines(b, elk_screen_data);
+            if(elkConfig.stats.blitting_performance_stats)
+            {
+                native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+                timestamp = native_timestamp_get();
+            }
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,512,
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
 
         case LINEDBL:
             blit_normal(b, elk_screen_data);
+            if(elkConfig.stats.blitting_performance_stats)
+            {
+                native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+                timestamp = native_timestamp_get();
+            }
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
 
         case _2XSAI:  // TODO: Get filter working for allegro5
             blit_normal(b, elk_screen_data);
+            if(elkConfig.stats.blitting_performance_stats)
+            {
+                native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+                timestamp = native_timestamp_get();
+            }
+
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             //blit(b,b162,0,0,0,0,640,256);
             //Super2xSaI(elk_screen_data,b,0,0,0,0,640,256);
             //al_set_target_backbuffer(al_get_current_display());
@@ -453,18 +490,28 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth)
 
         case SCALE2X:
             scale2x(elk_screen_data, b16, 640,256);
+            if(elkConfig.stats.blitting_performance_stats)
+            {
+                native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+                timestamp = native_timestamp_get();
+            }
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b16, 0,0,1280,512, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
 
         case EAGLE: // TODO: Get filter working for allegro5
             blit_normal(b, elk_screen_data);
+            if(elkConfig.stats.blitting_performance_stats)
+            {
+                native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+                timestamp = native_timestamp_get();
+            }
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,256, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             //blit(b,b162,0,0,0,0,640,256);
             //SuperEagle(b162,b16,0,0,0,0,320,256);
             //al_set_target_backbuffer(al_get_current_display());
@@ -476,20 +523,54 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data, int colDepth)
         case PAL:
         {
             palfilter(b, elk_screen_data);
-            //log_time_mark("video_blit_to_screen - pmid");
+            if(elkConfig.stats.blitting_performance_stats)
+            {
+                native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
+                timestamp = native_timestamp_get();
+            }
+
             al_set_target_backbuffer(al_get_current_display());
             al_draw_scaled_bitmap(b, 0,0,640,512, 
-                                     main_window.current_elk.startx, main_window.current_elk.starty,
-                                     main_window.current_elk.winsizex,main_window.current_elk.winsizey, 0);
+                                     current_elk_window.startx, current_elk_window.starty,
+                                     current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
         }
     }
 
     al_flip_display();
     endblit();
+
+
+    if(elkConfig.stats.blitting_performance_stats)
+    {
+        native_time_add_sample(&video_scaled_draw_average, native_timestamp_get() - timestamp);
+        if(native_time_all_samples_collected(&video_blit_average))
+        {
+            native_time_log_average(&video_blit_average, "blit average");
+            native_time_reset_samples(&video_blit_average);
+        }
+
+        if(native_time_all_samples_collected(&video_scaled_draw_average))
+        {
+            native_time_log_average(&video_scaled_draw_average, "scaled draw average");
+            native_time_reset_samples(&video_scaled_draw_average);
+        }
+    }
+
+    // If in fullscreen mode, check if menu is active and needs to be hidden
+    if(menutimer)
+    {
+        menutimer--;
+        if(!menutimer && elkConfig.display.fullscreen)
+        {
+            // Timer expired, if fullscreen is active we remove the menu.
+            menu_destroy(display);
+            al_hide_mouse_cursor(display);
+        }
+    }
 }
 
-void video_capture_screenshot(int drawMode, int colDepth)
+void video_capture_screenshot(int drawMode)
 {
     bm_screenshot = al_create_bitmap(640,512);
     // NOTE: No need to run any filtering (e.g. palfilt) here as
@@ -557,18 +638,6 @@ void video_clearall()
 void video_shutdown()
 {
     //allegro_exit();
-}
-
-void video_start_timer()
-{
-    //log_debug("video_start_timer: staring timer %p", timer);
-    al_start_timer(timer);
-}
-
-void video_stop_timer()
-{
-    //log_debug("video_start_timer: staring timer %p", timer);
-    al_stop_timer(timer);   
 }
 
 bool video_is_main_display(ALLEGRO_DISPLAY * current_display)

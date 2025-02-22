@@ -11,6 +11,25 @@
 #define uint16 unsigned short
 #define uint8 unsigned char
 
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
+
+// This structure will all information related to the native window state
+// and coordinates.
+
+typedef struct
+{
+    int startx;           // Start position within the native window for the electron window.
+    int starty;           // Start position within the native window for the electron window.
+    int winsizex;         // Current window size in pixels
+    int winsizey;         // Current window size in pixels
+} window_info_elk_t;
+
+
+int  video_init_begin();
+void video_init_complete();
+
 int Init_2xSaI(int depth);
 void Super2xSaI(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);
 void SuperEagle(BITMAP * bitmapSource, BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h);

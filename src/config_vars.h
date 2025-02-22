@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "keyboard.h"
+#include "logger.h"
 
 /******************************************************************************
 * Preprocessor Macros
@@ -31,6 +32,13 @@
 /******************************************************************************
 * Typedefs
 *******************************************************************************/
+
+typedef struct config_vars
+{
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+} cfg_rgb_t;
 
 typedef struct 
 {
@@ -81,7 +89,21 @@ typedef struct
     uint8_t drawmode;
     uint8_t videoresize;
     uint8_t maintain_aspect_ratio;
+    uint8_t maintain_pixel_ratio;
+    uint32_t native_window_width;           // Non-fullscreen mode window width.
+    uint32_t native_window_height;          // Non-fullscreen mode window height.
+    uint8_t fullscreen;
+    cfg_rgb_t border;
 } display_config_t;
+
+// Enable/disable various elkulator performance monitoring statistics
+typedef struct 
+{
+    bool titlebar_performance_stats;
+    bool blitting_performance_stats;
+    log_level_t log_level;
+} stats_config_t;
+
 
 typedef struct
 {
@@ -96,6 +118,7 @@ typedef struct
     keyboard_config_t  keyboard;
     tape_config_t      tape;
     disc_config_t      disc;
+    stats_config_t     stats;
 } elk_config_t;
 
 extern elk_config_t elkConfig;

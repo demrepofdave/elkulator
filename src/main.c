@@ -41,12 +41,17 @@
 
 #include "host_abstraction_layer/event_handler.h"
 #include "host_abstraction_layer/fileutils.h"
+#include "host_abstraction_layer/hal.h"
+#include "host_abstraction_layer/native_time.h"
 #include "host_abstraction_layer/sound.h"
 #include "host_abstraction_layer/video.h"
 
 /******************************************************************************
 * Preprocessor Macros
 *******************************************************************************/
+
+#define RUNELK_AVERAGE_PERIOD  50
+#define ACCEPTABLE_CUMULATED_TIMEDIFF 5000
 
 /******************************************************************************
 * Typedefs
@@ -78,6 +83,8 @@ int fullscreen=0;
 
 extern int wantloadstate;
 extern int wantsavestate;
+
+t_timeDiffAverage runelk_runtime_average;
 
 /******************************************************************************
 * Private Function Definitions
@@ -132,12 +139,6 @@ void initelk(int argc, char *argv[])
     int parallelnext=0;
     int serialnext=0;
     int serialdebugnext=0;
-    fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
-    #ifdef HAL_ALLEGRO_4
-        // TODO: Tidy-up.
-        char *p = fileutils_get_filename(exedir);
-        p[0] = 0;
-    #endif
     elkConfig.disc.discname[0]  = 0;
     elkConfig.disc.discname2[0] = 0;
     tapename[0] = 0;
@@ -146,7 +147,6 @@ void initelk(int argc, char *argv[])
     {
         romnames[i][0] = 0;
     }
-    loadconfig();
 
     for (c=1;c<argc;c++)
     {
@@ -239,7 +239,6 @@ void initelk(int argc, char *argv[])
         if (tapenext) tapenext--;
     }
 
-    sound_init_part1(0,NULL);
     loadroms();
     reset6502();
     initula();
@@ -262,9 +261,8 @@ void initelk(int argc, char *argv[])
     }
     if (elkConfig.disc.defaultwriteprot) writeprot[0]=writeprot[1]=1;
 
-    video_init_part3(drawitint);
+    hal_install_timer_callback(drawitint);
 
-    sound_init_part2();
     initsound();
     loaddiscsamps();
     maketapenoise();
@@ -283,7 +281,7 @@ elkstate_t elk_state = ELK_STATE_INITIALIZING;
 
 native_timediff_t runelk()
 {       
-    native_timestamp_t timestamp_start = log_get_timestamp();
+    native_timestamp_t timestamp_start = native_timestamp_get();
     native_timediff_t  timestamp_diff  = 0;
     int c;
     //log_time_mark("=== runelk begin ===");
@@ -322,7 +320,7 @@ native_timediff_t runelk()
     // Record how long elkrun took (this will allow the calling
     // function to make adjustments if this function took too
     // long (e.g. rendering took longer than expected)
-    timestamp_diff = log_get_timestamp() - timestamp_start;
+    timestamp_diff = native_timestamp_get() - timestamp_start;
 
     return timestamp_diff;
 }
@@ -335,13 +333,13 @@ void closeelk()
 
 void pauseelk()
 {
-    video_stop_timer();
+    hal_stop_timer();
     elk_state = ELK_STATE_PAUSED;
 }
 
 void resumeelk()
 {
-    video_start_timer();
+    hal_start_timer();
     elk_state = ELK_STATE_RUNNING;
 }
 
@@ -358,8 +356,18 @@ int main(int argc, char *argv[])
 {
     int count = 0;
     //init_config(); TODO: May need this not sure.
-    log_msg(__FUNCTION__, "Elkulator has started");
-    int ret = video_init_part1();
+    fileutils_get_executable_name(exedir,MAX_PATH_FILENAME_BUFFER_SIZE - 1);
+    #ifdef HAL_ALLEGRO_4
+        // TODO: Tidy-up.
+        char *p = fileutils_get_filename(exedir);
+        p[0] = 0;
+    #endif
+
+    loadconfig(); // Note: Also sets logging level from config file.
+
+    log_info("Elkulator has started");
+
+    int ret = hal_init_begin();
     if (ret != 0)
     {
         fprintf(stderr, "Error %d initializing Allegro.\n", ret);
@@ -379,7 +387,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                video_rest(1);
+                hal_timer_rest(1);
             }
 
             if (menu_pressed())
@@ -389,13 +397,14 @@ int main(int argc, char *argv[])
         }
     #else       
         resumeelk();
+        native_time_init_average(&runelk_runtime_average, RUNELK_AVERAGE_PERIOD);
         char elk_timediff_str[28];
         char elk_cumulated_timediff_str[28];
         elk_event_t elkEvent = 0;
         native_timediff_t elk_runtime = 0;
         native_timediff_t native_timer_diff = 0;
         native_timediff_t native_cummulative_time_diff = 0;
-        native_timestamp_t native_timestamp_last_trigger = log_get_timestamp();
+        native_timestamp_t native_timestamp_last_trigger = native_timestamp_get();
         native_timestamp_t native_timestamp_current = 0;
         while (!(elkEvent & ELK_EVENT_EXIT))
         {
@@ -410,13 +419,13 @@ int main(int argc, char *argv[])
             //log_debug("elkEvent=%04x", elkEvent);
             if(elkEvent & ELK_EVENT_TIMER_TRIGGERED) 
             {
-                native_timestamp_current = log_get_timestamp();
+                native_timestamp_current = native_timestamp_get();
                 native_timer_diff = native_timestamp_current - native_timestamp_last_trigger;
                 native_timestamp_last_trigger = native_timestamp_current;
                 native_cummulative_time_diff = native_cumulative_time_adjust(20000, native_cummulative_time_diff, native_timer_diff);
 
                 //drawit++;
-                if(native_cummulative_time_diff > 20000)
+                if(native_cummulative_time_diff > ACCEPTABLE_CUMULATED_TIMEDIFF)
                 {
                     pause_video_blit();
                     // Print out some stats for debug purposes.
@@ -425,6 +434,11 @@ int main(int argc, char *argv[])
                     log_debug("elkruntime = %s (%s)", elk_timediff_str, elk_cumulated_timediff_str);
                 }
                 elk_runtime = runelk();
+
+                if(elkConfig.stats.titlebar_performance_stats)
+                {
+                    native_time_add_sample(&runelk_runtime_average, elk_runtime);
+                }
 
                 // If tape is running and its speed is fast or really fast
                 // We need to runelk another 19 times (or until tape is
@@ -435,7 +449,7 @@ int main(int argc, char *argv[])
                 bool skip_video_refresh = false;
                 while(count && is_tapeon() && (is_csw() || is_uef()) && elkConfig.tape.speed)
                 {
-                    if(elk_runtime > 20000 && !skip_video_refresh)
+                    if(elk_runtime > ACCEPTABLE_CUMULATED_TIMEDIFF && !skip_video_refresh)
                     {
                         log_debug("!!tape skip video refresh disabled!!");
                         skip_video_refresh = true;
@@ -449,12 +463,22 @@ int main(int argc, char *argv[])
             else if(elkEvent & ELK_EVENT_HANDLED)
             {
                 // Menu may have been accessed, reset timing.
-                native_timestamp_last_trigger = log_get_timestamp();
+                native_timestamp_last_trigger = native_timestamp_get();
+            }
+            // Calculate average if triggered.
+            if(elkConfig.stats.titlebar_performance_stats)
+            {
+                if(native_time_all_samples_collected(&runelk_runtime_average))
+                {
+                    native_timediff_sprintf(elk_timediff_str, sizeof(elk_timediff_str), native_time_get_average(&runelk_runtime_average));
+                    video_set_window_title(VERSION_STR "  (%s)", elk_timediff_str);
+                    native_time_reset_samples(&runelk_runtime_average);
+                }
             }
         }
     #endif // HAL_ALLEGRO_4
     closeelk();
-    log_msg(__FUNCTION__, "Elkulator has ended");
+    log_info("Elkulator has ended");
     return 0;
 }
 
