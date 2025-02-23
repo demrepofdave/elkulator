@@ -2,6 +2,7 @@
 #include <allegro5/allegro.h>
 //#include <allegro/internal/aintern.h>
 #include "video_internal.h"
+#include "logger.h"
 
 //#define TRACE rpclog
 #define uint32 unsigned long
@@ -16,7 +17,8 @@ static uint32 redblueMask = 0xF81F;
 static uint32 greenMask = 0x7E0;
 static int xsai_depth = 0;
 
-
+typedef uint32_t elk_pallete_t;
+extern elk_pallete_t elkpal[8];
 
 int Init_2xSaI(int d)
 {
@@ -104,122 +106,58 @@ static int GetResult2(uint32 A, uint32 B, uint32 C, uint32 D, uint32 E)
 	+ ((((A & qlowpixelMask) + (B & qlowpixelMask) + (C & qlowpixelMask) + (D & qlowpixelMask)) >> 2) & qlowpixelMask)
 
 
-/* Clipping Macro, stolen from Allegro, modified to work with 2xSaI */
-#define BLIT_CLIP2(src, dest, s_x, s_y, d_x, d_y, w, h, xscale, yscale)      \
-   /* check for ridiculous cases */                                          \
-   if ((s_x >= src->cr) || (s_y >= src->cb) ||                               \
-       (d_x >= dest->cr) || (d_y >= dest->cb))                               \
-      return;                                                                \
-                                                                             \
-   if ((s_x + w < src->cl) || (s_y + h < src->ct) ||                         \
-       (d_x + w * xscale < dest->cl) || (d_y + h * yscale < dest->ct))       \
-      return;                                                                \
-                                                                             \
-   if (xscale < 1 || yscale < 1)                                             \
-      return;                                                                \
-                                                                             \
-   /* clip src left */                                                       \
-   if (s_x < src->cl) {                                                      \
-      w += s_x;                                                              \
-      d_x -= s_x * xscale;                                                   \
-      s_x = src->cl;                                                         \
-   }                                                                         \
-                                                                             \
-   /* clip src top */                                                        \
-   if (s_y < src->ct) {                                                      \
-      h += s_y;                                                              \
-      d_y -= s_y * yscale;                                                   \
-      s_y = src->ct;                                                         \
-   }                                                                         \
-                                                                             \
-   /* clip src right */                                                      \
-   if (s_x + w > src->cr)                                                    \
-      w = src->cr - s_x;                                                     \
-                                                                             \
-   /* clip src bottom */                                                     \
-   if (s_y + h > src->cb)                                                    \
-      h = src->cb - s_y;                                                     \
-                                                                             \
-   /* clip dest left */                                                      \
-   if (d_x < dest->cl) {                                                     \
-      d_x -= dest->cl;                                                       \
-      w += d_x / xscale;                                                     \
-      s_x -= d_x / xscale;                                                   \
-      d_x = dest->cl;                                                        \
-   }                                                                         \
-                                                                             \
-   /* clip dest top */                                                       \
-   if (d_y < dest->ct) {                                                     \
-      d_y -= dest->ct;                                                       \
-      h += d_y / yscale;                                                     \
-      s_y -= d_y / yscale;                                                   \
-      d_y = dest->ct;                                                        \
-   }                                                                         \
-                                                                             \
-   /* clip dest right */                                                     \
-   if (d_x + w * xscale > dest->cr)                                          \
-      w = (dest->cr - d_x) / xscale;                                         \
-                                                                             \
-   /* clip dest bottom */                                                    \
-   if (d_y + h * yscale > dest->cb)                                          \
-      h = (dest->cb - d_y) / yscale;                                         \
-                                                                             \
-   /* bottle out if zero size */                                             \
-   if ((w <= 0) || (h <= 0))                                                 \
-      return;
-
-
 static uint8_t *src_line[4];
 static uint8_t *dst_line[2];
 
 
-void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, uint8_t * elk_screen_data, int s_x, int s_y, int d_x, int d_y, int w, int h)
+void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, uint8_t * elk_screen_data, int w, int h)
 {
-	int sbpp, dbpp;
-
-	Super2xSaI_ex(elk_screen_data, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, bitmapDest, w, h);
-	
+	Super2xSaI_ex(elk_screen_data, bitmapDest, w, h);
 	return;
 }
 
-void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
+void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
 {
 	int j, v;
 	unsigned int x, y;
-	int sbpp = BYTES_PER_PIXEL(bitmap_color_depth(dest));
 	uint32_t color[16];
 
 	/* Point to the first 3 lines. */
-	src_line[0] = src;
-	src_line[1] = src;
-	src_line[2] = src + src_pitch;
-	src_line[3] = src + src_pitch * 2;
+	src_line[0] = elk_screen_data;
+	src_line[1] = elk_screen_data;
+	src_line[2] = elk_screen_data + width;
+	src_line[3] = elk_screen_data + (width * 2);
 
 	/* Can we write the results directly? */
-	if (is_video_bitmap(dest) || is_planar_bitmap(dest)) {
-		dst_line[0] = malloc(sizeof(char) * sbpp * width);
-		dst_line[1] = malloc(sizeof(char) * sbpp * width);
-		v = 1;
-	}
-	else {
-		dst_line[0] = dest->line[0];
-		dst_line[1] = dest->line[1];
-		v = 0;
-	}
+	dst_line[0] = dest->line[0];
+	dst_line[1] = dest->line[1];
+	v = 0;
 	
 	/* Set destination */
 	bmp_select(dest);
 
 	x = 0, y = 0;
 	
-    uint32_t *lbp;
-    lbp = (uint32_t*)src_line[0];
-    color[0] = *lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
-    color[4] = color[0];   color[5] = color[0];   color[6] = *(lbp + 1);  color[7] = *(lbp + 2);
-    lbp = (uint32_t*)src_line[2];
-    color[8] = *lbp;     color[9] = color[8];     color[10] = *(lbp + 1); color[11] = *(lbp + 2);
-    lbp = (uint32_t*)src_line[3];
-    color[12] = *lbp;    color[13] = color[12];   color[14] = *(lbp + 1); color[15] = *(lbp + 2);
+    uint32_t lbp, lbp1, lbp2;
+
+    lbp  = elkpal[*src_line[0]];
+	lbp1 = elkpal[*(src_line[0] + 1)];
+	lbp2 = elkpal[*(src_line[0] + 2)];
+
+    color[0] = lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
+    color[4] = color[0];  color[5] = color[0];   color[6] = lbp1;  color[7] = lbp2;
+
+	lbp  = elkpal[*src_line[2]];
+	lbp1 = elkpal[*(src_line[2] + 1)];
+	lbp2 = elkpal[*(src_line[2] + 2)];
+
+    color[8] = lbp;     color[9] = color[8];     color[10] = lbp1; color[11] = lbp2;
+
+	lbp  = elkpal[*src_line[3]];
+	lbp1 = elkpal[*(src_line[3] + 1)];
+	lbp2 = elkpal[*(src_line[3] + 2)];
+
+    color[12] = lbp;    color[13] = color[12];   color[14] = lbp1; color[15] = lbp2;
 
 	for (y = 0; y < height; y++) {
 	
@@ -302,10 +240,10 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, A
 			if (x < width - 3) {
 				x += 3;
 
-    			color[3] = *(((uint32_t*)src_line[0]) + x);
-				color[7] = *(((uint32_t*)src_line[1]) + x);
-				color[11] = *(((uint32_t*)src_line[2]) + x);
-				color[15] = *(((uint32_t*)src_line[3]) + x);
+    			color[3]  = elkpal[*(src_line[0] + x)];
+				color[7]  = elkpal[*(src_line[1] + x)];
+				color[11] = elkpal[*(src_line[2] + x)];
+				color[15] = elkpal[*(src_line[3] + x)];
 
 				x -= 3;
 			}
@@ -320,39 +258,40 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, A
 		if (y + 3 >= height)
 			src_line[3] = src_line[2];
 		else
-			src_line[3] = src_line[2] + src_pitch;
+			src_line[3] = src_line[2] + width;
 			
 		/* Then shift the color matrix up */
-    	uint32_t *lbp;
-		lbp = (uint32_t*)src_line[0];
-		color[0] = *lbp;     color[1] = color[0];    color[2] = *(lbp + 1);  color[3] = *(lbp + 2);
-		lbp = (uint32_t*)src_line[1];
-		color[4] = *lbp;     color[5] = color[4];    color[6] = *(lbp + 1);  color[7] = *(lbp + 2);
-		lbp = (uint32_t*)src_line[2];
-		color[8] = *lbp;     color[9] = color[9];    color[10] = *(lbp + 1); color[11] = *(lbp + 2);
-		lbp = (uint32_t*)src_line[3];
-		color[12] = *lbp;    color[13] = color[12];  color[14] = *(lbp + 1); color[15] = *(lbp + 2);
+		lbp  = elkpal[*src_line[0]];
+		lbp1 = elkpal[*(src_line[0] + 1)];
+		lbp2 = elkpal[*(src_line[0] + 2)];
+
+		color[0] = lbp;     color[1] = color[0];    color[2] = lbp1;  color[3] = lbp2;
+
+		lbp  = elkpal[*src_line[1]];
+		lbp1 = elkpal[*(src_line[1] + 1)];
+		lbp2 = elkpal[*(src_line[1] + 2)];
+
+		color[4] = lbp;     color[5] = color[4];    color[6] = lbp1;  color[7] = lbp2;
+
+		lbp  = elkpal[*src_line[2]];
+		lbp1 = elkpal[*(src_line[2] + 1)];
+		lbp2 = elkpal[*(src_line[2] + 2)];
+
+		color[8] = lbp;     color[9] = color[9];    color[10] = lbp1; color[11] = lbp2;
+
+		lbp  = elkpal[*src_line[3]];
+		lbp1 = elkpal[*(src_line[3] + 1)];
+		lbp2 = elkpal[*(src_line[3] + 2)];
+
+		color[12] = lbp;    color[13] = color[12];  color[14] = lbp1; color[15] = lbp2;
 		
 		/* Write the 2 lines, if not already done so */
-		if (v) {
-			uint32_t dst_addr;
-		
-			dst_addr = bmp_write_line(dest, y * 2);
-			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[0] + j)));
-				
-			dst_addr = bmp_write_line(dest, y * 2 + 1);
-			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[1] + j)));
-		}
-		else {
-			if (y < height - 1) {
-				dst_line[0] = dest->line[y * 2 + 2];
-				dst_line[1] = dest->line[y * 2 + 3];
-			}
+		if (y < height - 1) {
+			dst_line[0] = dest->line[y * 2 + 2];
+			dst_line[1] = dest->line[y * 2 + 3];
 		}
 	}
-	bmp_unwrite_line(dest);
+	//bmp_unwrite_line(dest);
 	
 	if (v) {
 		free(dst_line[0]);
@@ -362,217 +301,215 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, A
 
 
 
-void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
-{
-	int sbpp, dbpp;
+//void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
+//{
+//	int sbpp, dbpp;
 
-	ALLEGRO_BITMAP * dst2         = NULL;
+//	ALLEGRO_BITMAP * dst2         = NULL;
 
-	if (!bitmapSource || !bitmapDest)
-		return;
+//	if (!bitmapSource || !bitmapDest)
+//		return;
 
-	sbpp = bitmap_color_depth(bitmapSource);
-	dbpp = bitmap_color_depth(bitmapDest);
+//	sbpp = bitmap_color_depth(bitmapSource);
+//	dbpp = bitmap_color_depth(bitmapDest);
 
-	if ((sbpp != xsai_depth) || (sbpp != dbpp))	/* Must be same color depth */
-		return;
-
-//	BLIT_CLIP2(src, dest, s_x, s_y, d_x, d_y, w, h, 2, 2);
+//	if ((sbpp != xsai_depth) || (sbpp != dbpp))	/* Must be same color depth */
+//		return;
 		
-	if (w < 4 || h < 4) {  /* Image is too small to be 2xSaI'ed. */
-		stretch_blit(bitmapSource, bitmapDest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
-		return;
-	}	
+//	if (w < 4 || h < 4) {  /* Image is too small to be 2xSaI'ed. */
+//		stretch_blit(bitmapSource, bitmapDest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
+//		return;
+//	}	
 	
-	sbpp = BYTES_PER_PIXEL(sbpp);
-	if (d_x || d_y)
-		dst2 = create_sub_bitmap(bitmapDest, d_x, d_y, w * 2, h * 2);
+//	sbpp = BYTES_PER_PIXEL(sbpp);
+//	if (d_x || d_y)
+//		dst2 = create_sub_bitmap(bitmapDest, d_x, d_y, w * 2, h * 2);
 	
-	SuperEagle_ex(bitmapSource->line[s_y] + s_x * sbpp, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, dst2 ? dst2 : bitmapDest, w, h);
+//	SuperEagle_ex(bitmapSource->line[s_y] + s_x * sbpp, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, dst2 ? dst2 : bitmapDest, w, h);
 	
-	if (dst2)
-		destroy_bitmap(dst2);
+//	if (dst2)
+//		destroy_bitmap(dst2);
 	
-	return;
-}
+//	return;
+//}
 
-void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) {
+//void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) {
 
-	int j, v;
-	unsigned int x, y;
-	int sbpp = BYTES_PER_PIXEL(bitmap_color_depth(dest));
-	uint32_t color[12];
+//	int j, v;
+//	unsigned int x, y;
+//	int sbpp = BYTES_PER_PIXEL(bitmap_color_depth(dest));
+//	uint32_t color[12];
 
 	/* Point to the first 3 lines. */
-	src_line[0] = src;
-	src_line[1] = src;
-	src_line[2] = src + src_pitch;
-	src_line[3] = src + src_pitch * 2;
+//	src_line[0] = src;
+//	src_line[1] = src;
+//	src_line[2] = src + src_pitch;
+//	src_line[3] = src + src_pitch * 2;
 	
 	/* Can we write the results directly? */
-	if (is_video_bitmap(dest) || is_planar_bitmap(dest)) {
-		dst_line[0] = malloc(sizeof(char) * sbpp * width);
-		dst_line[1] = malloc(sizeof(char) * sbpp * width);
-		v = 1;
-	}
-	else {
-		dst_line[0] = dest->line[0];
-		dst_line[1] = dest->line[1];
-		v = 0;
-	}
+//	if (is_video_bitmap(dest) || is_planar_bitmap(dest)) {
+//		dst_line[0] = malloc(sizeof(char) * sbpp * width);
+//		dst_line[1] = malloc(sizeof(char) * sbpp * width);
+//		v = 1;
+//	}
+//	else {
+//		dst_line[0] = dest->line[0];
+//		dst_line[1] = dest->line[1];
+//		v = 0;
+//	}
 	
 	/* Set destination */
-	bmp_select(dest);
+//	bmp_select(dest);
 
-	x = 0, y = 0;
+//	x = 0, y = 0;
 	
-    uint32_t *lbp;
-    lbp = (uint32_t*)src_line[0];
-    color[0] = *lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
-    color[4] = *(lbp + 1); color[5] = *(lbp + 2);
-    lbp = (uint32_t*)src_line[2];
-    color[6] = *lbp;     color[7] = color[6];     color[8] = *(lbp + 1); color[9] = *(lbp + 2);
-    lbp = (uint32_t*)src_line[3];
-    color[10] = *lbp;    color[11] = *(lbp + 1);
+//    uint32_t *lbp;
+//    lbp = (uint32_t*)src_line[0];
+//    color[0] = *lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
+//    color[4] = *(lbp + 1); color[5] = *(lbp + 2);
+//    lbp = (uint32_t*)src_line[2];
+//    color[6] = *lbp;     color[7] = color[6];     color[8] = *(lbp + 1); color[9] = *(lbp + 2);
+//    lbp = (uint32_t*)src_line[3];
+//    color[10] = *lbp;    color[11] = *(lbp + 1);
 
-	for (y = 0; y < height; y++) {
+//	for (y = 0; y < height; y++) {
 	
 		/* Todo: x = width - 2, x = width - 1 */
 		
-		for (x = 0; x < width; x++) {
-			uint32_t product1a, product1b, product2a, product2b;
+//		for (x = 0; x < width; x++) {
+//			uint32_t product1a, product1b, product2a, product2b;
 
 //---------------------------------------     B1 B2           0  1
 //                                         4  5  6  S2 ->  2  3  4  5
 //                                         1  2  3  S1     6  7  8  9
 //                                            A1 A2          10 11
 
-			if (color[7] == color[4] && color[3] != color[8]) {
-				product1b = product2a = color[7];
+//			if (color[7] == color[4] && color[3] != color[8]) {
+//				product1b = product2a = color[7];
 
-				if ((color[6] == color[7]) || (color[4] == color[1]))
-					product1a = INTERPOLATE(color[7], INTERPOLATE(color[7], color[3]));
-				else
-					product1a = INTERPOLATE(color[3], color[4]);
+//				if ((color[6] == color[7]) || (color[4] == color[1]))
+//					product1a = INTERPOLATE(color[7], INTERPOLATE(color[7], color[3]));
+//				else
+//					product1a = INTERPOLATE(color[3], color[4]);
 
-				if ((color[4] == color[5]) || (color[7] == color[10]))
-					product2b = INTERPOLATE(color[7], INTERPOLATE(color[7], color[8]));
-				else
-					product2b = INTERPOLATE(color[7], color[8]);
-			}
-			else if (color[3] == color[8] && color[7] != color[4]) {
-				product2b = product1a = color[3];
+//				if ((color[4] == color[5]) || (color[7] == color[10]))
+//					product2b = INTERPOLATE(color[7], INTERPOLATE(color[7], color[8]));
+//				else
+//					product2b = INTERPOLATE(color[7], color[8]);
+//			}
+//			else if (color[3] == color[8] && color[7] != color[4]) {
+//				product2b = product1a = color[3];
 
-				if ((color[0] == color[3]) || (color[5] == color[9]))
-					product1b = INTERPOLATE(color[3], INTERPOLATE(color[3], color[4]));
-				else
-					product1b = INTERPOLATE(color[3], color[1]);
+//				if ((color[0] == color[3]) || (color[5] == color[9]))
+//					product1b = INTERPOLATE(color[3], INTERPOLATE(color[3], color[4]));
+//				else
+//					product1b = INTERPOLATE(color[3], color[1]);
 
-				if ((color[8] == color[11]) || (color[2] == color[3]))
-					product2a = INTERPOLATE(color[3], INTERPOLATE(color[3], color[2]));
-				else
-					product2a = INTERPOLATE(color[7], color[8]);
+//				if ((color[8] == color[11]) || (color[2] == color[3]))
+//					product2a = INTERPOLATE(color[3], INTERPOLATE(color[3], color[2]));
+//				else
+//					product2a = INTERPOLATE(color[7], color[8]);
 
-			}
-			else if (color[3] == color[8] && color[7] == color[4]) {
-				register int r = 0;
+//			}
+//			else if (color[3] == color[8] && color[7] == color[4]) {
+//				register int r = 0;
 
-				r += GET_RESULT(color[4], color[3], color[6], color[10]);
-				r += GET_RESULT(color[4], color[3], color[2], color[0]);
-				r += GET_RESULT(color[4], color[3], color[11], color[9]);
-				r += GET_RESULT(color[4], color[3], color[1], color[5]);
+//				r += GET_RESULT(color[4], color[3], color[6], color[10]);
+//				r += GET_RESULT(color[4], color[3], color[2], color[0]);
+//				r += GET_RESULT(color[4], color[3], color[11], color[9]);
+//				r += GET_RESULT(color[4], color[3], color[1], color[5]);
 
-				if (r > 0) {
-					product1b = product2a = color[7];
-					product1a = product2b = INTERPOLATE(color[3], color[4]);
-				}
-				else if (r < 0) {
-					product2b = product1a = color[3];
-					product1b = product2a = INTERPOLATE(color[3], color[4]);
-				}
-				else {
-					product2b = product1a = color[3];
-					product1b = product2a = color[7];
-				}
-			}
-			else {
-				product2b = product1a = INTERPOLATE(color[7], color[4]);
-				product2b = Q_INTERPOLATE(color[8], color[8], color[8], product2b);
-				product1a = Q_INTERPOLATE(color[3], color[3], color[3], product1a);
+//				if (r > 0) {
+//					product1b = product2a = color[7];
+//					product1a = product2b = INTERPOLATE(color[3], color[4]);
+//				}
+//				else if (r < 0) {
+//					product2b = product1a = color[3];
+//					product1b = product2a = INTERPOLATE(color[3], color[4]);
+//				}
+//				else {
+//					product2b = product1a = color[3];
+//					product1b = product2a = color[7];
+//				}
+//			}
+//			else {
+//				product2b = product1a = INTERPOLATE(color[7], color[4]);
+//				product2b = Q_INTERPOLATE(color[8], color[8], color[8], product2b);
+//				product1a = Q_INTERPOLATE(color[3], color[3], color[3], product1a);
 
-				product2a = product1b = INTERPOLATE(color[3], color[8]);
-				product2a = Q_INTERPOLATE(color[7], color[7], color[7], product2a);
-				product1b = Q_INTERPOLATE(color[4], color[4], color[4], product1b);
-			}
+//				product2a = product1b = INTERPOLATE(color[3], color[8]);
+//				product2a = Q_INTERPOLATE(color[7], color[7], color[7], product2a);
+//				product1b = Q_INTERPOLATE(color[4], color[4], color[4], product1b);
+//			}
 
-            *((uint32_t *) (&dst_line[0][x * 8])) = product1a;
-            *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
-            *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
-            *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
+//            *((uint32_t *) (&dst_line[0][x * 8])) = product1a;
+//            *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
+//            *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
+//            *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
 			
 			/* Move color matrix forward */
-			color[0] = color[1]; 
-			color[2] = color[3]; color[3] = color[4]; color[4] = color[5];
-			color[6] = color[7]; color[7] = color[8]; color[8] = color[9]; 
-			color[10] = color[11];
+//			color[0] = color[1]; 
+//			color[2] = color[3]; color[3] = color[4]; color[4] = color[5];
+//			color[6] = color[7]; color[7] = color[8]; color[8] = color[9]; 
+//			color[10] = color[11];
 			
-			if (x < width - 2) {
-				x += 2;
-                color[1] = *(((uint32_t*)src_line[0]) + x);
-                if (x < width) {
-                    color[5] = *(((uint32_t*)src_line[1]) + x + 1);
-                    color[9] = *(((uint32_t*)src_line[2]) + x + 1);
-                }
-                color[11] = *(((uint32_t*)src_line[3]) + x);
-				x -= 2;
-			}
-		}
+//			if (x < width - 2) {
+//				x += 2;
+//                color[1] = *(((uint32_t*)src_line[0]) + x);
+//                if (x < width) {
+//                    color[5] = *(((uint32_t*)src_line[1]) + x + 1);
+//                    color[9] = *(((uint32_t*)src_line[2]) + x + 1);
+//                }
+//                color[11] = *(((uint32_t*)src_line[3]) + x);
+//				x -= 2;
+//			}
+//		}
 
 		/* We're done with one line, so we shift the source lines up */
-		src_line[0] = src_line[1];
-		src_line[1] = src_line[2];
-		src_line[2] = src_line[3];		
+//		src_line[0] = src_line[1];
+//		src_line[1] = src_line[2];
+//		src_line[2] = src_line[3];		
 
 		/* Read next line */
-		if (y + 3 >= height)
-			src_line[3] = src_line[2];
-		else
-			src_line[3] = src_line[2] + src_pitch;
+//		if (y + 3 >= height)
+//			src_line[3] = src_line[2];
+//		else
+//			src_line[3] = src_line[2] + src_pitch;
 			
 		/* Then shift the color matrix up */
-        uint32_t *lbp;
-        lbp = (uint32_t*)src_line[0];
-        color[0] = *lbp;     color[1] = *(lbp + 1);
-        lbp = (uint32_t*)src_line[1];
-        color[2] = *lbp;     color[3] = color[2];    color[4] = *(lbp + 1);  color[5] = *(lbp + 2);
-        lbp = (uint32_t*)src_line[2];
-        color[6] = *lbp;     color[7] = color[6];    color[8] = *(lbp + 1);  color[9] = *(lbp + 2);
-        lbp = (uint32_t*)src_line[3];
-        color[10] = *lbp;    color[11] = *(lbp + 1);
+//        uint32_t *lbp;
+//        lbp = (uint32_t*)src_line[0];
+//        color[0] = *lbp;     color[1] = *(lbp + 1);
+//        lbp = (uint32_t*)src_line[1];
+//        color[2] = *lbp;     color[3] = color[2];    color[4] = *(lbp + 1);  color[5] = *(lbp + 2);
+//        lbp = (uint32_t*)src_line[2];
+//        color[6] = *lbp;     color[7] = color[6];    color[8] = *(lbp + 1);  color[9] = *(lbp + 2);
+//        lbp = (uint32_t*)src_line[3];
+//        color[10] = *lbp;    color[11] = *(lbp + 1);
 
 		/* Write the 2 lines, if not already done so */
-		if (v) {
-			uint32_t dst_addr;
+//		if (v) {
+//			uint32_t dst_addr;
 		
-			dst_addr = bmp_write_line(dest, y * 2);
-			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[0] + j)));
+//			dst_addr = bmp_write_line(dest, y * 2);
+//			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
+//				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[0] + j)));
 				
-			dst_addr = bmp_write_line(dest, y * 2 + 1);
-			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[1] + j)));
-		}
-		else {
-			if (y < height - 1) {
-				dst_line[0] = dest->line[y * 2 + 2];
-				dst_line[1] = dest->line[y * 2 + 3];
-			}
-		}
-	}
-	bmp_unwrite_line(dest);
+//			dst_addr = bmp_write_line(dest, y * 2 + 1);
+//			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
+//				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[1] + j)));
+//		}
+//		else {
+//			if (y < height - 1) {
+//				dst_line[0] = dest->line[y * 2 + 2];
+//				dst_line[1] = dest->line[y * 2 + 3];
+//			}
+//		}
+//	}
+//	bmp_unwrite_line(dest);
 	
-	if (v) {
-		free(dst_line[0]);
-		free(dst_line[1]);
-	}
-}
+//	if (v) {
+//		free(dst_line[0]);
+//		free(dst_line[1]);
+//	}
+//}
