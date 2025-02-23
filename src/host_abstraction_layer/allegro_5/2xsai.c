@@ -1,6 +1,7 @@
 #include <string.h>
 #include <allegro5/allegro.h>
 //#include <allegro/internal/aintern.h>
+#include <allegro5/allegro_primitives.h>
 #include "video_internal.h"
 #include "logger.h"
 
@@ -19,6 +20,22 @@ static int xsai_depth = 0;
 
 typedef uint32_t elk_pallete_t;
 extern elk_pallete_t elkpal[8];
+
+// TODO: Raid allegro4 code for implementation.
+int makecol_depth(int depth, int r, int g, int b){
+    switch (depth){
+        //case 8: return bestfit_color(current_palette, r>>2, g>>2, b>>2);
+        case 15: return (r >> 3) + ((g >> 3) << 5) + ((b >> 3) << 10);
+        case 16: return (r >> 3) + ((g >> 2) << 5) + ((b >> 3) << 11);
+        case 24: return r + (g << 8) + (b << 16);
+        case 32: return r + (g << 8) + (b << 16) + (255 << 24);
+        default: return 0;
+    }
+}
+
+int makecol(int r, int g, int b){
+    return makecol_depth(32, r, g, b); // TODO: Check code here.
+}
 
 int Init_2xSaI(int d)
 {
@@ -46,10 +63,11 @@ int Init_2xSaI(int d)
 	redblueMask = makecol_depth(d, 255, 0, 255);
 	greenMask = makecol_depth(d, 0, 255, 0);
 
-	TRACE("Color Mask:       0x%lX\n", colorMask);
-	TRACE("Low Pixel Mask:   0x%lX\n", lowPixelMask);
-	TRACE("QColor Mask:      0x%lX\n", qcolorMask);
-	TRACE("QLow Pixel Mask:  0x%lX\n", qlowpixelMask);
+	log_debug("Color Depth:      %d\n", d);
+	log_debug("Color Mask:       0x%lX\n", colorMask);
+	log_debug("Low Pixel Mask:   0x%lX\n", lowPixelMask);
+	log_debug("QColor Mask:      0x%lX\n", qcolorMask);
+	log_debug("QLow Pixel Mask:  0x%lX\n", qlowpixelMask);
 	
 	xsai_depth = d;
 
@@ -110,7 +128,7 @@ static uint8_t *src_line[4];
 static uint8_t *dst_line[2];
 
 
-void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, uint8_t * elk_screen_data, int w, int h)
+void Super2xSaI(uint8_t * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int w, int h)
 {
 	Super2xSaI_ex(elk_screen_data, bitmapDest, w, h);
 	return;
@@ -118,7 +136,6 @@ void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, uint8_t * elk_screen_data, int w, i
 
 void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
 {
-	int j, v;
 	unsigned int x, y;
 	uint32_t color[16];
 
@@ -127,14 +144,16 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 	src_line[1] = elk_screen_data;
 	src_line[2] = elk_screen_data + width;
 	src_line[3] = elk_screen_data + (width * 2);
-
-	/* Can we write the results directly? */
-	dst_line[0] = dest->line[0];
-	dst_line[1] = dest->line[1];
-	v = 0;
 	
 	/* Set destination */
-	bmp_select(dest);
+	//bmp_select(dest);
+    uint8_t * region_data_line = NULL;
+	ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(dest, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+    region_data_line = (uint8_t *)destRegion->data;
+
+	/* Can we write the results directly? */
+	dst_line[0] = (uint8 *)region_data_line;
+	dst_line[1] = (uint8 *)region_data_line + destRegion->pitch;
 
 	x = 0, y = 0;
 	
@@ -287,16 +306,11 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 		
 		/* Write the 2 lines, if not already done so */
 		if (y < height - 1) {
-			dst_line[0] = dest->line[y * 2 + 2];
-			dst_line[1] = dest->line[y * 2 + 3];
+			dst_line[0] = region_data_line + (destRegion->pitch * (y + 2));
+			dst_line[1] = region_data_line + (destRegion->pitch * (y + 3));
 		}
 	}
-	//bmp_unwrite_line(dest);
-	
-	if (v) {
-		free(dst_line[0]);
-		free(dst_line[1]);
-	}
+	al_unlock_bitmap(dest);
 }
 
 
