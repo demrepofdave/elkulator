@@ -182,6 +182,7 @@ void initelk(int argc, char *argv[])
         {
             romnext=-1;
         }
+#ifndef WIN32
         else if (!strcasecmp(argv[c],"-parallel"))
         {
             parallelnext=1;
@@ -194,6 +195,7 @@ void initelk(int argc, char *argv[])
         {
             serialdebugnext=1;
         }
+#endif
         else if (!strcasecmp(argv[c],"-debug"))
         {
             debug=debugon=1;
@@ -221,6 +223,7 @@ void initelk(int argc, char *argv[])
                 romnext = -2;
             }
         }
+#ifndef WIN32
         else if (parallelnext)
         {
             strcpy(parallelname,argv[c]);
@@ -236,6 +239,7 @@ void initelk(int argc, char *argv[])
             serial_debug = atoi(argv[c]);
             serialdebugnext=0;
         }
+#endif
         if (tapenext) tapenext--;
     }
 

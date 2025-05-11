@@ -153,7 +153,7 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 
 	/* Can we write the results directly? */
 	dst_line[0] = region_data_line;
-	dst_line[1] = region_data_line + (destRegion->pitch * 2);
+	dst_line[1] = region_data_line + destRegion->pitch;
 
 	x = 0, y = 0;
 	
@@ -312,8 +312,8 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 		/* Write the 2 lines, if not already done so */
 		if (y < height - 1) {
 
-			int dest_pitch_y_plus_2 = (destRegion->pitch * ((y + 2) *2));
-			int dest_pitch_y_plus_3 = (destRegion->pitch * ((y + 3) *2));
+			int dest_pitch_y_plus_2 = (destRegion->pitch * ((y + 2)));
+			int dest_pitch_y_plus_3 = (destRegion->pitch * ((y + 3)));
 
 			dst_line[0] = region_data_line + dest_pitch_y_plus_2;
 			dst_line[1] = region_data_line + dest_pitch_y_plus_3;
