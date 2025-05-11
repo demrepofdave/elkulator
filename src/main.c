@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
                         skip_video_refresh = true;
                         pause_video_blit(); // We don't need to update the screen for this (helps on slower machines).
                     }
-                    elk_runtime += runelk(skip_video_refresh);
+                    elk_runtime += runelk();
                     count--;
                 }
                 resume_video_blit();
