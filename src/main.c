@@ -356,7 +356,7 @@ void native_window_close_button_handler(void)
 * Public Function Definitions
 *******************************************************************************/
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     int count = 0;
     //init_config(); TODO: May need this not sure.
