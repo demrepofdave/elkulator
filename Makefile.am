@@ -17,9 +17,9 @@ elkulator_CFLAGS = $(allegro_CFLAGS) -I ./src/ -Wno-unused-result
 
 # workaround for Win32 Allegro, which has `allegro-config' missing
 if OS_WIN
-elkulator_LDADD = -lalleg -lz -lopenal -lalut -lallegro_main
+elkulator_LDADD = -lalleg -lz -lopenal -lalut
 else
-elkulator_LDADD = $(allegro_LIBS) -lz -lopenal -lalut -lz -lallegro_main
+elkulator_LDADD = $(allegro_LIBS) -lz -lopenal -lalut -lz
 endif
 
 if ENABLE_ALLEGRO4

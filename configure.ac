@@ -52,6 +52,7 @@ else
    AC_CHECK_HEADER([allegro5/allegro.h],[],
 	    [AC_MSG_FAILURE([The Allegro version 5 library is needed but not installed], 1)],[])
    AC_CHECK_LIB([allegro], [al_install_system])
+   AC_CHECK_LIB([allegro_main], [al_install_system])
    AC_CHECK_LIB([allegro_acodec], [al_init_acodec_addon])
    AC_CHECK_LIB([allegro_audio], [al_install_audio])
    AC_CHECK_LIB([allegro_dialog], [al_init_native_dialog_addon])
