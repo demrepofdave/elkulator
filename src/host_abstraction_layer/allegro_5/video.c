@@ -488,14 +488,9 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
                 timestamp = native_timestamp_get();
             }
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b16, 0,0,1280,256, 
+            al_draw_scaled_bitmap(b16, 0,0,1280,512, 
                                      current_elk_window.startx, current_elk_window.starty,
                                      current_elk_window.winsizex,current_elk_window.winsizey, 0);
-
-            //al_set_target_backbuffer(al_get_current_display());
-            //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
-            //al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
-            //blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
             break;
 
         case SCALE2X:
