@@ -152,8 +152,8 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
     region_data_line = (uint8_t *)destRegion->data;
 
 	/* Can we write the results directly? */
-	dst_line[0] = (uint8 *)region_data_line;
-	dst_line[1] = (uint8 *)region_data_line + destRegion->pitch;
+	dst_line[0] = region_data_line;
+	dst_line[1] = region_data_line + (destRegion->pitch * 2);
 
 	x = 0, y = 0;
 	
@@ -245,11 +245,16 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 				product1a = INTERPOLATE(color[9], color[5]);
 			else
 				product1a = color[5];
-	
+
             *((uint32_t *) (&dst_line[0][x * 8])) = product1a;
             *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
             *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
             *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
+			// TODO: Following does not work yet.
+			*((uint32_t *) (&dst_line[0][x * 8]) + destRegion->pitch) = product1a;
+            *((uint32_t *) (&dst_line[0][x * 8 + 4]) + destRegion->pitch) = product1b;
+            *((uint32_t *) (&dst_line[1][x * 8]) + destRegion->pitch) = product2a;
+            *((uint32_t *) (&dst_line[1][x * 8 + 4])+ destRegion->pitch) = product2b;
 			
 			/* Move color matrix forward */
 			color[0] = color[1]; color[4] = color[5]; color[8] = color[9];   color[12] = color[13];
@@ -306,8 +311,13 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 		
 		/* Write the 2 lines, if not already done so */
 		if (y < height - 1) {
-			dst_line[0] = region_data_line + (destRegion->pitch * (y + 2));
-			dst_line[1] = region_data_line + (destRegion->pitch * (y + 3));
+
+			int dest_pitch_y_plus_2 = (destRegion->pitch * ((y + 2) *2));
+			int dest_pitch_y_plus_3 = (destRegion->pitch * ((y + 3) *2));
+
+			dst_line[0] = region_data_line + dest_pitch_y_plus_2;
+			dst_line[1] = region_data_line + dest_pitch_y_plus_3;
+
 		}
 	}
 	al_unlock_bitmap(dest);
