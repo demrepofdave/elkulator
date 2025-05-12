@@ -325,215 +325,216 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 
 
 
-//void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
-//{
-//	int sbpp, dbpp;
+void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
+{
+	int sbpp, dbpp;
 
-//	ALLEGRO_BITMAP * dst2         = NULL;
+	ALLEGRO_BITMAP * dst2         = NULL;
 
-//	if (!bitmapSource || !bitmapDest)
-//		return;
+	if (!bitmapSource || !bitmapDest)
+		return;
 
-//	sbpp = bitmap_color_depth(bitmapSource);
-//	dbpp = bitmap_color_depth(bitmapDest);
+	sbpp = bitmap_color_depth(bitmapSource);
+	dbpp = bitmap_color_depth(bitmapDest);
 
-//	if ((sbpp != xsai_depth) || (sbpp != dbpp))	/* Must be same color depth */
-//		return;
+	if ((sbpp != xsai_depth) || (sbpp != dbpp))	/* Must be same color depth */
+		return;
 		
-//	if (w < 4 || h < 4) {  /* Image is too small to be 2xSaI'ed. */
-//		stretch_blit(bitmapSource, bitmapDest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
-//		return;
-//	}	
+	if (w < 4 || h < 4) {  /* Image is too small to be 2xSaI'ed. */
+		stretch_blit(bitmapSource, bitmapDest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
+		return;
+	}	
 	
-//	sbpp = BYTES_PER_PIXEL(sbpp);
-//	if (d_x || d_y)
-//		dst2 = create_sub_bitmap(bitmapDest, d_x, d_y, w * 2, h * 2);
+	sbpp = BYTES_PER_PIXEL(sbpp);
+	if (d_x || d_y)
+		dst2 = create_sub_bitmap(bitmapDest, d_x, d_y, w * 2, h * 2);
 	
-//	SuperEagle_ex(bitmapSource->line[s_y] + s_x * sbpp, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, dst2 ? dst2 : bitmapDest, w, h);
+	SuperEagle_ex(bitmapSource->line[s_y] + s_x * sbpp, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, dst2 ? dst2 : bitmapDest, w, h);
 	
-//	if (dst2)
-//		destroy_bitmap(dst2);
+	if (dst2)
+		destroy_bitmap(dst2);
 	
-//	return;
-//}
+	return;
+}
 
-//void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) {
+void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height)
+{
 
-//	int j, v;
-//	unsigned int x, y;
-//	int sbpp = BYTES_PER_PIXEL(bitmap_color_depth(dest));
-//	uint32_t color[12];
+	int j, v;
+	unsigned int x, y;
+	int sbpp = BYTES_PER_PIXEL(bitmap_color_depth(dest));
+	uint32_t color[12];
 
 	/* Point to the first 3 lines. */
-//	src_line[0] = src;
-//	src_line[1] = src;
-//	src_line[2] = src + src_pitch;
-//	src_line[3] = src + src_pitch * 2;
+	src_line[0] = src;
+	src_line[1] = src;
+	src_line[2] = src + src_pitch;
+	src_line[3] = src + src_pitch * 2;
 	
 	/* Can we write the results directly? */
-//	if (is_video_bitmap(dest) || is_planar_bitmap(dest)) {
-//		dst_line[0] = malloc(sizeof(char) * sbpp * width);
-//		dst_line[1] = malloc(sizeof(char) * sbpp * width);
-//		v = 1;
-//	}
-//	else {
-//		dst_line[0] = dest->line[0];
-//		dst_line[1] = dest->line[1];
-//		v = 0;
-//	}
+	if (is_video_bitmap(dest) || is_planar_bitmap(dest)) {
+		dst_line[0] = malloc(sizeof(char) * sbpp * width);
+		dst_line[1] = malloc(sizeof(char) * sbpp * width);
+		v = 1;
+	}
+	else {
+		dst_line[0] = dest->line[0];
+		dst_line[1] = dest->line[1];
+		v = 0;
+	}
 	
 	/* Set destination */
-//	bmp_select(dest);
+	bmp_select(dest);
 
-//	x = 0, y = 0;
+	x = 0, y = 0;
 	
-//    uint32_t *lbp;
-//    lbp = (uint32_t*)src_line[0];
-//    color[0] = *lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
-//    color[4] = *(lbp + 1); color[5] = *(lbp + 2);
-//    lbp = (uint32_t*)src_line[2];
-//    color[6] = *lbp;     color[7] = color[6];     color[8] = *(lbp + 1); color[9] = *(lbp + 2);
-//    lbp = (uint32_t*)src_line[3];
-//    color[10] = *lbp;    color[11] = *(lbp + 1);
+    uint32_t *lbp;
+    lbp = (uint32_t*)src_line[0];
+    color[0] = *lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
+    color[4] = *(lbp + 1); color[5] = *(lbp + 2);
+    lbp = (uint32_t*)src_line[2];
+    color[6] = *lbp;     color[7] = color[6];     color[8] = *(lbp + 1); color[9] = *(lbp + 2);
+    lbp = (uint32_t*)src_line[3];
+    color[10] = *lbp;    color[11] = *(lbp + 1);
 
-//	for (y = 0; y < height; y++) {
+	for (y = 0; y < height; y++) {
 	
 		/* Todo: x = width - 2, x = width - 1 */
 		
-//		for (x = 0; x < width; x++) {
-//			uint32_t product1a, product1b, product2a, product2b;
+		for (x = 0; x < width; x++) {
+			uint32_t product1a, product1b, product2a, product2b;
 
 //---------------------------------------     B1 B2           0  1
 //                                         4  5  6  S2 ->  2  3  4  5
 //                                         1  2  3  S1     6  7  8  9
 //                                            A1 A2          10 11
 
-//			if (color[7] == color[4] && color[3] != color[8]) {
-//				product1b = product2a = color[7];
+			if (color[7] == color[4] && color[3] != color[8]) {
+				product1b = product2a = color[7];
 
-//				if ((color[6] == color[7]) || (color[4] == color[1]))
-//					product1a = INTERPOLATE(color[7], INTERPOLATE(color[7], color[3]));
-//				else
-//					product1a = INTERPOLATE(color[3], color[4]);
+				if ((color[6] == color[7]) || (color[4] == color[1]))
+					product1a = INTERPOLATE(color[7], INTERPOLATE(color[7], color[3]));
+				else
+					product1a = INTERPOLATE(color[3], color[4]);
 
-//				if ((color[4] == color[5]) || (color[7] == color[10]))
-//					product2b = INTERPOLATE(color[7], INTERPOLATE(color[7], color[8]));
-//				else
-//					product2b = INTERPOLATE(color[7], color[8]);
-//			}
-//			else if (color[3] == color[8] && color[7] != color[4]) {
-//				product2b = product1a = color[3];
+				if ((color[4] == color[5]) || (color[7] == color[10]))
+					product2b = INTERPOLATE(color[7], INTERPOLATE(color[7], color[8]));
+				else
+					product2b = INTERPOLATE(color[7], color[8]);
+			}
+			else if (color[3] == color[8] && color[7] != color[4]) {
+				product2b = product1a = color[3];
 
-//				if ((color[0] == color[3]) || (color[5] == color[9]))
-//					product1b = INTERPOLATE(color[3], INTERPOLATE(color[3], color[4]));
-//				else
-//					product1b = INTERPOLATE(color[3], color[1]);
+				if ((color[0] == color[3]) || (color[5] == color[9]))
+					product1b = INTERPOLATE(color[3], INTERPOLATE(color[3], color[4]));
+				else
+					product1b = INTERPOLATE(color[3], color[1]);
 
-//				if ((color[8] == color[11]) || (color[2] == color[3]))
-//					product2a = INTERPOLATE(color[3], INTERPOLATE(color[3], color[2]));
-//				else
-//					product2a = INTERPOLATE(color[7], color[8]);
+				if ((color[8] == color[11]) || (color[2] == color[3]))
+					product2a = INTERPOLATE(color[3], INTERPOLATE(color[3], color[2]));
+				else
+					product2a = INTERPOLATE(color[7], color[8]);
 
-//			}
-//			else if (color[3] == color[8] && color[7] == color[4]) {
-//				register int r = 0;
+			}
+			else if (color[3] == color[8] && color[7] == color[4]) {
+				register int r = 0;
 
-//				r += GET_RESULT(color[4], color[3], color[6], color[10]);
-//				r += GET_RESULT(color[4], color[3], color[2], color[0]);
-//				r += GET_RESULT(color[4], color[3], color[11], color[9]);
-//				r += GET_RESULT(color[4], color[3], color[1], color[5]);
+				r += GET_RESULT(color[4], color[3], color[6], color[10]);
+				r += GET_RESULT(color[4], color[3], color[2], color[0]);
+				r += GET_RESULT(color[4], color[3], color[11], color[9]);
+				r += GET_RESULT(color[4], color[3], color[1], color[5]);
 
-//				if (r > 0) {
-//					product1b = product2a = color[7];
-//					product1a = product2b = INTERPOLATE(color[3], color[4]);
-//				}
-//				else if (r < 0) {
-//					product2b = product1a = color[3];
-//					product1b = product2a = INTERPOLATE(color[3], color[4]);
-//				}
-//				else {
-//					product2b = product1a = color[3];
-//					product1b = product2a = color[7];
-//				}
-//			}
-//			else {
-//				product2b = product1a = INTERPOLATE(color[7], color[4]);
-//				product2b = Q_INTERPOLATE(color[8], color[8], color[8], product2b);
-//				product1a = Q_INTERPOLATE(color[3], color[3], color[3], product1a);
+				if (r > 0) {
+					product1b = product2a = color[7];
+					product1a = product2b = INTERPOLATE(color[3], color[4]);
+				}
+				else if (r < 0) {
+					product2b = product1a = color[3];
+					product1b = product2a = INTERPOLATE(color[3], color[4]);
+				}
+				else {
+					product2b = product1a = color[3];
+					product1b = product2a = color[7];
+				}
+			}
+			else {
+				product2b = product1a = INTERPOLATE(color[7], color[4]);
+				product2b = Q_INTERPOLATE(color[8], color[8], color[8], product2b);
+				product1a = Q_INTERPOLATE(color[3], color[3], color[3], product1a);
 
-//				product2a = product1b = INTERPOLATE(color[3], color[8]);
-//				product2a = Q_INTERPOLATE(color[7], color[7], color[7], product2a);
-//				product1b = Q_INTERPOLATE(color[4], color[4], color[4], product1b);
-//			}
+				product2a = product1b = INTERPOLATE(color[3], color[8]);
+				product2a = Q_INTERPOLATE(color[7], color[7], color[7], product2a);
+				product1b = Q_INTERPOLATE(color[4], color[4], color[4], product1b);
+			}
 
-//            *((uint32_t *) (&dst_line[0][x * 8])) = product1a;
-//            *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
-//            *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
-//            *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
+            *((uint32_t *) (&dst_line[0][x * 8])) = product1a;
+            *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
+            *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
+            *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
 			
 			/* Move color matrix forward */
-//			color[0] = color[1]; 
-//			color[2] = color[3]; color[3] = color[4]; color[4] = color[5];
-//			color[6] = color[7]; color[7] = color[8]; color[8] = color[9]; 
-//			color[10] = color[11];
+			color[0] = color[1]; 
+			color[2] = color[3]; color[3] = color[4]; color[4] = color[5];
+			color[6] = color[7]; color[7] = color[8]; color[8] = color[9]; 
+			color[10] = color[11];
 			
-//			if (x < width - 2) {
-//				x += 2;
-//                color[1] = *(((uint32_t*)src_line[0]) + x);
-//                if (x < width) {
-//                    color[5] = *(((uint32_t*)src_line[1]) + x + 1);
-//                    color[9] = *(((uint32_t*)src_line[2]) + x + 1);
-//                }
-//                color[11] = *(((uint32_t*)src_line[3]) + x);
-//				x -= 2;
-//			}
-//		}
+			if (x < width - 2) {
+				x += 2;
+                color[1] = *(((uint32_t*)src_line[0]) + x);
+                if (x < width) {
+                    color[5] = *(((uint32_t*)src_line[1]) + x + 1);
+                    color[9] = *(((uint32_t*)src_line[2]) + x + 1);
+                }
+                color[11] = *(((uint32_t*)src_line[3]) + x);
+				x -= 2;
+			}
+		}
 
 		/* We're done with one line, so we shift the source lines up */
-//		src_line[0] = src_line[1];
-//		src_line[1] = src_line[2];
-//		src_line[2] = src_line[3];		
+		src_line[0] = src_line[1];
+		src_line[1] = src_line[2];
+		src_line[2] = src_line[3];		
 
 		/* Read next line */
-//		if (y + 3 >= height)
-//			src_line[3] = src_line[2];
-//		else
-//			src_line[3] = src_line[2] + src_pitch;
+		if (y + 3 >= height)
+			src_line[3] = src_line[2];
+		else
+			src_line[3] = src_line[2] + src_pitch;
 			
 		/* Then shift the color matrix up */
-//        uint32_t *lbp;
-//        lbp = (uint32_t*)src_line[0];
-//        color[0] = *lbp;     color[1] = *(lbp + 1);
-//        lbp = (uint32_t*)src_line[1];
-//        color[2] = *lbp;     color[3] = color[2];    color[4] = *(lbp + 1);  color[5] = *(lbp + 2);
-//        lbp = (uint32_t*)src_line[2];
-//        color[6] = *lbp;     color[7] = color[6];    color[8] = *(lbp + 1);  color[9] = *(lbp + 2);
-//        lbp = (uint32_t*)src_line[3];
-//        color[10] = *lbp;    color[11] = *(lbp + 1);
+        uint32_t *lbp;
+        lbp = (uint32_t*)src_line[0];
+        color[0] = *lbp;     color[1] = *(lbp + 1);
+        lbp = (uint32_t*)src_line[1];
+        color[2] = *lbp;     color[3] = color[2];    color[4] = *(lbp + 1);  color[5] = *(lbp + 2);
+        lbp = (uint32_t*)src_line[2];
+        color[6] = *lbp;     color[7] = color[6];    color[8] = *(lbp + 1);  color[9] = *(lbp + 2);
+        lbp = (uint32_t*)src_line[3];
+        color[10] = *lbp;    color[11] = *(lbp + 1);
 
 		/* Write the 2 lines, if not already done so */
-//		if (v) {
-//			uint32_t dst_addr;
+		if (v) {
+			uint32_t dst_addr;
 		
-//			dst_addr = bmp_write_line(dest, y * 2);
-//			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-//				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[0] + j)));
+			dst_addr = bmp_write_line(dest, y * 2);
+			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
+				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[0] + j)));
 				
-//			dst_addr = bmp_write_line(dest, y * 2 + 1);
-//			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-//				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[1] + j)));
-//		}
-//		else {
-//			if (y < height - 1) {
-//				dst_line[0] = dest->line[y * 2 + 2];
-//				dst_line[1] = dest->line[y * 2 + 3];
-//			}
-//		}
-//	}
-//	bmp_unwrite_line(dest);
+			dst_addr = bmp_write_line(dest, y * 2 + 1);
+			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
+				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[1] + j)));
+		}
+		else {
+			if (y < height - 1) {
+				dst_line[0] = dest->line[y * 2 + 2];
+				dst_line[1] = dest->line[y * 2 + 3];
+			}
+		}
+	}
+	bmp_unwrite_line(dest);
 	
-//	if (v) {
-//		free(dst_line[0]);
-//		free(dst_line[1]);
-//	}
-//}
+	if (v) {
+		free(dst_line[0]);
+		free(dst_line[1]);
+	}
+}
