@@ -238,6 +238,7 @@ void video_init_complete()
     video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
     //video_set_window_size(640,512,0,0);
     //video_set_gfx_mode_windowed();
+    Init_2xSaI(32);
     initpaltables();
 }
 

@@ -244,11 +244,6 @@ void Super2xSaI(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, u
             *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
             *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
             *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
-			// TODO: Following does not work yet.
-			//*((uint32_t *) (&dst_line[0][x * 8]) + destRegion->pitch) = product1a;
-            //*((uint32_t *) (&dst_line[0][x * 8 + 4]) + destRegion->pitch) = product1b;
-            //*((uint32_t *) (&dst_line[1][x * 8]) + destRegion->pitch) = product2a;
-            //*((uint32_t *) (&dst_line[1][x * 8 + 4])+ destRegion->pitch) = product2b;
 			
 			/* Move color matrix forward */
 			color[0] = color[1]; color[4] = color[5]; color[8] = color[9];   color[12] = color[13];
