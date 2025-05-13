@@ -43,8 +43,8 @@ void video_mouse_event();
 bool video_is_main_display(ALLEGRO_DISPLAY * current_display);
 
 int Init_2xSaI(int depth);
-void Super2xSaI(uint8_t * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int w, int h);
-void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int w, int h);
+void Super2xSaI(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height);
+void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height);
 
 // Other filer routines.
 void scale2x(uint8_t * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int width, int height);
@@ -52,7 +52,6 @@ void scale2x(uint8_t * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int width, 
 void initpaltables();
 void palfilter(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data);
 
-void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height);
-void SuperEagle_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height);
+
 
 #endif // _VIDEO_INTERNAL_H

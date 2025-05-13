@@ -128,13 +128,7 @@ static uint8_t *src_line[4];
 static uint8_t *dst_line[2];
 
 
-void Super2xSaI(uint8_t * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int w, int h)
-{
-	Super2xSaI_ex(elk_screen_data, bitmapDest, w, h);
-	return;
-}
-
-void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
+void Super2xSaI(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
 {
 	unsigned int x, y;
 	uint32_t color[16];
@@ -251,10 +245,10 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
             *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
             *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
 			// TODO: Following does not work yet.
-			*((uint32_t *) (&dst_line[0][x * 8]) + destRegion->pitch) = product1a;
-            *((uint32_t *) (&dst_line[0][x * 8 + 4]) + destRegion->pitch) = product1b;
-            *((uint32_t *) (&dst_line[1][x * 8]) + destRegion->pitch) = product2a;
-            *((uint32_t *) (&dst_line[1][x * 8 + 4])+ destRegion->pitch) = product2b;
+			//*((uint32_t *) (&dst_line[0][x * 8]) + destRegion->pitch) = product1a;
+            //*((uint32_t *) (&dst_line[0][x * 8 + 4]) + destRegion->pitch) = product1b;
+            //*((uint32_t *) (&dst_line[1][x * 8]) + destRegion->pitch) = product2a;
+            //*((uint32_t *) (&dst_line[1][x * 8 + 4])+ destRegion->pitch) = product2b;
 			
 			/* Move color matrix forward */
 			color[0] = color[1]; color[4] = color[5]; color[8] = color[9];   color[12] = color[13];
@@ -325,12 +319,7 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 
 
 
-void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP * bitmapDest, int w, int h)
-{
-	SuperEagle_ex(elk_screen_data, bitmapDest, w, h);
-}
-
-void SuperEagle_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height)
+void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height)
 {
 
 	int j, v;
@@ -513,4 +502,5 @@ void SuperEagle_ex(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width
 			dst_line[1] = region_data_line + dest_pitch_y_plus_3;
 		}
 	}
+    al_unlock_bitmap(dest);
 }

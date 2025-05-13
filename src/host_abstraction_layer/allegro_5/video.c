@@ -355,24 +355,6 @@ void video_leavefullscreen()
     }
 }
 
-//#ifdef WIN32
-//CRITICAL_SECTION cs;
-//#endif
-
-void startblit()
-{
-//    #ifdef WIN32
-//        EnterCriticalSection(&cs);
-//    #endif
-}
-
-void endblit()
-{
-//    #ifdef WIN32
-//        LeaveCriticalSection(&cs);
-//    #endif
-}
-
 void blit_normal(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 {
     int y = 0;
@@ -438,8 +420,6 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
     ALLEGRO_COLOR bordercol = al_map_rgb(elkConfig.display.border.red, elkConfig.display.border.green, elkConfig.display.border.blue); // TODO: Optimise this (store, don't recalculate every blit).
     al_draw_filled_rectangle(0,0, al_get_display_width(display), al_get_display_height(display), bordercol);
 
-    startblit();
-
     switch (drawMode)
     {
         case SCANLINES:
@@ -468,19 +448,7 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
                                      current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
 
-        case _2XSAI:  // TODO: Get filter working for allegro5
-            //blit_normal(b, elk_screen_data);
-            //if(elkConfig.stats.blitting_performance_stats)
-            //{
-            //    native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
-            //    timestamp = native_timestamp_get();
-            //}
-
-            //al_set_target_backbuffer(al_get_current_display());
-            //al_draw_scaled_bitmap(b, 0,0,640,256, 
-            //                         current_elk_window.startx, current_elk_window.starty,
-            //                         current_elk_window.winsizex,current_elk_window.winsizey, 0);
-            //blit(b,b162,0,0,0,0,640,256);
+        case _2XSAI:
             Super2xSaI(elk_screen_data,b16,640,256);
             if(elkConfig.stats.blitting_performance_stats)
             {
@@ -543,8 +511,6 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
     }
 
     al_flip_display();
-    endblit();
-
 
     if(elkConfig.stats.blitting_performance_stats)
     {
