@@ -430,11 +430,11 @@ void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, u
 			}
 
             *((uint32_t *) (&dst_line[0][x * 8])) = product1a;
-            *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
+            *((uint32_t *) (&dst_line[0][(x * 8) + 4])) = product1b;
             *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
-            *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
+            *((uint32_t *) (&dst_line[1][(x * 8) + 4])) = product2b;
 			
-			/* Move color matrix forward */
+            *((uint32_t *) (&dst_line[0][x * 8])) = elkpal[*(src_line[0]+x)];
 			color[0] = color[1]; 
 			color[2] = color[3]; color[3] = color[4]; color[4] = color[5];
 			color[6] = color[7]; color[7] = color[8]; color[8] = color[9]; 
@@ -442,12 +442,12 @@ void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, u
 			
 			if (x < width - 2) {
 				x += 2;
-                color[1] = *(((uint32_t*)src_line[0]) + x);
+                color[1] = elkpal[*(src_line[0] + x)];
                 if (x < width) {
-                    color[5] = *(((uint32_t*)src_line[1]) + x + 1);
-                    color[9] = *(((uint32_t*)src_line[2]) + x + 1);
+                    color[5] = elkpal[*(src_line[1] + x + 1)];
+                    color[9] = elkpal[*(src_line[2] + x + 1)];
                 }
-                color[11] = *(((uint32_t*)src_line[3]) + x);
+                color[11] = elkpal[*(src_line[3] + x)];
 				x -= 2;
 			}
 		}
