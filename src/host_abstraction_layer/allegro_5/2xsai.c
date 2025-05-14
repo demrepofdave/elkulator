@@ -337,7 +337,6 @@ void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, u
 
 	x = 0, y = 0;
 	
-    // uint32_t *lbp;
     uint32_t lbp, lbp1, lbp2;
 
     lbp  = elkpal[*src_line[0]];
@@ -348,14 +347,14 @@ void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, u
     color[4] = lbp1;      color[5] = lbp2;
 
     lbp  = elkpal[*src_line[2]];
-	lbp1 = elkpal[*(src_line[2] + 1)];
-	lbp2 = elkpal[*(src_line[2] + 2)];
+    lbp1 = elkpal[*(src_line[2] + 1)];
+    lbp2 = elkpal[*(src_line[2] + 2)];
 
     color[6] = lbp;     color[7] = color[6];     color[8] = lbp1; color[9] = lbp2;
 
     lbp  = elkpal[*src_line[3]];
-	lbp1 = elkpal[*(src_line[3] + 1)];
-	lbp2 = elkpal[*(src_line[3] + 2)];
+    lbp1 = elkpal[*(src_line[3] + 1)];
+    lbp2 = elkpal[*(src_line[3] + 2)];
 
     color[10] = lbp;    color[11] = lbp1;
 
@@ -430,11 +429,10 @@ void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, u
 			}
 
             *((uint32_t *) (&dst_line[0][x * 8])) = product1a;
-            *((uint32_t *) (&dst_line[0][(x * 8) + 4])) = product1b;
+            *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
             *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
-            *((uint32_t *) (&dst_line[1][(x * 8) + 4])) = product2b;
-			
-            *((uint32_t *) (&dst_line[0][x * 8])) = elkpal[*(src_line[0]+x)];
+            *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
+
 			color[0] = color[1]; 
 			color[2] = color[3]; color[3] = color[4]; color[4] = color[5];
 			color[6] = color[7]; color[7] = color[8]; color[8] = color[9]; 
@@ -466,25 +464,25 @@ void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, u
 		/* Then shift the color matrix up */
         lbp  = elkpal[*src_line[0]];
 	    lbp1 = elkpal[*(src_line[0] + 1)];
-    	lbp2 = elkpal[*(src_line[0] + 2)];
+        lbp2 = elkpal[*(src_line[0] + 2)];
 
         color[0] = lbp;     color[1] = lbp1;
 
         lbp  = elkpal[*src_line[1]];
 	    lbp1 = elkpal[*(src_line[1] + 1)];
-    	lbp2 = elkpal[*(src_line[1] + 2)];
+        lbp2 = elkpal[*(src_line[1] + 2)];
 
         color[2] = lbp;     color[3] = color[2];    color[4] = lbp1;  color[5] = lbp2;
 
         lbp  = elkpal[*src_line[2]];
 	    lbp1 = elkpal[*(src_line[2] + 1)];
-    	lbp2 = elkpal[*(src_line[2] + 2)];
+        lbp2 = elkpal[*(src_line[2] + 2)];
 
         color[6] = lbp;     color[7] = color[6];    color[8] = lbp1;  color[9] = lbp2;
 
         lbp  = elkpal[*src_line[3]];
 	    lbp1 = elkpal[*(src_line[3] + 1)];
-    	lbp2 = elkpal[*(src_line[3] + 2)];
+        lbp2 = elkpal[*(src_line[3] + 2)];
 
         color[10] = lbp;    color[11] = lbp1;
 
