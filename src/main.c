@@ -182,6 +182,7 @@ void initelk(int argc, char *argv[])
         {
             romnext=-1;
         }
+#ifndef WIN32
         else if (!strcasecmp(argv[c],"-parallel"))
         {
             parallelnext=1;
@@ -194,6 +195,7 @@ void initelk(int argc, char *argv[])
         {
             serialdebugnext=1;
         }
+#endif
         else if (!strcasecmp(argv[c],"-debug"))
         {
             debug=debugon=1;
@@ -221,6 +223,7 @@ void initelk(int argc, char *argv[])
                 romnext = -2;
             }
         }
+#ifndef WIN32
         else if (parallelnext)
         {
             strcpy(parallelname,argv[c]);
@@ -236,6 +239,7 @@ void initelk(int argc, char *argv[])
             serial_debug = atoi(argv[c]);
             serialdebugnext=0;
         }
+#endif
         if (tapenext) tapenext--;
     }
 
@@ -352,7 +356,7 @@ void native_window_close_button_handler(void)
 * Public Function Definitions
 *******************************************************************************/
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     int count = 0;
     //init_config(); TODO: May need this not sure.
@@ -455,7 +459,7 @@ int main(int argc, char *argv[])
                         skip_video_refresh = true;
                         pause_video_blit(); // We don't need to update the screen for this (helps on slower machines).
                     }
-                    elk_runtime += runelk(skip_video_refresh);
+                    elk_runtime += runelk();
                     count--;
                 }
                 resume_video_blit();

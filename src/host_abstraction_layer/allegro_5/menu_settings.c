@@ -52,9 +52,9 @@ elk_event_t menu_redefine_keyboard(ALLEGRO_EVENT * event);
 #define VIDEO_DISPLAY_TYPE_MAX   7
 static const char *settings_video_display_type[VIDEO_DISPLAY_TYPE_MAX] = { "Scanlines",
                                                      "Line doubling",
-                                                     "2xSai (disabled)",
+                                                     "2xSai",
                                                      "Scale2X",
-                                                     "Super Eagle (disabled)",
+                                                     "Super Eagle",
                                                      "PAL Filter", NULL };
 
 #define DISC_DRIVE_TYPE_MAX  3

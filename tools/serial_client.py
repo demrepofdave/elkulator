@@ -46,7 +46,7 @@ def cr_to_lf(s):
     containing line feeds, replacing carriage returns.
     """
 
-    return s.replace("\n", "").replace("\r", "\n")
+    return s.replace(b"\n", b"").replace(b"\r", b"\n")
 
 def lf_to_cr(s):
 
@@ -55,7 +55,7 @@ def lf_to_cr(s):
     containing carriage returns, replacing line feeds.
     """
 
-    return s.replace("\r", "").replace("\n", "\r")
+    return s.replace(b"\r", b"").replace(b"\n", b"\r")
 
 # Communications functions.
 
@@ -67,12 +67,12 @@ def session(poller, channels):
         fds = poller.poll()
         for fd, status in fds:
             if status & (select.POLLHUP | select.POLLNVAL | select.POLLERR):
-                print >>sys.stderr, "Connection closed."
+                print("Connection closed.", file=sys.stderr)
                 return
             elif status & select.POLLIN:
                 reader, writer, converter = channels[fd]
                 s = converter(reader.read(1))
-                writer.write(s)
+                writer.write(s.decode('utf-8'))
 
 def main():
 
@@ -98,16 +98,16 @@ def main():
 
     # Accept a connection.
 
-    print >>sys.stderr, "Waiting for connection at:", filename
+    print("Waiting for connection at:", filename, file=sys.stderr)
 
     c, addr = s.accept()
 
-    print >>sys.stderr, "Connection accepted."
+    print("Connection accepted.", file=sys.stderr)
 
     # Employ file-like objects for reading and writing.
 
-    reader = c.makefile("r", 0)
-    writer = c.makefile("w", 0)
+    reader = c.makefile("rb", 0)
+    writer = c.makefile("wb", 0)
 
     # Employ polling on the socket input and on standard input.
 

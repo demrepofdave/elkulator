@@ -238,6 +238,7 @@ void video_init_complete()
     video_set_window_size(elkConfig.display.native_window_width, elkConfig.display.native_window_height,0,0);
     //video_set_window_size(640,512,0,0);
     //video_set_gfx_mode_windowed();
+    Init_2xSaI(32);
     initpaltables();
 }
 
@@ -355,24 +356,6 @@ void video_leavefullscreen()
     }
 }
 
-//#ifdef WIN32
-//CRITICAL_SECTION cs;
-//#endif
-
-void startblit()
-{
-//    #ifdef WIN32
-//        EnterCriticalSection(&cs);
-//    #endif
-}
-
-void endblit()
-{
-//    #ifdef WIN32
-//        LeaveCriticalSection(&cs);
-//    #endif
-}
-
 void blit_normal(ALLEGRO_BITMAP * destBitmap, uint8_t * elk_screen_data)
 {
     int y = 0;
@@ -438,8 +421,6 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
     ALLEGRO_COLOR bordercol = al_map_rgb(elkConfig.display.border.red, elkConfig.display.border.green, elkConfig.display.border.blue); // TODO: Optimise this (store, don't recalculate every blit).
     al_draw_filled_rectangle(0,0, al_get_display_width(display), al_get_display_height(display), bordercol);
 
-    startblit();
-
     switch (drawMode)
     {
         case SCANLINES:
@@ -468,24 +449,17 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
                                      current_elk_window.winsizex,current_elk_window.winsizey, 0);
             break;
 
-        case _2XSAI:  // TODO: Get filter working for allegro5
-            blit_normal(b, elk_screen_data);
+        case _2XSAI:
+            Super2xSaI(elk_screen_data,b16,640,256);
             if(elkConfig.stats.blitting_performance_stats)
             {
                 native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
                 timestamp = native_timestamp_get();
             }
-
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b, 0,0,640,256, 
+            al_draw_scaled_bitmap(b16, 0,0,1280,512, 
                                      current_elk_window.startx, current_elk_window.starty,
                                      current_elk_window.winsizex,current_elk_window.winsizey, 0);
-            //blit(b,b162,0,0,0,0,640,256);
-            //Super2xSaI(elk_screen_data,b,0,0,0,0,640,256);
-            //al_set_target_backbuffer(al_get_current_display());
-            //al_draw_scaled_bitmap(b16, firstx, firsty, xsize, ysize, scr_x_start, scr_y_start, scr_x_size, scr_y_size, 0);
-            //al_draw_bitmap(b16, (winsizeX-640)/2,(winsizeY-512)/2);
-            //blit(b16,screen,0,0,(winsizeX-640)/2,(winsizeY-512)/2,640,512);
             break;
 
         case SCALE2X:
@@ -502,14 +476,14 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
             break;
 
         case EAGLE: // TODO: Get filter working for allegro5
-            blit_normal(b, elk_screen_data);
+            SuperEagle(elk_screen_data,b16,640,256);
             if(elkConfig.stats.blitting_performance_stats)
             {
                 native_time_add_sample(&video_blit_average, native_timestamp_get() - timestamp);
                 timestamp = native_timestamp_get();
             }
             al_set_target_backbuffer(al_get_current_display());
-            al_draw_scaled_bitmap(b, 0,0,640,256, 
+            al_draw_scaled_bitmap(b16, 0,0,1280,512, 
                                      current_elk_window.startx, current_elk_window.starty,
                                      current_elk_window.winsizex,current_elk_window.winsizey, 0);
             //blit(b,b162,0,0,0,0,640,256);
@@ -538,8 +512,6 @@ void video_blit_to_screen(int drawMode, uint8_t * elk_screen_data)
     }
 
     al_flip_display();
-    endblit();
-
 
     if(elkConfig.stats.blitting_performance_stats)
     {

@@ -1,7 +1,9 @@
 #include <string.h>
 #include <allegro5/allegro.h>
 //#include <allegro/internal/aintern.h>
+#include <allegro5/allegro_primitives.h>
 #include "video_internal.h"
+#include "logger.h"
 
 //#define TRACE rpclog
 #define uint32 unsigned long
@@ -16,7 +18,24 @@ static uint32 redblueMask = 0xF81F;
 static uint32 greenMask = 0x7E0;
 static int xsai_depth = 0;
 
+typedef uint32_t elk_pallete_t;
+extern elk_pallete_t elkpal[8];
 
+// TODO: Raid allegro4 code for implementation.
+int makecol_depth(int depth, int r, int g, int b){
+    switch (depth){
+        //case 8: return bestfit_color(current_palette, r>>2, g>>2, b>>2);
+        case 15: return (r >> 3) + ((g >> 3) << 5) + ((b >> 3) << 10);
+        case 16: return (r >> 3) + ((g >> 2) << 5) + ((b >> 3) << 11);
+        case 24: return r + (g << 8) + (b << 16);
+        case 32: return r + (g << 8) + (b << 16) + (255 << 24);
+        default: return 0;
+    }
+}
+
+int makecol(int r, int g, int b){
+    return makecol_depth(32, r, g, b); // TODO: Check code here.
+}
 
 int Init_2xSaI(int d)
 {
@@ -44,10 +63,11 @@ int Init_2xSaI(int d)
 	redblueMask = makecol_depth(d, 255, 0, 255);
 	greenMask = makecol_depth(d, 0, 255, 0);
 
-	TRACE("Color Mask:       0x%lX\n", colorMask);
-	TRACE("Low Pixel Mask:   0x%lX\n", lowPixelMask);
-	TRACE("QColor Mask:      0x%lX\n", qcolorMask);
-	TRACE("QLow Pixel Mask:  0x%lX\n", qlowpixelMask);
+	log_debug("Color Depth:      %d\n", d);
+	log_debug("Color Mask:       0x%lX\n", colorMask);
+	log_debug("Low Pixel Mask:   0x%lX\n", lowPixelMask);
+	log_debug("QColor Mask:      0x%lX\n", qcolorMask);
+	log_debug("QLow Pixel Mask:  0x%lX\n", qlowpixelMask);
 	
 	xsai_depth = d;
 
@@ -104,122 +124,53 @@ static int GetResult2(uint32 A, uint32 B, uint32 C, uint32 D, uint32 E)
 	+ ((((A & qlowpixelMask) + (B & qlowpixelMask) + (C & qlowpixelMask) + (D & qlowpixelMask)) >> 2) & qlowpixelMask)
 
 
-/* Clipping Macro, stolen from Allegro, modified to work with 2xSaI */
-#define BLIT_CLIP2(src, dest, s_x, s_y, d_x, d_y, w, h, xscale, yscale)      \
-   /* check for ridiculous cases */                                          \
-   if ((s_x >= src->cr) || (s_y >= src->cb) ||                               \
-       (d_x >= dest->cr) || (d_y >= dest->cb))                               \
-      return;                                                                \
-                                                                             \
-   if ((s_x + w < src->cl) || (s_y + h < src->ct) ||                         \
-       (d_x + w * xscale < dest->cl) || (d_y + h * yscale < dest->ct))       \
-      return;                                                                \
-                                                                             \
-   if (xscale < 1 || yscale < 1)                                             \
-      return;                                                                \
-                                                                             \
-   /* clip src left */                                                       \
-   if (s_x < src->cl) {                                                      \
-      w += s_x;                                                              \
-      d_x -= s_x * xscale;                                                   \
-      s_x = src->cl;                                                         \
-   }                                                                         \
-                                                                             \
-   /* clip src top */                                                        \
-   if (s_y < src->ct) {                                                      \
-      h += s_y;                                                              \
-      d_y -= s_y * yscale;                                                   \
-      s_y = src->ct;                                                         \
-   }                                                                         \
-                                                                             \
-   /* clip src right */                                                      \
-   if (s_x + w > src->cr)                                                    \
-      w = src->cr - s_x;                                                     \
-                                                                             \
-   /* clip src bottom */                                                     \
-   if (s_y + h > src->cb)                                                    \
-      h = src->cb - s_y;                                                     \
-                                                                             \
-   /* clip dest left */                                                      \
-   if (d_x < dest->cl) {                                                     \
-      d_x -= dest->cl;                                                       \
-      w += d_x / xscale;                                                     \
-      s_x -= d_x / xscale;                                                   \
-      d_x = dest->cl;                                                        \
-   }                                                                         \
-                                                                             \
-   /* clip dest top */                                                       \
-   if (d_y < dest->ct) {                                                     \
-      d_y -= dest->ct;                                                       \
-      h += d_y / yscale;                                                     \
-      s_y -= d_y / yscale;                                                   \
-      d_y = dest->ct;                                                        \
-   }                                                                         \
-                                                                             \
-   /* clip dest right */                                                     \
-   if (d_x + w * xscale > dest->cr)                                          \
-      w = (dest->cr - d_x) / xscale;                                         \
-                                                                             \
-   /* clip dest bottom */                                                    \
-   if (d_y + h * yscale > dest->cb)                                          \
-      h = (dest->cb - d_y) / yscale;                                         \
-                                                                             \
-   /* bottle out if zero size */                                             \
-   if ((w <= 0) || (h <= 0))                                                 \
-      return;
-
-
 static uint8_t *src_line[4];
 static uint8_t *dst_line[2];
 
 
-void Super2xSaI(ALLEGRO_BITMAP * bitmapDest, uint8_t * elk_screen_data, int s_x, int s_y, int d_x, int d_y, int w, int h)
+void Super2xSaI(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
 {
-	int sbpp, dbpp;
-
-	Super2xSaI_ex(elk_screen_data, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, bitmapDest, w, h);
-	
-	return;
-}
-
-void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) 
-{
-	int j, v;
 	unsigned int x, y;
-	int sbpp = BYTES_PER_PIXEL(bitmap_color_depth(dest));
 	uint32_t color[16];
 
 	/* Point to the first 3 lines. */
-	src_line[0] = src;
-	src_line[1] = src;
-	src_line[2] = src + src_pitch;
-	src_line[3] = src + src_pitch * 2;
-
-	/* Can we write the results directly? */
-	if (is_video_bitmap(dest) || is_planar_bitmap(dest)) {
-		dst_line[0] = malloc(sizeof(char) * sbpp * width);
-		dst_line[1] = malloc(sizeof(char) * sbpp * width);
-		v = 1;
-	}
-	else {
-		dst_line[0] = dest->line[0];
-		dst_line[1] = dest->line[1];
-		v = 0;
-	}
+	src_line[0] = elk_screen_data;
+	src_line[1] = elk_screen_data;
+	src_line[2] = elk_screen_data + width;
+	src_line[3] = elk_screen_data + (width * 2);
 	
 	/* Set destination */
-	bmp_select(dest);
+	//bmp_select(dest);
+    uint8_t * region_data_line = NULL;
+	ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(dest, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+    region_data_line = (uint8_t *)destRegion->data;
+
+	/* Can we write the results directly? */
+	dst_line[0] = region_data_line;
+	dst_line[1] = region_data_line + destRegion->pitch;
 
 	x = 0, y = 0;
 	
-    uint32_t *lbp;
-    lbp = (uint32_t*)src_line[0];
-    color[0] = *lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
-    color[4] = color[0];   color[5] = color[0];   color[6] = *(lbp + 1);  color[7] = *(lbp + 2);
-    lbp = (uint32_t*)src_line[2];
-    color[8] = *lbp;     color[9] = color[8];     color[10] = *(lbp + 1); color[11] = *(lbp + 2);
-    lbp = (uint32_t*)src_line[3];
-    color[12] = *lbp;    color[13] = color[12];   color[14] = *(lbp + 1); color[15] = *(lbp + 2);
+    uint32_t lbp, lbp1, lbp2;
+
+    lbp  = elkpal[*src_line[0]];
+	lbp1 = elkpal[*(src_line[0] + 1)];
+	lbp2 = elkpal[*(src_line[0] + 2)];
+
+    color[0] = lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
+    color[4] = color[0];  color[5] = color[0];   color[6] = lbp1;  color[7] = lbp2;
+
+	lbp  = elkpal[*src_line[2]];
+	lbp1 = elkpal[*(src_line[2] + 1)];
+	lbp2 = elkpal[*(src_line[2] + 2)];
+
+    color[8] = lbp;     color[9] = color[8];     color[10] = lbp1; color[11] = lbp2;
+
+	lbp  = elkpal[*src_line[3]];
+	lbp1 = elkpal[*(src_line[3] + 1)];
+	lbp2 = elkpal[*(src_line[3] + 2)];
+
+    color[12] = lbp;    color[13] = color[12];   color[14] = lbp1; color[15] = lbp2;
 
 	for (y = 0; y < height; y++) {
 	
@@ -288,7 +239,7 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, A
 				product1a = INTERPOLATE(color[9], color[5]);
 			else
 				product1a = color[5];
-	
+
             *((uint32_t *) (&dst_line[0][x * 8])) = product1a;
             *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
             *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
@@ -302,10 +253,10 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, A
 			if (x < width - 3) {
 				x += 3;
 
-    			color[3] = *(((uint32_t*)src_line[0]) + x);
-				color[7] = *(((uint32_t*)src_line[1]) + x);
-				color[11] = *(((uint32_t*)src_line[2]) + x);
-				color[15] = *(((uint32_t*)src_line[3]) + x);
+    			color[3]  = elkpal[*(src_line[0] + x)];
+				color[7]  = elkpal[*(src_line[1] + x)];
+				color[11] = elkpal[*(src_line[2] + x)];
+				color[15] = elkpal[*(src_line[3] + x)];
 
 				x -= 3;
 			}
@@ -320,120 +271,92 @@ void Super2xSaI_ex(uint8_t * elk_screen_data, uint32 src_pitch, uint8 *unused, A
 		if (y + 3 >= height)
 			src_line[3] = src_line[2];
 		else
-			src_line[3] = src_line[2] + src_pitch;
+			src_line[3] = src_line[2] + width;
 			
 		/* Then shift the color matrix up */
-    	uint32_t *lbp;
-		lbp = (uint32_t*)src_line[0];
-		color[0] = *lbp;     color[1] = color[0];    color[2] = *(lbp + 1);  color[3] = *(lbp + 2);
-		lbp = (uint32_t*)src_line[1];
-		color[4] = *lbp;     color[5] = color[4];    color[6] = *(lbp + 1);  color[7] = *(lbp + 2);
-		lbp = (uint32_t*)src_line[2];
-		color[8] = *lbp;     color[9] = color[9];    color[10] = *(lbp + 1); color[11] = *(lbp + 2);
-		lbp = (uint32_t*)src_line[3];
-		color[12] = *lbp;    color[13] = color[12];  color[14] = *(lbp + 1); color[15] = *(lbp + 2);
+		lbp  = elkpal[*src_line[0]];
+		lbp1 = elkpal[*(src_line[0] + 1)];
+		lbp2 = elkpal[*(src_line[0] + 2)];
+
+		color[0] = lbp;     color[1] = color[0];    color[2] = lbp1;  color[3] = lbp2;
+
+		lbp  = elkpal[*src_line[1]];
+		lbp1 = elkpal[*(src_line[1] + 1)];
+		lbp2 = elkpal[*(src_line[1] + 2)];
+
+		color[4] = lbp;     color[5] = color[4];    color[6] = lbp1;  color[7] = lbp2;
+
+		lbp  = elkpal[*src_line[2]];
+		lbp1 = elkpal[*(src_line[2] + 1)];
+		lbp2 = elkpal[*(src_line[2] + 2)];
+
+		color[8] = lbp;     color[9] = color[9];    color[10] = lbp1; color[11] = lbp2;
+
+		lbp  = elkpal[*src_line[3]];
+		lbp1 = elkpal[*(src_line[3] + 1)];
+		lbp2 = elkpal[*(src_line[3] + 2)];
+
+		color[12] = lbp;    color[13] = color[12];  color[14] = lbp1; color[15] = lbp2;
 		
 		/* Write the 2 lines, if not already done so */
-		if (v) {
-			uint32_t dst_addr;
-		
-			dst_addr = bmp_write_line(dest, y * 2);
-			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[0] + j)));
-				
-			dst_addr = bmp_write_line(dest, y * 2 + 1);
-			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[1] + j)));
-		}
-		else {
-			if (y < height - 1) {
-				dst_line[0] = dest->line[y * 2 + 2];
-				dst_line[1] = dest->line[y * 2 + 3];
-			}
+		if (y < height - 1) {
+
+			int dest_pitch_y_plus_2 = (destRegion->pitch * ((y * 2 + 2)));
+			int dest_pitch_y_plus_3 = (destRegion->pitch * ((y * 2 + 3)));
+
+			dst_line[0] = region_data_line + dest_pitch_y_plus_2;
+			dst_line[1] = region_data_line + dest_pitch_y_plus_3;
+
 		}
 	}
-	bmp_unwrite_line(dest);
-	
-	if (v) {
-		free(dst_line[0]);
-		free(dst_line[1]);
-	}
+	al_unlock_bitmap(dest);
 }
 
 
 
-void SuperEagle(ALLEGRO_BITMAP * bitmapSource, ALLEGRO_BITMAP * bitmapDest, int s_x, int s_y, int d_x, int d_y, int w, int h)
+void SuperEagle(uint8_t * elk_screen_data, ALLEGRO_BITMAP *dest, uint32 width, uint32 height)
 {
-	int sbpp, dbpp;
-
-	ALLEGRO_BITMAP * dst2         = NULL;
-
-	if (!bitmapSource || !bitmapDest)
-		return;
-
-	sbpp = bitmap_color_depth(bitmapSource);
-	dbpp = bitmap_color_depth(bitmapDest);
-
-	if ((sbpp != xsai_depth) || (sbpp != dbpp))	/* Must be same color depth */
-		return;
-
-//	BLIT_CLIP2(src, dest, s_x, s_y, d_x, d_y, w, h, 2, 2);
-		
-	if (w < 4 || h < 4) {  /* Image is too small to be 2xSaI'ed. */
-		stretch_blit(bitmapSource, bitmapDest, s_x, s_y, w, h, d_x, d_y, w * 2, h * 2);
-		return;
-	}	
-	
-	sbpp = BYTES_PER_PIXEL(sbpp);
-	if (d_x || d_y)
-		dst2 = create_sub_bitmap(bitmapDest, d_x, d_y, w * 2, h * 2);
-	
-	SuperEagle_ex(bitmapSource->line[s_y] + s_x * sbpp, (unsigned int)(bitmapSource->line[1] - bitmapSource->line[0]), NULL, dst2 ? dst2 : bitmapDest, w, h);
-	
-	if (dst2)
-		destroy_bitmap(dst2);
-	
-	return;
-}
-
-void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *dest, uint32 width, uint32 height) {
 
 	int j, v;
 	unsigned int x, y;
-	int sbpp = BYTES_PER_PIXEL(bitmap_color_depth(dest));
 	uint32_t color[12];
 
 	/* Point to the first 3 lines. */
-	src_line[0] = src;
-	src_line[1] = src;
-	src_line[2] = src + src_pitch;
-	src_line[3] = src + src_pitch * 2;
+	src_line[0] = elk_screen_data;
+	src_line[1] = elk_screen_data;
+	src_line[2] = elk_screen_data + width;
+	src_line[3] = elk_screen_data + (width * 2);
 	
+    uint8_t * region_data_line = NULL;
+	ALLEGRO_LOCKED_REGION * destRegion = al_lock_bitmap(dest, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+    region_data_line = (uint8_t *)destRegion->data;
+
 	/* Can we write the results directly? */
-	if (is_video_bitmap(dest) || is_planar_bitmap(dest)) {
-		dst_line[0] = malloc(sizeof(char) * sbpp * width);
-		dst_line[1] = malloc(sizeof(char) * sbpp * width);
-		v = 1;
-	}
-	else {
-		dst_line[0] = dest->line[0];
-		dst_line[1] = dest->line[1];
-		v = 0;
-	}
-	
-	/* Set destination */
-	bmp_select(dest);
+	dst_line[0] = region_data_line;
+	dst_line[1] = region_data_line + destRegion->pitch;
 
 	x = 0, y = 0;
 	
-    uint32_t *lbp;
-    lbp = (uint32_t*)src_line[0];
-    color[0] = *lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
-    color[4] = *(lbp + 1); color[5] = *(lbp + 2);
-    lbp = (uint32_t*)src_line[2];
-    color[6] = *lbp;     color[7] = color[6];     color[8] = *(lbp + 1); color[9] = *(lbp + 2);
-    lbp = (uint32_t*)src_line[3];
-    color[10] = *lbp;    color[11] = *(lbp + 1);
+    uint32_t lbp, lbp1, lbp2;
+
+    lbp  = elkpal[*src_line[0]];
+	lbp1 = elkpal[*(src_line[0] + 1)];
+	lbp2 = elkpal[*(src_line[0] + 2)];
+
+    color[0] = lbp;       color[1] = color[0];   color[2] = color[0];    color[3] = color[0];
+    color[4] = lbp1;      color[5] = lbp2;
+
+    lbp  = elkpal[*src_line[2]];
+    lbp1 = elkpal[*(src_line[2] + 1)];
+    lbp2 = elkpal[*(src_line[2] + 2)];
+
+    color[6] = lbp;     color[7] = color[6];     color[8] = lbp1; color[9] = lbp2;
+
+    lbp  = elkpal[*src_line[3]];
+    lbp1 = elkpal[*(src_line[3] + 1)];
+    lbp2 = elkpal[*(src_line[3] + 2)];
+
+    color[10] = lbp;    color[11] = lbp1;
 
 	for (y = 0; y < height; y++) {
 	
@@ -509,8 +432,7 @@ void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *
             *((uint32_t *) (&dst_line[0][x * 8 + 4])) = product1b;
             *((uint32_t *) (&dst_line[1][x * 8])) = product2a;
             *((uint32_t *) (&dst_line[1][x * 8 + 4])) = product2b;
-			
-			/* Move color matrix forward */
+
 			color[0] = color[1]; 
 			color[2] = color[3]; color[3] = color[4]; color[4] = color[5];
 			color[6] = color[7]; color[7] = color[8]; color[8] = color[9]; 
@@ -518,12 +440,12 @@ void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *
 			
 			if (x < width - 2) {
 				x += 2;
-                color[1] = *(((uint32_t*)src_line[0]) + x);
+                color[1] = elkpal[*(src_line[0] + x)];
                 if (x < width) {
-                    color[5] = *(((uint32_t*)src_line[1]) + x + 1);
-                    color[9] = *(((uint32_t*)src_line[2]) + x + 1);
+                    color[5] = elkpal[*(src_line[1] + x + 1)];
+                    color[9] = elkpal[*(src_line[2] + x + 1)];
                 }
-                color[11] = *(((uint32_t*)src_line[3]) + x);
+                color[11] = elkpal[*(src_line[3] + x)];
 				x -= 2;
 			}
 		}
@@ -537,42 +459,41 @@ void SuperEagle_ex(uint8 *src, uint32 src_pitch, uint8 *unused, ALLEGRO_BITMAP *
 		if (y + 3 >= height)
 			src_line[3] = src_line[2];
 		else
-			src_line[3] = src_line[2] + src_pitch;
+			src_line[3] = src_line[2] + width;
 			
 		/* Then shift the color matrix up */
-        uint32_t *lbp;
-        lbp = (uint32_t*)src_line[0];
-        color[0] = *lbp;     color[1] = *(lbp + 1);
-        lbp = (uint32_t*)src_line[1];
-        color[2] = *lbp;     color[3] = color[2];    color[4] = *(lbp + 1);  color[5] = *(lbp + 2);
-        lbp = (uint32_t*)src_line[2];
-        color[6] = *lbp;     color[7] = color[6];    color[8] = *(lbp + 1);  color[9] = *(lbp + 2);
-        lbp = (uint32_t*)src_line[3];
-        color[10] = *lbp;    color[11] = *(lbp + 1);
+        lbp  = elkpal[*src_line[0]];
+	    lbp1 = elkpal[*(src_line[0] + 1)];
+        lbp2 = elkpal[*(src_line[0] + 2)];
+
+        color[0] = lbp;     color[1] = lbp1;
+
+        lbp  = elkpal[*src_line[1]];
+	    lbp1 = elkpal[*(src_line[1] + 1)];
+        lbp2 = elkpal[*(src_line[1] + 2)];
+
+        color[2] = lbp;     color[3] = color[2];    color[4] = lbp1;  color[5] = lbp2;
+
+        lbp  = elkpal[*src_line[2]];
+	    lbp1 = elkpal[*(src_line[2] + 1)];
+        lbp2 = elkpal[*(src_line[2] + 2)];
+
+        color[6] = lbp;     color[7] = color[6];    color[8] = lbp1;  color[9] = lbp2;
+
+        lbp  = elkpal[*src_line[3]];
+	    lbp1 = elkpal[*(src_line[3] + 1)];
+        lbp2 = elkpal[*(src_line[3] + 2)];
+
+        color[10] = lbp;    color[11] = lbp1;
 
 		/* Write the 2 lines, if not already done so */
-		if (v) {
-			uint32_t dst_addr;
-		
-			dst_addr = bmp_write_line(dest, y * 2);
-			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[0] + j)));
-				
-			dst_addr = bmp_write_line(dest, y * 2 + 1);
-			for (j = 0; j < dest->w * sbpp; j += sizeof(long))
-				bmp_write32(dst_addr + j, *((uint32_t *) (dst_line[1] + j)));
-		}
-		else {
-			if (y < height - 1) {
-				dst_line[0] = dest->line[y * 2 + 2];
-				dst_line[1] = dest->line[y * 2 + 3];
-			}
+        if (y < height - 1) {
+            int dest_pitch_y_plus_2 = (destRegion->pitch * ((y * 2 + 2)));
+			int dest_pitch_y_plus_3 = (destRegion->pitch * ((y * 2 + 3)));
+
+			dst_line[0] = region_data_line + dest_pitch_y_plus_2;
+			dst_line[1] = region_data_line + dest_pitch_y_plus_3;
 		}
 	}
-	bmp_unwrite_line(dest);
-	
-	if (v) {
-		free(dst_line[0]);
-		free(dst_line[1]);
-	}
+    al_unlock_bitmap(dest);
 }

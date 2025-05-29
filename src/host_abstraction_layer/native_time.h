@@ -51,7 +51,7 @@ native_timediff_t native_cumulative_time_adjust(native_timediff_t offset, native
 void native_timediff_sprintf(char * diff_string, size_t diff_string_length, native_timediff_t timediff);
 native_timestamp_t native_timestamp_get();
 
-void log_timer_begin();
+void log_timer_begin(const char *msg);
 void log_time_mark(const char *msg);
 void log_time_display();
 
