@@ -89,6 +89,7 @@ void hal_init_complete()
     event_register_event_source(&evsrc);
 
     event_register_event_source(al_get_keyboard_event_source());
+    event_register_event_source(al_get_joystick_event_source());
 
     al_install_mouse();
     event_register_event_source(al_get_mouse_event_source());
