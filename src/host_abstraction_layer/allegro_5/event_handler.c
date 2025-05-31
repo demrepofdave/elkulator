@@ -87,9 +87,10 @@ bool register_main_event_handlers()
     result &= register_event_handler(ALLEGRO_EVENT_KEY_CHAR, key_handler_handle_event);
     result &= register_event_handler(ALLEGRO_EVENT_KEY_UP,   key_handler_handle_event);
 
-    result &= register_event_handler(ALLEGRO_EVENT_JOYSTICK_AXIS,        joystick_handler_handle_event);
-    result &= register_event_handler(ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN, joystick_handler_handle_event);
-    result &= register_event_handler(ALLEGRO_EVENT_JOYSTICK_BUTTON_UP,   joystick_handler_handle_event);
+    result &= register_event_handler(ALLEGRO_EVENT_JOYSTICK_AXIS,          joystick_handler_handle_event);
+    result &= register_event_handler(ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN,   joystick_handler_handle_event);
+    result &= register_event_handler(ALLEGRO_EVENT_JOYSTICK_BUTTON_UP,     joystick_handler_handle_event);
+    result &= register_event_handler(ALLEGRO_EVENT_JOYSTICK_CONFIGURATION, joystick_handler_handle_event);
 
 
     // TODO: Events we acknowledge but are not yet handled by specific code.

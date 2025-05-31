@@ -167,16 +167,7 @@ int video_init_begin()
         exit(1);
     }
 
-    // Get number of joysticks
-    int num_joysticks = al_get_num_joysticks();
-    log_fatal("main: num joysticks %d\n", num_joysticks);
-
-    for(int index = 0; index < num_joysticks; index++)
-    {
-        ALLEGRO_JOYSTICK * joystick = al_get_joystick(index);
-        log_fatal("main: Joystick %s, buttons = %d\n", al_get_joystick_name(joystick), al_get_joystick_num_buttons(joystick));
-    }
-
+    joystick_init();
     
     if (!al_install_keyboard())
     {
