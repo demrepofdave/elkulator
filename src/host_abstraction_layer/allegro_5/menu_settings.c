@@ -43,6 +43,10 @@ elk_event_t menu_handle_toggle_paged_ram_jim(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_plus_3_enable(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_adfs_enable(ALLEGRO_EVENT * event);
 elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event);
+
+elk_event_t menu_handle_joystick_plus1_enable(ALLEGRO_EVENT * event);
+elk_event_t menu_handle_joystick_firstbyte_enable(ALLEGRO_EVENT * event);
+
 elk_event_t menu_redefine_keyboard(ALLEGRO_EVENT * event);
 
 /******************************************************************************
@@ -170,8 +174,8 @@ static ALLEGRO_MENU *create_settings_disc_menu(void)
 static ALLEGRO_MENU *create_settings_joystick_menu(void)
 {
     ALLEGRO_MENU *menu = al_create_menu();
-    al_append_menu_item(menu, "Plus 1 joystick interface",     IDM_SETTINGS_JOYSTICK_PLUS1, ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
-    al_append_menu_item(menu, "First Byte joystick interface", IDM_SETTINGS_JOYSTICK_FIRSTBYTE,  ALLEGRO_MENU_ITEM_DISABLED, NULL, NULL);
+    add_checkbox_item(menu, "Plus 1 joystick interface",     IDM_SETTINGS_JOYSTICK_PLUS1,     elkConfig.expansion.plus1,     menu_handle_joystick_plus1_enable);
+    add_checkbox_item(menu, "First Byte joystick interface", IDM_SETTINGS_JOYSTICK_FIRSTBYTE, elkConfig.expansion.firstbyte, menu_handle_joystick_firstbyte_enable);
     return menu;
 }
 
@@ -378,6 +382,21 @@ elk_event_t menu_handle_dfs_enable(ALLEGRO_EVENT * event)
         al_set_menu_item_flags(menu, IDM_SETTINGS_DISC_ADFS_ENABLE, ALLEGRO_MENU_ITEM_CHECKBOX);
     }
     return(ELK_EVENT_RESET);
+}
+
+// Called when IDM_SETTINGS_JOYSTICK_PLUS1 event is recieved.
+elk_event_t menu_handle_joystick_plus1_enable(ALLEGRO_EVENT * event)
+{
+    // Plus 1 needs its ROM paged in, so reset to (re)initialise memory.
+    elkConfig.expansion.plus1 = !elkConfig.expansion.plus1;
+    return(ELK_EVENT_RESET);
+}
+
+// Called when IDM_SETTINGS_JOYSTICK_FIRSTBYTE event is recieved.
+elk_event_t menu_handle_joystick_firstbyte_enable(ALLEGRO_EVENT * event)
+{
+    elkConfig.expansion.firstbyte = !elkConfig.expansion.firstbyte;
+    return(ELK_EVENT_NONE);
 }
 
 elk_event_t menu_redefine_keyboard(ALLEGRO_EVENT * event)
