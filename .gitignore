@@ -26,3 +26,6 @@
 /src/host_abstraction_layer/allegro_4/.dirstamp
 /src/host_abstraction_layer/allegro_5/.dirstamp
 /src/host_abstraction_layer/common/.dirstamp
+/.idea
+/games
+/build/config.log
