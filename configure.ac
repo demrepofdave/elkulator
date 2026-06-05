@@ -24,7 +24,7 @@ else
 fi
 
 AC_MSG_CHECKING([whether to use legacy allegro4])
-AC_ARG_ENABLE(allergo4,
+AC_ARG_ENABLE(allegro4,
 	      AC_HELP_STRING([--enable-allegro4], [use allegro4 to build]))
 if test "$enable_allegro4" = "yes"; then
    CFLAGS="$CFLAGS -DHAL_ALLEGRO_4"

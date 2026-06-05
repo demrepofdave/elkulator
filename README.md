@@ -10,7 +10,7 @@ Elkulator is licensed under the GPL, see COPYING for more details.
 
 # ROMs
 
-The basic ROMs for emulation are included with the source.
+**The basic ROMs for emulation are included with the source.**
 
 However, if for some reason they are missing the the ROMs required by Elkulator can be
 obtained from the 1.0 release of the emulator, available from 
@@ -62,7 +62,7 @@ If this is successful then you should be able to run the emulator:
   ./elkulator.exe
 ```
  
-## Linux (Ubuntu and debian based distros)
+## Linux (Ubuntu and Debian based distros)
 
 You will need the following libraries:
 
@@ -76,8 +76,15 @@ following command in a terminal window:
 
 ```
   sudo apt-get update
-  sudo apt-get install automake liballegro5-dev zlib1g-dev libalut-dev libopenal-dev 
+  sudo apt-get install automake liballegro5-dev liballegro-acodec5-dev \
+    liballegro-audio5-dev liballegro-dialog5-dev liballegro-image5-dev \
+    zlib1g-dev libalut-dev libopenal-dev
 ```
+
+(The acodec, audio, dialog and image addon `-dev` packages are only
+`Recommends` of `liballegro5-dev`, so they are pulled in automatically by a
+default apt configuration but skipped under `--no-install-recommends`. They are
+listed explicitly above so the build works regardless of your apt settings.)
 
 To configure and build Elkulator, open a terminal window, navigate to the
 Elkulator directory then enter
@@ -107,12 +114,11 @@ You will need the following libraries:
 - ALut
 - Zlib
 
-On a Debian system you should be able to install these by invoking the
+On a Fedora system you should be able to install these by invoking the
 following command in a terminal window:
 
 ```
-  sudo apt-get update
-  sudo apt-get install automake allegro5-devel allegro5-addon-dialog-devel allegro5-addon-audio-devel allegro5-addon-acodec-devel allegro5-addon-image-devel allegro5-addon-video-devel openal-devel freealut-devel zlib-devel 
+  sudo dnf install automake allegro5-devel allegro5-addon-dialog-devel allegro5-addon-audio-devel allegro5-addon-acodec-devel allegro5-addon-image-devel allegro5-addon-video-devel openal-devel freealut-devel zlib-devel 
 ```
 
 To configure and build Elkulator, open a terminal window, navigate to the

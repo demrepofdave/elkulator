@@ -36,6 +36,8 @@
 #include "elk.h"
 #include "video_internal.h"
 #include "event_handler_internal.h"
+#include "joystick_internal.h"
+#include "joydev.h"
 
 /******************************************************************************
 * Preprocessor Macros
@@ -168,7 +170,11 @@ int video_init_begin()
     }
 
     joystick_init();
-    
+
+    /* Allegro 5's joystick driver misses some kernel joydev devices
+     * (e.g. the CM5 uConsole pad), so also enumerate /dev/input/jsN directly. */
+    joydev_init();
+
     if (!al_install_keyboard())
     {
         log_fatal("main: unable to install keyboard");
